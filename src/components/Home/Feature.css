@@ -1,0 +1,17 @@
+
+   .imageCard {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-right: 10px;
+    scroll-behavior: smooth;
+  }
+  
+  .imageCard::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .imageCard {
+    scrollbar-width: none;
+  }
+  

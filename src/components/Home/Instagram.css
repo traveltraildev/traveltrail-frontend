@@ -1,0 +1,21 @@
+.Instagram .imageCard {
+    display: flex;
+    /* overflow: hidden; */
+    white-space: nowrap;
+    position: relative;
+  }
+  
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  
+ .Instagram .scrollContainer {
+    display: flex;
+    animation: scroll linear infinite;
+    animation-duration: var(--speed);
+  }
