@@ -19,6 +19,27 @@ import EditAboutUsPage from "./pages/admin/cms/EditAboutUsPage";
 import EditContactUsPage from "./pages/admin/cms/EditContactUsPage";
 import EditTermsAndConditionsPage from "./pages/admin/cms/EditTermsAndConditionsPage";
 import AddTripPage from "./pages/admin/cms/AddTripPage"; // Import AddTripPage
+import EditTripPage from "./pages/admin/cms/EditTripPage"; // Import EditTripPage
+import { AuthProvider } from './context/AuthContext';
+import AdminLoginPage from './pages/AdminLoginPage';
+import { useAuth } from './context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
+
+   // Create RequireAuth component
+   const RequireAuth = ({ children }) => {
+    const { isAuthenticated, loading } = useAuth();
+    const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate('/admin/login');
+    }
+  }, [isAuthenticated, loading, navigate]);
+  
+    if (loading) return <CircularProgress />;
+    return isAuthenticated ? children : null;
+  };
 
 function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -27,10 +48,12 @@ function App() {
       setIsMobile(window.innerWidth < 768);
     };
 
+
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   return (
+    <AuthProvider>
     <div className="App app-container">
       <Router>
         <Navbar />
@@ -38,22 +61,25 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
            <Route path="/trips" element={<Trips />} /> 
-           <Route path="/admin/cms/trips-list" element={<AdminTripsPage />} /> {/* Updated route path and component */}
+           <Route path="/admin/cms/trips-list" element={<RequireAuth> <AdminTripsPage /> </RequireAuth>} /> {/* Updated route path and component */}
            <Route path="/trips/:id" element={<TripDetails isMobile={isMobile} />} />
           <Route path="/accommodations/:id" element={<AccommodationDetailsPage isMobile={isMobile} />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/about-us" element={<AboutUsPage />} />
           <Route path="/contact-us" element={<ContactUsPage />} />
           <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
-          <Route path="/admin/cms" element={<CMSAdminPanel />} />
-          <Route path="/admin/cms/edit/about-us" element={<EditAboutUsPage />} />
-          <Route path="/admin/cms/edit/contact-us" element={<EditContactUsPage />} />
-          <Route path="/admin/cms/edit/terms-and-conditions" element={<EditTermsAndConditionsPage />} />
+          <Route path="/admin/cms" element={ <RequireAuth> <CMSAdminPanel /> </RequireAuth>} />
+          <Route path="/admin/cms/edit/about-us" element={<RequireAuth><EditAboutUsPage /></RequireAuth>} />
+          <Route path="/admin/cms/edit/contact-us" element={<RequireAuth><EditContactUsPage /> </RequireAuth>} />
+          <Route path="/admin/cms/edit/terms-and-conditions" element={<RequireAuth><EditTermsAndConditionsPage /></RequireAuth>} />
           {/* ADD ROUTE FOR ADD TRIP PAGE */}
           <Route path="/admin/cms/add-trip" element={<AddTripPage isMobile={isMobile} />} /> {/* Pass isMobile prop */}
+          <Route path="/admin/cms/edit-trip/:tripId" element={<EditTripPage />} />
           </Routes>
         {!isMobile && <Footer />}
       </Router>
     </div>
+    </AuthProvider>
   );
 }
 

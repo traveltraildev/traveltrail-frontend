@@ -1,4 +1,4 @@
-// --- START OF FILE BookNow.js ---
+// --- BookNow.js ---
 import {
   Box,
   Typography,
@@ -7,12 +7,14 @@ import {
   Button,
   Card,
   CardContent,
+  CircularProgress,
 } from "@mui/material";
 import React from "react";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 
 const BookNow = ({ trip }) => {
   const [formData, setFormData] = React.useState({
@@ -24,158 +26,158 @@ const BookNow = ({ trip }) => {
     adultAttendees: "",
     childAttendees: "",
   });
+  const [loading, setLoading] = React.useState(false);
 
   const handleChange = (field, value) => {
-    setFormData((prevData) => ({ ...prevData, [field]: value }));
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    setLoading(true);
+  
+    if (!formData.firstName || !formData.lastName || !formData.phoneNumber || 
+        !formData.startDate || !formData.endDate) {
+      alert('Please fill in all required fields');
+      setLoading(false);
+      return;
+    }
+  
+    // Prepare WhatsApp message FIRST
+    const message = `*New Booking*
+  📌 *Trip:* ${trip.name}
+  👤 *Name:* ${formData.firstName} ${formData.lastName}
+  📞 *Contact:* ${formData.phoneNumber}
+  🗓 *Dates:* ${dayjs(formData.startDate).format('DD MMM')}-${dayjs(formData.endDate).format('DD MMM YYYY')}
+  👥 *Attendees:* ${formData.adultAttendees || 0} Adults, ${formData.childAttendees || 0} Kids`;
+  
+    try {
+      // SILENT Google Sheets submission
+      fetch('/api/sheets-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          startDate: dayjs(formData.startDate).format('YYYY-MM-DD'),
+          endDate: dayjs(formData.endDate).format('YYYY-MM-DD'),
+          adultAttendees: formData.adultAttendees || 0,
+          childAttendees: formData.childAttendees || 0,
+          tripName: trip.name
+        })
+      }).catch(error => console.error('Sheets submission error:', error)); // Silent error logging
+  
+      // IMMEDIATE WhatsApp redirect
+      window.open(`https://wa.me/919808007842?text=${encodeURIComponent(message)}`, '_blank');
+  
+      // Reset form
+      setFormData({
+        startDate: null,
+        endDate: null,
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        adultAttendees: "",
+        childAttendees: "",
+      });
+  
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      // Fallback: Still open WhatsApp even if something unexpected happens
+      window.open(`https://wa.me/919808007842?text=${encodeURIComponent(message)}`, '_blank');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Card elevation={2} sx={{ borderRadius: "15px" }}> {/* Reduced elevation */}
-      <CardContent sx={{ padding: "16px" }}> {/* Reduced CardContent padding */}
-        <Box sx={{ padding: "16px" }}> {/* Reduced Box padding */}
-          
-
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: "bold", mb: 1, fontSize: "1.1rem" }} // Reduced mb, fontSize
-          >
-            Booking Form
+    <Card elevation={2} sx={{ borderRadius: "15px" }}>
+      <CardContent sx={{ p: 2 }}>
+        <Box sx={{ p: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
+            Book Your Trip
           </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              maxWidth: 600,
-              mx: "auto",
-              gap: 1.5, // Reduced gap
-            }}
-          >
-            <Typography
-              variant="subtitle1"
-              sx={{
-                mb: 0.5, // Reduced mb
-                fontWeight: "bold",
-                fontSize: "0.9rem" // Reduced form section title font
-              }}
-            >
-              Date
-            </Typography>
+
+          <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 600, mx: 'auto' }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
-                    label="From"
-                    value={formData.startDate ? dayjs(formData.startDate) : null}
-                    onChange={(date) => handleChange("startDate", date ? date.format('YYYY-MM-DD') : null)}
-                    textField={(params) => <TextField {...params} size="small" fullWidth variant="outlined" />} // size="small" TextField
+                    label="Start Date"
+                    value={formData.startDate && dayjs(formData.startDate)}
+                    onChange={date => handleChange("startDate", date)}
+                    minDate={dayjs().add(1, 'day')}
+                    slotProps={{ textField: { fullWidth: true, required: true, size: 'small' } }}
                   />
                 </LocalizationProvider>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
-                    label="To"
-                    value={formData.endDate ? dayjs(formData.endDate) : null}
-                    onChange={(date) => handleChange("endDate",  date ? date.format('YYYY-MM-DD') : null)}
-                    textField={(params) => <TextField {...params} size="small" fullWidth variant="outlined" />} // size="small" TextField
+                    label="End Date"
+                    value={formData.endDate && dayjs(formData.endDate)}
+                    onChange={date => handleChange("endDate", date)}
+                    minDate={formData.startDate ? dayjs(formData.startDate).add(1, 'day') : dayjs().add(2, 'day')}
+                    slotProps={{ textField: { fullWidth: true, required: true, size: 'small' } }}
                   />
                 </LocalizationProvider>
               </Grid>
             </Grid>
 
-            <Typography
-              variant="subtitle1"
-              sx={{
-                mb: 0.5, // Reduced mb
-                mt: 1.5, // Reduced mt
-                fontWeight: "bold",
-                fontSize: "0.9rem" // Reduced form section title font
-              }}
-            >
-              Name
-            </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="First Name"
                   value={formData.firstName}
-                  onChange={(e) => handleChange("firstName", e.target.value)}
+                  onChange={e => handleChange("firstName", e.target.value)}
                   fullWidth
-                  variant="outlined"
-                  size="small" // size="small" TextField
+                  required
+                  size="small"
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Last Name"
                   value={formData.lastName}
-                  onChange={(e) => handleChange("lastName", e.target.value)}
+                  onChange={e => handleChange("lastName", e.target.value)}
                   fullWidth
-                  variant="outlined"
-                  size="small" // size="small" TextField
+                  required
+                  size="small"
                 />
               </Grid>
             </Grid>
 
-            <Typography
-              variant="subtitle1"
-              sx={{
-                mb: 0.5, // Reduced mb
-                mt: 1.5, // Reduced mt
-                fontWeight: "bold",
-                fontSize: "0.9rem" // Reduced form section title font
-              }}
-            >
-              Phone
-            </Typography>
             <TextField
               label="Phone Number"
               value={formData.phoneNumber}
-              onChange={(e) => handleChange("phoneNumber", e.target.value)}
+              onChange={e => handleChange("phoneNumber", e.target.value)}
               fullWidth
-              variant="outlined"
-              size="small" // size="small" TextField
+              required
+              size="small"
+              sx={{ mt: 2 }}
+              inputProps={{ pattern: "[+0-9]{10,15}" }}
             />
 
-            <Typography
-              variant="subtitle1"
-              sx={{
-                mb: 0.5, // Reduced mb
-                mt: 1.5, // Reduced mt
-                fontWeight: "bold",
-                fontSize: "0.9rem" // Reduced form section title font
-              }}
-            >
-              No. of Attendees
-            </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid item xs={6}>
                 <TextField
-                  label="Adult Attendees"
+                  label="Adults"
                   type="number"
                   value={formData.adultAttendees}
-                  onChange={(e) => handleChange("adultAttendees", e.target.value)}
+                  onChange={e => handleChange("adultAttendees", e.target.value)}
                   fullWidth
-                  variant="outlined"
-                  size="small" // size="small" TextField
+                  size="small"
+                  inputProps={{ min: 1 }}
                 />
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  label="Child Attendees"
+                  label="Children"
                   type="number"
                   value={formData.childAttendees}
-                  onChange={(e) => handleChange("childAttendees", e.target.value)}
+                  onChange={e => handleChange("childAttendees", e.target.value)}
                   fullWidth
-                  variant="outlined"
-                  size="small" // size="small" TextField
+                  size="small"
+                  inputProps={{ min: 0 }}
                 />
               </Grid>
             </Grid>
@@ -183,19 +185,16 @@ const BookNow = ({ trip }) => {
             <Button
               type="submit"
               variant="contained"
-              color="primary"
-              size="small" // size="small" Button
+              startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <WhatsAppIcon />}
+              disabled={loading}
               sx={{
-                backgroundColor: "#33bfff",
-                marginTop: "16px", // Reduced marginTop
-                "&:hover": {
-                  backgroundColor: "#00a2e8",
-                },
-                fontSize: "0.9rem" // Reduced button font size
+                mt: 3,
+                bgcolor: '#25D366',
+                '&:hover': { bgcolor: '#128C7E' },
+                width: '100%'
               }}
-              fullWidth
             >
-              Book Now
+              {loading ? 'Submitting...' : 'Confirm via WhatsApp'}
             </Button>
           </Box>
         </Box>
@@ -205,4 +204,3 @@ const BookNow = ({ trip }) => {
 };
 
 export default BookNow;
-// --- END OF FILE BookNow.js ---

@@ -8,11 +8,14 @@ import Typography from "@mui/material/Typography";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import PinDropIcon from "@mui/icons-material/PinDrop";
 import { Link } from "react-router-dom";
-import HamburgerMenu from "./HamburgerMenu"; // Import HamburgerMenu
+import HamburgerMenu from "./HamburgerMenu";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useAuth } from '../../context/AuthContext';
+import Button from '@mui/material/Button';
 
 export default function Navbar() {
   const isSmallScreen = useMediaQuery('(max-width:600px)');
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <Box sx={{ flexGrow: 1, position: "fixed", zIndex: 1, width: "100%", top: 0 }}>
@@ -36,6 +39,8 @@ export default function Navbar() {
             </Box>
           </Link>
           <Box sx={{ flexGrow: 1 }} />
+          
+          {/* Common Elements */}
           <Typography>
             <PinDropIcon sx={{ mt: "8px", mr: "8px" }} />
           </Typography>
@@ -48,38 +53,60 @@ export default function Navbar() {
             Gurgaon
           </Typography>
 
-           {/* ADDED Trips Link in Navbar */}
-           <Typography
-            variant="h6"
-            component={Link}
-            to="/trips"
-            color="inherit"
-            sx={{ ml: 2, textDecoration: 'none', display: { xs: "none", md: "block" } }} // Hide on xs, show on md+
-          >
-            Trips
-          </Typography>
-          
-          <Box sx={{ display: "flex" }}>
-            {!isSmallScreen ? (
-              <>
+          {/* Conditional Admin Elements */}
+          {isAuthenticated ? (
+            <Box sx={{ display: "flex", alignItems: 'center' }}>
+              <Button 
+                component={Link}
+                to="/admin/cms"
+                color="inherit"
+                sx={{ ml: 2, textDecoration: 'none' }}
+              >
+                CMS
+              </Button>
+              <Button 
+                color="inherit" 
+                onClick={logout}
+                sx={{ mx: 2 }}
+              >
+                Logout
+              </Button>
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="admin account"
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+            </Box>
+          ) : (
+            <Box sx={{ display: "flex", alignItems: 'center' }}>
+              <Typography
+                variant="h6"
+                component={Link}
+                to="/trips"
+                color="inherit"
+                sx={{ ml: 2, textDecoration: 'none', display: { xs: "none", md: "block" } }}
+              >
+                Trips
+              </Typography>
+              {!isSmallScreen && (
                 <IconButton
                   size="large"
                   edge="end"
-                  aria-label="account of current user"
-                  aria-haspopup="true"
+                  aria-label="user account"
                   color="inherit"
                 >
                   <AccountCircle />
-                </IconButton>,
-                <HamburgerMenu />
-              </>
-            ) : (
+                </IconButton>
+              )}
               <HamburgerMenu />
-            )}
-          </Box>
+            </Box>
+          )}
         </Toolbar>
       </AppBar>
     </Box>
   );
 }
-// --- END OF FILE Navbar.js ---
+// --- END OF FILE ---
