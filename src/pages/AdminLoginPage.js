@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
@@ -10,14 +10,34 @@ const AdminLoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    localStorage.removeItem('adminToken'); // Clear token on mount
+  }, []); // Empty dependency array = runs once on component mount
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = await login(username, password);
-    
-    if (success) {
-      navigate('/admin/cms/trips-list');
-    } else {
-      setError('Invalid credentials');
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+  
+      const data = await response.json();
+      
+      if (response.ok) {
+        // ✅ Store the token here
+        localStorage.setItem('adminToken', data.token); 
+        
+        // Redirect to admin dashboard
+        navigate('/admin/dashboard');
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Login failed. Check console.');
     }
   };
 

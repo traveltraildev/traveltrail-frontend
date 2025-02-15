@@ -36,6 +36,12 @@ const AddTripPage = ({ isMobile }) => {
   const [itenaryDays, setItenaryDays] = useState([0]); // State to manage number of itinerary days - start with 1 day (index 0)
   const navigate = useNavigate();
 
+  // Add authentication token handling
+  const getAuthHeader = () => {
+    const token = localStorage.getItem('adminToken');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+  };
+
   const handleChange = (e, newValue) => { // Updated handleChange for Autocomplete and TextField
     const { name } = e.target;
     setFormData(prevData => ({
@@ -107,11 +113,11 @@ const AddTripPage = ({ isMobile }) => {
     try {
       const tripDataToSubmit = {
         ...formData,
-        themes: formData.themes, // themes, inclusions, exclusions, images are already arrays in formData state
+        themes: formData.themes,
         inclusions: formData.inclusions,
         exclusions: formData.exclusions,
         images: formData.images,
-        itineraries: formData.itineraries, // itineraries is now an array of objects in formData state
+        itineraries: formData.itineraries,
         price: parseInt(formData.price),
         daysCount: parseInt(formData.daysCount),
         nightsCount: parseInt(formData.nightsCount),
@@ -122,20 +128,29 @@ const AddTripPage = ({ isMobile }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...getAuthHeader() // Add authentication header
         },
-        body: JSON.stringify(tripDataToSubmit), // Send tripDataToSubmit (with arrays and objects) as JSON
+        body: JSON.stringify(tripDataToSubmit),
       });
+
       if (!response.ok) {
+        if (response.status === 401) {
+          localStorage.removeItem('adminToken');
+          navigate('/admin/login');
+          throw new Error('Session expired. Please login again.');
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
       const responseData = await response.json();
       console.log("Trip added successfully:", responseData);
-      alert("Trip package added successfully via API!");
-      setLoading(false);
-      // navigate(`/trips/${responseData.tripId}`);
+      alert("Trip package added successfully!");
+      navigate(`/trips/${responseData.tripId}`);
+      
     } catch (error) {
-      console.error("Error adding new trip package via API:", error);
-      alert("Error adding trip package via API. Check console.");
+      console.error("Error adding trip:", error);
+      alert(error.message || "Error adding trip package. Check console.");
+    } finally {
       setLoading(false);
     }
   };
