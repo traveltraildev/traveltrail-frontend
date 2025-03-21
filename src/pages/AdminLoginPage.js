@@ -7,37 +7,42 @@ const AdminLoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login } = useAuth(); // Get login method from auth context
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.removeItem('adminToken'); // Clear token on mount
-  }, []); // Empty dependency array = runs once on component mount
-
+    localStorage.removeItem('adminToken'); // Clear any existing token
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/admin/login', {
+      const response = await fetch('http://localhost:5000/api/admin/login', { // Add full URL
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
-  
-      const data = await response.json();
       
-      if (response.ok) {
-        // ✅ Store the token here
-        localStorage.setItem('adminToken', data.token); 
-        
-        // Redirect to admin dashboard
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle server-side validation errors
+        setError(data.message || 'Authentication failed');
+        return;
+      }
+
+      // ✅ Critical Fix: Use adminToken instead of token
+      if (data.success && data.adminToken) {
+        localStorage.setItem('adminToken', data.adminToken);
+        login(); // Update auth context state
         navigate('/admin/dashboard');
       } else {
-        alert(data.message || 'Login failed');
+        setError('Invalid server response');
       }
+
     } catch (error) {
-      console.error('Login error:', error);
-      alert('Login failed. Check console.');
+      console.error('Network error:', error);
+      setError('Server connection failed');
     }
   };
 
@@ -63,7 +68,13 @@ const AdminLoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          {error && <Typography color="error">{error}</Typography>}
+          
+          {error && (
+            <Typography color="error" sx={{ mt: 2 }}>
+              {error}
+            </Typography>
+          )}
+
           <Button
             type="submit"
             fullWidth

@@ -1,4 +1,5 @@
 // --- BookNow.js ---
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -17,6 +18,7 @@ import dayjs from 'dayjs';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 
 const BookNow = ({ trip }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = React.useState({
     startDate: null,
     endDate: null,
@@ -43,47 +45,42 @@ const BookNow = ({ trip }) => {
       return;
     }
   
-    // Prepare WhatsApp message FIRST
-    const message = `*New Booking*
-  📌 *Trip:* ${trip.name}
-  👤 *Name:* ${formData.firstName} ${formData.lastName}
-  📞 *Contact:* ${formData.phoneNumber}
-  🗓 *Dates:* ${dayjs(formData.startDate).format('DD MMM')}-${dayjs(formData.endDate).format('DD MMM YYYY')}
-  👥 *Attendees:* ${formData.adultAttendees || 0} Adults, ${formData.childAttendees || 0} Kids`;
-  
+   
     try {
-      // SILENT Google Sheets submission
-      fetch('/api/sheets-proxy', {
+      // Submit to Google Sheets
+      const response = await fetch('/api/sheets-proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          secret: process.env.REACT_APP_GAS_SECRET,
           startDate: dayjs(formData.startDate).format('YYYY-MM-DD'),
           endDate: dayjs(formData.endDate).format('YYYY-MM-DD'),
           adultAttendees: formData.adultAttendees || 0,
           childAttendees: formData.childAttendees || 0,
           tripName: trip.name
         })
-      }).catch(error => console.error('Sheets submission error:', error)); // Silent error logging
-  
-      // IMMEDIATE WhatsApp redirect
-      window.open(`https://wa.me/919808007842?text=${encodeURIComponent(message)}`, '_blank');
-  
-      // Reset form
-      setFormData({
-        startDate: null,
-        endDate: null,
-        firstName: "",
-        lastName: "",
-        phoneNumber: "",
-        adultAttendees: "",
-        childAttendees: "",
       });
-  
+
+      if (!response.ok) throw new Error('Submission failed');
+
+      // Redirect to confirmation page with booking data
+      navigate('/booking-confirmation', {
+        state: {
+          success: true,
+          bookingData: {
+            ...formData,
+            tripName: trip.name,
+            startDate: dayjs(formData.startDate).format('DD MMM YYYY'),
+            endDate: dayjs(formData.endDate).format('DD MMM YYYY'),
+            adults: formData.adultAttendees || 0,
+            children: formData.childAttendees || 0
+          }
+        }
+      });
+
     } catch (error) {
-      console.error('Unexpected error:', error);
-      // Fallback: Still open WhatsApp even if something unexpected happens
-      window.open(`https://wa.me/919808007842?text=${encodeURIComponent(message)}`, '_blank');
+      navigate('/booking-confirmation', { state: { success: false } });
     } finally {
       setLoading(false);
     }
@@ -183,19 +180,19 @@ const BookNow = ({ trip }) => {
             </Grid>
 
             <Button
-              type="submit"
-              variant="contained"
-              startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <WhatsAppIcon />}
-              disabled={loading}
-              sx={{
-                mt: 3,
-                bgcolor: '#25D366',
-                '&:hover': { bgcolor: '#128C7E' },
-                width: '100%'
-              }}
-            >
-              {loading ? 'Submitting...' : 'Confirm via WhatsApp'}
-            </Button>
+      type="submit"
+      variant="contained"
+      startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+      disabled={loading}
+      sx={{
+        mt: 3,
+        bgcolor: '#1976d2',
+        '&:hover': { bgcolor: '#115293' },
+        width: '100%'
+      }}
+    >
+      {loading ? 'Submitting...' : 'Book Now'}
+    </Button>
           </Box>
         </Box>
       </CardContent>
