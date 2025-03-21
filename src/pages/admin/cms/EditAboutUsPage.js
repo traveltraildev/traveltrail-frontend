@@ -8,6 +8,7 @@ import Footer from "../../../components/common/Footer";
 // import { CKEditor } from '@ckeditor/ckeditor5-react';
 // import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { getAuthHeader } from "../../../utils";
 
 const EditAboutUsPage = () => {
   const [pageContent, setPageContent] = useState({ title: "", content: "" });
@@ -15,17 +16,17 @@ const EditAboutUsPage = () => {
 
   useEffect(() => {
     // Fetch content from REAL backend API (no changes needed here)
-    fetch('/api/cms/pages/about-us')
-      .then(response => {
+    fetch("/api/cms/pages/about-us")
+      .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         setPageContent(data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching About Us content:", error);
         alert("Error loading content from API. Check console.");
       });
@@ -33,16 +34,20 @@ const EditAboutUsPage = () => {
   }, []);
 
   const handleChange = (e) => {
-    setPageContent((prevData) => ({ ...prevData, [e.target.name]: e.target.value })); // Reverted handleChange
+    setPageContent((prevData) => ({
+      ...prevData,
+      [e.target.name]: e.target.value,
+    })); // Reverted handleChange
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/cms/pages/about-us', {
-        method: 'PUT',
+      const response = await fetch("/api/cms/pages/about-us", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
         },
         body: JSON.stringify(pageContent), // Send updated content in request body - NO CHANGE HERE
       });
@@ -63,7 +68,11 @@ const EditAboutUsPage = () => {
         <Typography variant="h4" component="h1" align="center" gutterBottom>
           Edit About Us Page
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+        >
           <TextField
             label="Title"
             name="title"

@@ -6,6 +6,7 @@ import Navbar2 from "../../../components/common/Navbar2";
 import Footer from "../../../components/common/Footer";
 // import simulatedAPI from "../../../api/cmsAPI"; // REMOVE simulatedAPI import
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { getAuthHeader } from "../../../utils";
 
 const EditContactUsPage = () => {
   const [pageContent, setPageContent] = useState({ title: "", content: "" });
@@ -13,17 +14,17 @@ const EditContactUsPage = () => {
 
   useEffect(() => {
     // Fetch content from REAL backend API
-    fetch('/api/cms/pages/contact-us') // API GET request to backend - CORRECT API CALL for Contact Us Edit
-      .then(response => {
+    fetch("/api/cms/pages/contact-us") // API GET request to backend - CORRECT API CALL for Contact Us Edit
+      .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         setPageContent(data); // Set fetched data to state
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching Contact Us content:", error);
         alert("Error loading content from API. Check console.");
       });
@@ -37,10 +38,12 @@ const EditContactUsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/cms/pages/contact-us', { // API PUT request to backend - CORRECT API CALL for Contact Us Update
-        method: 'PUT',
+      const response = await fetch("/api/cms/pages/contact-us", {
+        // API PUT request to backend - CORRECT API CALL for Contact Us Update
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
         },
         body: JSON.stringify(pageContent), // Send updated content in request body
       });
@@ -61,7 +64,11 @@ const EditContactUsPage = () => {
         <Typography variant="h4" component="h1" align="center" gutterBottom>
           Edit Contact Us Page
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+        >
           <TextField
             label="Title"
             name="title"
