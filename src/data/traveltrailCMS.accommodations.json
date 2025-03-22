@@ -1,0 +1,93 @@
+[{
+  "_id": {
+    "$oid": "67dc68240a440efae1331faf"
+  },
+  "name": "admin",
+  "price": 2,
+  "roomType": "admin",
+  "bedType": "Takat",
+  "maxOccupancy": 2,
+  "size": "54545",
+  "overview": "zxsfvsdsfsadfsda",
+  "images": [
+    "https://picsum.photos/seed/picsum/200/300",
+    "https://picsum.photos/seed/picsum/200/300"
+  ],
+  "themes": [
+    "Meerut",
+    "Dosti"
+  ],
+  "amenities": [
+    "Paani",
+    "MaccharDani",
+    "Yaar"
+  ],
+  "inclusions": [
+    "Rehna",
+    "Khana",
+    "Sona"
+  ],
+  "exclusions": [
+    "Raat",
+    "ke",
+    "kaam"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67dc80c90a440efae1331fb0"
+  },
+  "name": "07382971692",
+  "price": 3,
+  "roomType": "kj",
+  "bedType": "6",
+  "maxOccupancy": 2,
+  "size": "hgj",
+  "overview": "ghfhgfhgfghfhgfghf",
+  "images": [
+    "https://picsum.photos/200/300",
+    "https://picsum.photos/200/300"
+  ],
+  "themes": [
+    "uyyy"
+  ],
+  "amenities": [
+    "tr1"
+  ],
+  "inclusions": [
+    "trtr"
+  ],
+  "exclusions": [
+    "gh"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67dc83280a440efae1331fb1"
+  },
+  "name": "Divyansh",
+  "price": 12,
+  "roomType": "Delux",
+  "bedType": "Ling",
+  "maxOccupancy": 3,
+  "size": "10x15ft",
+  "overview": "\nThis is Overview of this StayThis is Overview of this StayThis is Overview of this Stay",
+  "images": [
+    "https://picsum.photos/200/300",
+    "https://picsum.photos/200/300",
+    "https://picsum.photos/200/300"
+  ],
+  "themes": [
+    "Romantic"
+  ],
+  "amenities": [
+    "MiniBar"
+  ],
+  "inclusions": [
+    "Food",
+    "Bed"
+  ],
+  "exclusions": [
+    "Alchol"
+  ]
+}]
