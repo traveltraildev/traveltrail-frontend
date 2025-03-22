@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid, GridToolbar, GridActionsCellItem } from "@mui/x-data-grid";
-import { 
-  CircularProgress, 
-  Alert, 
-  IconButton, 
+import {
+  CircularProgress,
+  Alert,
+  IconButton,
   Tooltip,
   Box,
   Typography,
   Container,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -85,7 +85,7 @@ const AccommodationsList = () => {
   };
 
   const handleEdit = (id) => {
-    navigate(`/edit-accommodation/${id}`);
+    navigate(`/admin/edit-accommodation/${id}`);
   };
 
   const handleDelete = async (id) => {
@@ -167,24 +167,24 @@ const AccommodationsList = () => {
   return (
     <>
       <Navbar />
-      <Container 
-        maxWidth="lg" 
+      <Container
+        maxWidth="lg"
         sx={{
           mt: theme.spacing(8), // Adjust this value based on your navbar height
-          mb: theme.spacing(4)
+          mb: theme.spacing(4),
         }}
       >
         <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
           Accommodations List
         </Typography>
-        
+
         <Box
           sx={{
             height: "calc(100vh - 300px)",
             width: "100%",
             borderRadius: "8px",
             overflow: "hidden",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
           }}
         >
           <DataGrid

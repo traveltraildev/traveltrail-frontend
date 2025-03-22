@@ -19,21 +19,14 @@ import StickyAccommodationTitle from "../components/TripDetails/StickyAccommodat
 
 const AccommodationDetailsPage = ({ isMobile }) => {
   const { id } = useParams();
-  const [accommodation, setAccommodation] = useState(null); // Initialize trip state to null
-  // const accommodation = accommodationsData.find(
-  //   (acc) => String(acc.id) === String(id)
-  // );
+  const [accommodation, setAccommodation] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
 
-  // if (!accommodation) {
-  //   return <Typography>Accommodation not found</Typography>;
-  // }
-
   useEffect(() => {
-    fetch(`/api/accommodations/${id}`) // Fetch specific trip data from backend API using tripId
+    fetch(`/api/accommodations/${id}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -41,14 +34,14 @@ const AccommodationDetailsPage = ({ isMobile }) => {
         return response.json();
       })
       .then((data) => {
-        setAccommodation(data); // Set fetched trip data to state
+        setAccommodation(data);
       })
       .catch((error) => {
         console.error("Error fetching trip details:", error);
         alert("Error loading trip details. Check console.");
       });
     window.scrollTo(0, 0);
-  }, [id]); // useEffect dependency on id - fetch data when id changes
+  }, [id]);
 
   return (
     <>
