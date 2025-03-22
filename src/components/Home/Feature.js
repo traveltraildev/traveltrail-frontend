@@ -1,18 +1,21 @@
+// Replace the existing Feature component with this
 import { Box, Button, Typography } from "@mui/material";
 import React, { useRef } from "react";
 import "./Feature.css";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import IconButton from '@mui/material/IconButton';
+
 
 const Feature = ({ title }) => {
   const images = [
-    "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHx8&w=1000&q=80",
-    "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80",
+    "https://images.unsplash.com/photo-1502602898655-3e91760cbb34?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHx8&w=1000&q=80",
+    "https://images.unsplash.com/photo-1499856171879-897cb031a6c8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80",
     "https://media.istockphoto.com/photos/the-main-attraction-of-paris-and-all-of-europe-is-the-eiffel-tower-in-picture-id1185953092?k=6&m=1185953092&s=612x612&w=0&h=SNiShskOfwQ7Sys5TX0eb5eBxHobktWUfZGrox5LMyk=",
-    "https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Ym9va3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80",
-    "https://images.ctfassets.net/hrltx12pl8hq/3MbF54EhWUhsXunc5Keueb/60774fbbff86e6bf6776f1e17a8016b4/04-nature_721703848.jpg?fit=fill&w=480&h=270",
+    "https://images.unsplash.com/photo-1541963463537-d634d363d0f3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Ym9va3xlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1000&q=60",
+    "https://images.unsplash.com/photo-1516577868910-77d50d04c9ec?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=60",
     "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg",
-    "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aHVtYW58ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80",
+    "https://images.unsplash.com/photo-1503023528077-b7a10d920bd8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=60",
   ];
 
   const scrollRef = useRef(null);
@@ -31,34 +34,51 @@ const Feature = ({ title }) => {
   };
 
   return (
-    <Box>
+    <Box sx={{ my: 4 }}>
       <Typography variant="h5" sx={{ padding: "20px", fontWeight: "bold" }}>
         {title}
       </Typography>
       <Box sx={{ display: "flex", alignItems: "center" }}>
-        <ArrowBackIosNewIcon
+        <IconButton
           onClick={handlePrev}
           sx={{ cursor: "pointer", display: { xs: "none", sm: "inline-flex" } }}
-        />
+        >
+          <ArrowBackIosNewIcon />
+        </IconButton>
         <Box className="imageCard" ref={scrollRef}>
-          {[...images, ...images].map((image, id) => (
-            <Box className="image" key={id} sx={{ marginRight: "20px" }}>
+          {images.map((image, id) => (
+            <Box
+              key={id}
+              sx={{
+                minWidth: "220px",
+                marginRight: "20px",
+                borderRadius: "12px",
+                overflow: "hidden",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                transition: "transform 0.3s ease"
+              }}
+            >
               <img
                 src={image}
                 alt={`img-${id}`}
                 style={{
                   height: "178px",
-                  width: "220px",
-                  borderRadius: "15px",
+                  width: "100%",
+                  objectFit: "cover",
+                  borderRadius: "8px",
                 }}
               />
               <Typography
-                variant="h6"
+                variant="body2"
                 sx={{
-                  fontSize: "15px",
+                  fontSize: "0.9rem",
                   fontWeight: "bold",
-                  paddingLeft: "5px",
-                  marginTop: "10px",
+                  p: 1,
+                  backgroundColor: "rgba(255,255,255,0.9)",
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
                 }}
               >
                 Kashmir/Laddakh Trail
@@ -66,10 +86,12 @@ const Feature = ({ title }) => {
             </Box>
           ))}
         </Box>
-        <ArrowForwardIosIcon
+        <IconButton
           onClick={handleNext}
           sx={{ cursor: "pointer", display: { xs: "none", sm: "inline-flex" } }}
-        />
+        >
+          <ArrowForwardIosIcon />
+        </IconButton>
       </Box>
     </Box>
   );

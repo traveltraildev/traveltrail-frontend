@@ -1,4 +1,5 @@
 // --- START OF FILE Navbar.js ---
+// Replace the entire file with this updated version
 import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -28,46 +29,51 @@ export default function Navbar() {
           backgroundImage: 'linear-gradient(to right, #e0f7fa, #b2ebf2)',
         }}
       >
-        <Toolbar>
-          <Link to="/">
+        <Toolbar sx={{ px: { xs: 1, md: 3 } }}>
+          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
             <Box>
               <img
                 src="/images/logo.jpg"
                 alt="Travel Trail"
-                style={{ height: "50px", width: "100%" }}
+                style={{ height: "40px", width: "auto" }}
               />
             </Box>
           </Link>
+
           <Box sx={{ flexGrow: 1 }} />
-          
-          {/* Common Elements */}
-          <Typography>
-            <PinDropIcon sx={{ mt: "8px", mr: "8px" }} />
-          </Typography>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ display: { sm: "block" } }}
-          >
+
+          <Typography variant="subtitle1" sx={{ mr: 1 }}>
+            <PinDropIcon sx={{ mt: "4px", mr: "4px" }} />
             Gurgaon
           </Typography>
 
-          {/* Conditional Admin Elements */}
-          {isAuthenticated ? (
-            <Box sx={{ display: "flex", alignItems: 'center' }}>
+          {!isAuthenticated && (
+            <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="user account"
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+            </Box>
+          )}
+
+          {isAuthenticated && (
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Button 
                 component={Link}
                 to="/admin/cms"
-                color="inherit"
-                sx={{ ml: 2, textDecoration: 'none' }}
+                color="primary"
+                sx={{ ml: 1, mr: 1 }}
               >
                 CMS
               </Button>
               <Button 
-                color="inherit" 
+                color="primary" 
                 onClick={logout}
-                sx={{ mx: 2 }}
+                sx={{ mr: 1 }}
               >
                 Logout
               </Button>
@@ -80,29 +86,10 @@ export default function Navbar() {
                 <AccountCircle />
               </IconButton>
             </Box>
-          ) : (
-            <Box sx={{ display: "flex", alignItems: 'center' }}>
-              <Typography
-                variant="h6"
-                component={Link}
-                to="/trips"
-                color="inherit"
-                sx={{ ml: 2, textDecoration: 'none', display: { xs: "none", md: "block" } }}
-              >
-                Trips
-              </Typography>
-              {!isSmallScreen && (
-                <IconButton
-                  size="large"
-                  edge="end"
-                  aria-label="user account"
-                  color="inherit"
-                >
-                  <AccountCircle />
-                </IconButton>
-              )}
-              <HamburgerMenu />
-            </Box>
+          )}
+
+          {!isAuthenticated && isSmallScreen && (
+            <HamburgerMenu />
           )}
         </Toolbar>
       </AppBar>

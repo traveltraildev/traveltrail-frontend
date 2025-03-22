@@ -1,12 +1,23 @@
-// --- START OF FILE AccommodationCard.js ---
+// Replace the existing AccommodationCard component with this
 import React from "react";
 import { Box, Typography, Card, CardContent } from "@mui/material";
 
 const AccommodationCard = ({ trip }) => {
   return (
-    <Card elevation={2} sx={{ borderRadius: "15px", mb: 2 }}> {/* Card for Accommodation, added mb */}
-      <CardContent sx={{ padding: "16px" }}> {/* Reduced CardContent padding */}
-        <Box sx={{ padding: "16px" }}> {/* Reduced Box padding */}
+    <Card
+      elevation={2}
+      sx={{
+        borderRadius: "15px",
+        mb: 2,
+        transition: "transform 0.3s ease",
+        "&:hover": {
+          transform: "translateY(-5px)",
+          boxShadow: "0 8px 16px rgba(0,0,0,0.1)"
+        }
+      }}
+    >
+      <CardContent sx={{ padding: "16px" }}>
+        <Box sx={{ padding: "16px" }}>
           <Typography
             variant="h6"
             sx={{ fontWeight: "bold", mb: 1, fontSize: "1.1rem" }}
@@ -31,11 +42,15 @@ const AccommodationCard = ({ trip }) => {
             <Box>
               <Typography
                 sx={{ fontWeight: "bold", fontSize: "0.95rem" }}
-              >{`${trip?.name} ( ${trip?.daysCount} Days, ${trip?.nightsCount} Nights )`}</Typography>
+              >
+                {`${trip?.name} ( ${trip?.daysCount} Days, ${trip?.nightsCount} Nights )`}
+              </Typography>
               <Typography
                 variant="body2"
-                sx={{ color: "gray", fontSize: "0.85rem" }}
-              >{`₹${trip?.price}/night`}</Typography>
+                sx={{ color: "text.secondary", fontSize: "0.85rem" }}
+              >
+                ₹{trip?.price}/night
+              </Typography>
             </Box>
           </Box>
         </Box>
@@ -45,4 +60,3 @@ const AccommodationCard = ({ trip }) => {
 };
 
 export default AccommodationCard;
-// --- END OF FILE AccommodationCard.js ---

@@ -1,4 +1,4 @@
-// --- START OF FILE src/components/common/HamburgerMenu.js ---
+// Replace the existing HamburgerMenu component with this
 import React from 'react';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -22,13 +22,13 @@ const HamburgerMenu = () => {
     <div>
       <IconButton
         size="large"
-        aria-label="Main Menu" // Updated aria-label to "Main Menu" as it's now for front-end pages
+        aria-label="Main Menu"
         aria-controls="hamburger-menu"
         aria-haspopup="true"
         onClick={handleMenuOpen}
         color="inherit"
       >
-        <MenuIcon /> {/* Hamburger Icon */}
+        <MenuIcon />
       </IconButton>
       <Menu
         id="hamburger-menu"
@@ -39,20 +39,22 @@ const HamburgerMenu = () => {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem onClick={handleMenuClose} component={Link} to="/about-us"> {/* Link to About Us Page */}
+        <MenuItem onClick={handleMenuClose} component={Link} to="/about-us">
           About Us
         </MenuItem>
-        <MenuItem onClick={handleMenuClose} component={Link} to="/contact-us"> {/* Link to Contact Us Page */}
+        <MenuItem onClick={handleMenuClose} component={Link} to="/contact-us">
           Contact Us
         </MenuItem>
-        <MenuItem onClick={handleMenuClose} component={Link} to="/terms-and-conditions"> {/* Link to Terms & Conditions Page */}
+        <MenuItem
+          onClick={handleMenuClose}
+          component={Link}
+          to="/terms-and-conditions"
+        >
           Terms & Conditions
         </MenuItem>
-        {/* REMOVED CMS Admin Panel Link */}
       </Menu>
     </div>
   );
 };
 
 export default HamburgerMenu;
-// --- END OF FILE src/components/common/HamburgerMenu.js ---

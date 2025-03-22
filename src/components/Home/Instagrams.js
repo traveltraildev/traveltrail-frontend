@@ -1,3 +1,4 @@
+// Replace the existing Instagrams component with this
 import { Box, Typography } from "@mui/material";
 import React from "react";
 import "./Instagram.css";
@@ -28,8 +29,9 @@ const Instagram = () => {
       </Typography>
       <Box className="imageCard" style={{ "--speed": speed }}>
         <Box className="scrollContainer">
-          {[...images, ...images]?.map((image, id) => (
+          {[...images, ...images].map((image, id) => (
             <img
+              key={id}
               src={image}
               alt={`img-${id}`}
               style={{
@@ -37,6 +39,7 @@ const Instagram = () => {
                 width: "200px",
                 paddingRight: "20px",
                 borderRadius: "15px 40px",
+                objectFit: "cover",
               }}
             />
           ))}
@@ -61,6 +64,7 @@ const Instagram = () => {
           style={{
             width: "100%",
             height: "500px",
+            objectFit: "cover",
           }}
         />
       </Box>

@@ -1,3 +1,4 @@
+// Replace the existing AddAccommodation component with this
 import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +12,7 @@ import {
   InputAdornment
 } from '@mui/material';
 
-const AddAccomodation = () => {
+const AddAccommodation = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -79,7 +80,6 @@ const AddAccomodation = () => {
       const token = localStorage.getItem('adminToken');
       if (!token) throw new Error('Authentication required');
   
-      // Convert array fields properly
       const payload = {
         ...formData,
         price: Number(formData.price),
@@ -124,9 +124,8 @@ const AddAccomodation = () => {
     return <CircularProgress sx={{ display: 'block', margin: '2rem auto' }} />;
   }
 
-
   return (
-    <Card elevation={3} sx={{ p: 3, mb: 4 }}>
+    <Card elevation={3} sx={{ p: 3, mb: 4, mt: 8 }}>
       <Typography variant="h4" gutterBottom>
         Add New Accommodation
       </Typography>
@@ -266,7 +265,8 @@ const AddAccomodation = () => {
               variant="contained"
               color="primary"
               disabled={loading}
-              startIcon={loading ? <CircularProgress size={20} /> : null}
+              startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+              sx={{ mt: 2, py: 1.5, bgcolor: "#1976d2", "&:hover": { bgcolor: "#115293" } }}
             >
               {loading ? 'Submitting...' : 'Add Accommodation'}
             </Button>
@@ -277,4 +277,4 @@ const AddAccomodation = () => {
   );
 };
 
-export default AddAccomodation;
+export default AddAccommodation;

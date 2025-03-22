@@ -1,4 +1,4 @@
-// --- BookNow.js ---
+// Replace the existing BookNow component with this
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -52,7 +52,6 @@ const BookNow = ({ trip }) => {
     }
 
     try {
-      // Submit to Google Sheets
       const response = await fetch("/api/sheets-proxy", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...getAuthHeader() },
@@ -91,141 +90,138 @@ const BookNow = ({ trip }) => {
   };
 
   return (
-    <Card elevation={2} sx={{ borderRadius: "15px" }}>
-      <CardContent sx={{ p: 2 }}>
-        <Box sx={{ p: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
-            Book Your Trip
-          </Typography>
+    <Card
+      elevation={2}
+      sx={{
+        borderRadius: "15px",
+        p: 3,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      }}
+    >
+      <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
+        Book Your Trip
+      </Typography>
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Start Date"
+                value={formData.startDate && dayjs(formData.startDate)}
+                onChange={(date) => handleChange("startDate", date)}
+                minDate={dayjs().add(1, "day")}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    required: true,
+                    size: "small",
+                  },
+                }}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="End Date"
+                value={formData.endDate && dayjs(formData.endDate)}
+                onChange={(date) => handleChange("endDate", date)}
+                minDate={
+                  formData.startDate
+                    ? dayjs(formData.startDate).add(1, "day")
+                    : dayjs().add(2, "day")
+                }
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    required: true,
+                    size: "small",
+                  },
+                }}
+              />
+            </LocalizationProvider>
+          </Grid>
+        </Grid>
 
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{ maxWidth: 600, mx: "auto" }}
-          >
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label="Start Date"
-                    value={formData.startDate && dayjs(formData.startDate)}
-                    onChange={(date) => handleChange("startDate", date)}
-                    minDate={dayjs().add(1, "day")}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        required: true,
-                        size: "small",
-                      },
-                    }}
-                  />
-                </LocalizationProvider>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label="End Date"
-                    value={formData.endDate && dayjs(formData.endDate)}
-                    onChange={(date) => handleChange("endDate", date)}
-                    minDate={
-                      formData.startDate
-                        ? dayjs(formData.startDate).add(1, "day")
-                        : dayjs().add(2, "day")
-                    }
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        required: true,
-                        size: "small",
-                      },
-                    }}
-                  />
-                </LocalizationProvider>
-              </Grid>
-            </Grid>
-
-            <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="First Name"
-                  value={formData.firstName}
-                  onChange={(e) => handleChange("firstName", e.target.value)}
-                  fullWidth
-                  required
-                  size="small"
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Last Name"
-                  value={formData.lastName}
-                  onChange={(e) => handleChange("lastName", e.target.value)}
-                  fullWidth
-                  required
-                  size="small"
-                />
-              </Grid>
-            </Grid>
-
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid item xs={12} sm={6}>
             <TextField
-              label="Phone Number"
-              value={formData.phoneNumber}
-              onChange={(e) => handleChange("phoneNumber", e.target.value)}
+              label="First Name"
+              value={formData.firstName}
+              onChange={(e) => handleChange("firstName", e.target.value)}
               fullWidth
               required
               size="small"
-              sx={{ mt: 2 }}
-              inputProps={{ pattern: "[+0-9]{10,15}" }}
             />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Last Name"
+              value={formData.lastName}
+              onChange={(e) => handleChange("lastName", e.target.value)}
+              fullWidth
+              required
+              size="small"
+            />
+          </Grid>
+        </Grid>
 
-            <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={6}>
-                <TextField
-                  label="Adults"
-                  type="number"
-                  value={formData.adultAttendees}
-                  onChange={(e) =>
-                    handleChange("adultAttendees", e.target.value)
-                  }
-                  fullWidth
-                  size="small"
-                  inputProps={{ min: 1 }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Children"
-                  type="number"
-                  value={formData.childAttendees}
-                  onChange={(e) =>
-                    handleChange("childAttendees", e.target.value)
-                  }
-                  fullWidth
-                  size="small"
-                  inputProps={{ min: 0 }}
-                />
-              </Grid>
-            </Grid>
+        <TextField
+          label="Phone Number"
+          value={formData.phoneNumber}
+          onChange={(e) => handleChange("phoneNumber", e.target.value)}
+          fullWidth
+          required
+          size="small"
+          sx={{ mt: 2 }}
+          inputProps={{ pattern: "[+0-9]{10,15}" }}
+        />
 
-            <Button
-              type="submit"
-              variant="contained"
-              startIcon={
-                loading ? <CircularProgress size={20} color="inherit" /> : null
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid item xs={6}>
+            <TextField
+              label="Adults"
+              type="number"
+              value={formData.adultAttendees}
+              onChange={(e) =>
+                handleChange("adultAttendees", e.target.value)
               }
-              disabled={loading}
-              sx={{
-                mt: 3,
-                bgcolor: "#1976d2",
-                "&:hover": { bgcolor: "#115293" },
-                width: "100%",
-              }}
-            >
-              {loading ? "Submitting..." : "Book Now"}
-            </Button>
-          </Box>
-        </Box>
-      </CardContent>
+              fullWidth
+              size="small"
+              inputProps={{ min: 1 }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Children"
+              type="number"
+              value={formData.childAttendees}
+              onChange={(e) =>
+                handleChange("childAttendees", e.target.value)
+              }
+              fullWidth
+              size="small"
+              inputProps={{ min: 0 }}
+            />
+          </Grid>
+        </Grid>
+
+        <Button
+          type="submit"
+          variant="contained"
+          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+          disabled={loading}
+          sx={{
+            mt: 3,
+            bgcolor: "#1976d2",
+            "&:hover": { bgcolor: "#115293" },
+            width: "100%",
+            py: 1.5,
+          }}
+        >
+          {loading ? "Submitting..." : "Book Now"}
+        </Button>
+      </Box>
     </Card>
   );
 };

@@ -1,4 +1,4 @@
-// --- START OF FILE src/components/common/ErrorBoundary.js ---
+// Replace the existing ErrorBoundary component with this
 import React from 'react';
 
 class ErrorBoundary extends React.Component {
@@ -8,23 +8,27 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI.
     return { hasError: true, error };
   }
 
   componentDidCatch(error, errorInfo) {
-    // You can also log the error to an error reporting service
     console.error("ErrorBoundary caught an error:", error, errorInfo);
     this.setState({ errorInfo });
   }
 
   render() {
     if (this.state.hasError) {
-      // Fallback UI
       return (
-        <div>
+        <div
+          style={{
+            padding: "2rem",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "8px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          }}
+        >
           <h2>Something went wrong in this section.</h2>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
+          <details style={{ whiteSpace: 'pre-wrap', color: "#666" }}>
             {this.state.error && this.state.error.toString()}
             <br />
             {this.state.errorInfo && this.state.errorInfo.componentStack}
@@ -38,4 +42,3 @@ class ErrorBoundary extends React.Component {
 }
 
 export default ErrorBoundary;
-// --- END OF FILE src/components/common/ErrorBoundary.js ---

@@ -1,55 +1,52 @@
-import { Button, Typography } from "@mui/material";
-import { Box } from "@mui/system";
-import React from "react";
+// Replace the existing Hero component with this
+import { Box, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import trips from "../../data/trips";
+import Button from '@mui/material/Button';
+
 
 const Hero = () => {
   console.log(trips);
   return (
-    <>
-      <Box
-        sx={{
-          borderRadius: "20px",
-          backgroundImage: `url(${trips[0]?.images[0]})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          height: {
-            xs: "20rem",
-            md: "25rem",
-          },
-          backgroundRepeat: "no-repeat",
-          paddingLeft: "5%",
-        }}
-      >
-        <Typography
-          variant="h3"
-          sx={{
-            color: "#fff",
-            fontSize: {
-              xs: "1.5rem",
-              sm: "2rem",
-              md: "2.5rem",
-              lg: "3rem",
-            },
-            paddingTop: "150px",
+    <Box
+      sx={{
+        backgroundImage: `url(${trips[0]?.images[0]})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        height: { xs: "400px", md: "500px" },
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "white",
+        textAlign: "center",
+        px: 3
+      }}
+    >
+      <Typography variant="h3" sx={{ mb: 2, fontWeight: 700 }}>
+        Upcoming Weekend Trip
+      </Typography>
+      <Typography variant="h5" sx={{ mb: 3 }}>
+        Shimla Stays (4 Days, 3 Nights) - <span style={{ color: "#33bfff" }}>₹ 2999 /-</span>
+      </Typography>
+      <Link to="/trips/1" style={{ textDecoration: "none", color: "white" }}>
+        <Button
+          variant="contained"
+          sx={{ 
+            backgroundColor: "#33bfff",
+            px: 4,
+            py: 2,
+            borderRadius: "8px",
+            "&:hover": {
+              backgroundColor: "#2196f3"
+            }
           }}
         >
-          Upcoming Weekend Trip
-        </Typography>
-        <Typography sx={{ color: "#fff", padding: "10px 0px" }}>
-          Shimla Stays(4 Days, 3 Nights) -{" "}
-          <Typography component="span" sx={{ color: "#33bfff" }}>
-            ₹ 2999 /-
-          </Typography>
-        </Typography>
-        <Link to="/trips/1">
-          <Button variant="contained" sx={{ backgroundColor: "#33bfff" }}>
-            Book Now
-          </Button>
-        </Link>
-      </Box>
-    </>
+          Book Now
+        </Button>
+      </Link>
+    </Box>
   );
 };
 

@@ -1,4 +1,4 @@
-// --- START OF FILE Navbar2.js ---
+// Replace the existing Navbar2 component with this
 import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
 import React from "react";
 import HomeIcon from "@mui/icons-material/Home";
@@ -10,7 +10,6 @@ import { Link } from "react-router-dom";
 const Navbar2 = () => {
   return (
     <div>
-      {" "}
       <AppBar
         position="fixed"
         color="default"
@@ -18,43 +17,38 @@ const Navbar2 = () => {
           backgroundColor: "white",
           top: "auto",
           bottom: 0,
+          boxShadow: "0 -2px 8px rgba(0,0,0,0.1)",
         }}
       >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Link to="/">
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
             <IconButton
               color="inherit"
-              aria-label="Home"
               sx={{ display: "block" }}
             >
-              <HomeIcon sx={{ fontSize: 40 }} />
-
-              <Typography>Home</Typography>
+              <HomeIcon sx={{ fontSize: 30 }} />
+              <Typography variant="caption" sx={{ mt: 0.5 }}>
+                Home
+              </Typography>
             </IconButton>
           </Link>
-          <IconButton
-            color="inherit"
-            aria-label="Search"
-            sx={{ display: "block" }}
-          >
-            <SearchIcon sx={{ fontSize: 40 }} />
-            <Typography>Search</Typography>
+          <IconButton color="inherit" sx={{ display: "block" }}>
+            <SearchIcon sx={{ fontSize: 30 }} />
+            <Typography variant="caption" sx={{ mt: 0.5 }}>
+                Search
+              </Typography>
           </IconButton>
-          <IconButton
-            color="inherit"
-            aria-label="Wishlist"
-            sx={{ display: "block" }}
-          >
-            <FavoriteBorderIcon sx={{ fontSize: 40 }} />
-            <Typography>Wishlist</Typography>
+          <IconButton color="inherit" sx={{ display: "block" }}>
+            <FavoriteBorderIcon sx={{ fontSize: 30 }} />
+            <Typography variant="caption" sx={{ mt: 0.5 }}>
+                Wishlist
+              </Typography>
           </IconButton>
-          <IconButton
-            color="inherit"
-            aria-label="Profile"
-            sx={{ display: "block" }}
-          >
-            <PersonIcon sx={{ fontSize: 40 }} />
-            <Typography>Profile</Typography>
+          <IconButton color="inherit" sx={{ display: "block" }}>
+            <PersonIcon sx={{ fontSize: 30 }} />
+            <Typography variant="caption" sx={{ mt: 0.5 }}>
+                Profile
+              </Typography>
           </IconButton>
         </Toolbar>
       </AppBar>
@@ -63,4 +57,3 @@ const Navbar2 = () => {
 };
 
 export default Navbar2;
-// --- END OF FILE Navbar2.js ---
