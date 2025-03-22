@@ -69,7 +69,7 @@ const AccommodationsList = () => {
   ];
 
   const handleView = (id) => {
-    navigate(`/view-accommodation/${id}`);
+    navigate(`/accommodations/${id}`);
   };
 
   const handleEdit = (id) => {

@@ -9,43 +9,58 @@ const ImageGallery = ({ images }) => {
 
   const handlePrevClick = () => {
     setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+      prevIndex === 0 ? images?.length - 1 : prevIndex - 1
     );
   };
 
   const handleNextClick = () => {
     setCurrentImageIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+      prevIndex === images?.length - 1 ? 0 : prevIndex + 1
     );
   };
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length); // Simpler next index logic
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images?.length); // Simpler next index logic
     }, 3000); // Increased interval to 3 seconds for slower slide
 
     return () => clearInterval(intervalId);
-  }, [images.length]);
+  }, [images?.length]);
 
   const handleThumbnailClick = (index) => {
     setCurrentImageIndex(index);
   };
 
   return (
-    <Box sx={{ position: "relative" }}> {/* Removed marginTop: "100px" */}
+    <Box sx={{ position: "relative" }}>
+      {" "}
+      {/* Removed marginTop: "100px" */}
       {/* Main large image */}
-      <Box sx={{ position: "relative", mb: 2, borderRadius: "12px", overflow: "hidden" }}> {/* Added border-radius and overflow hidden */}
-        <img
-          src={images[currentImageIndex]}
-          alt={`Slide ${currentImageIndex + 1}`}
-          style={{
-            width: "100%",
-            height: "auto",
-            maxHeight: "500px", // Increased max height slightly
-            objectFit: "cover",
-            display: "block", // Prevents extra space below image in some cases
-          }}
-        />
+      <Box
+        sx={{
+          position: "relative",
+          mb: 2,
+          borderRadius: "12px",
+          overflow: "hidden",
+        }}
+      >
+        {" "}
+        {/* Added border-radius and overflow hidden */}
+        {images?.length > 0 ? (
+          <img
+            src={images[currentImageIndex]}
+            alt={`Slide ${currentImageIndex + 1}`}
+            style={{
+              width: "100%",
+              height: "auto",
+              maxHeight: "500px", // Increased max height slightly
+              objectFit: "cover",
+              display: "block", // Prevents extra space below image in some cases
+            }}
+          />
+        ) : (
+          ""
+        )}
         {/* Navigation buttons */}
         <IconButton
           onClick={handlePrevClick}
@@ -80,7 +95,6 @@ const ImageGallery = ({ images }) => {
           <ArrowForwardIosIcon />
         </IconButton>
       </Box>
-
       {/* Thumbnails */}
       <Grid
         container
@@ -101,7 +115,8 @@ const ImageGallery = ({ images }) => {
                 objectFit: "cover",
                 cursor: "pointer",
                 opacity: currentImageIndex === index ? 1 : 0.6, // Opacity for current thumbnail
-                border: currentImageIndex === index ? "2px solid #33bfff" : "none", // Border for selected thumbnail
+                border:
+                  currentImageIndex === index ? "2px solid #33bfff" : "none", // Border for selected thumbnail
                 "&:hover": {
                   opacity: 1, // Hover effect on thumbnails
                 },
