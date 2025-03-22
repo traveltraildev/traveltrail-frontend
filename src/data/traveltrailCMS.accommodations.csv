@@ -1,0 +1,4 @@
+_id,name,price,roomType,bedType,maxOccupancy,size,overview,images[0],images[1],images[2],themes[0],themes[1],amenities[0],amenities[1],amenities[2],inclusions[0],inclusions[1],inclusions[2],exclusions[0],exclusions[1],exclusions[2]
+67dc68240a440efae1331faf,admin,2,admin,Takat,2,54545,zxsfvsdsfsadfsda,https://picsum.photos/seed/picsum/200/300,https://picsum.photos/seed/picsum/200/300,,Meerut,Dosti,Paani,MaccharDani,Yaar,Rehna,Khana,Sona,Raat,ke,kaam
+67dc80c90a440efae1331fb0,07382971692,3,kj,6,2,hgj,ghfhgfhgfghfhgfghf,https://picsum.photos/200/300,https://picsum.photos/200/300,,uyyy,,tr1,,,trtr,,,gh,,
+67dc83280a440efae1331fb1,Divyansh,12,Delux,Ling,3,10x15ft,\nThis is Overview of this StayThis is Overview of this StayThis is Overview of this Stay,https://picsum.photos/200/300,https://picsum.photos/200/300,https://picsum.photos/200/300,Romantic,,MiniBar,,,Food,Bed,,Alchol,,

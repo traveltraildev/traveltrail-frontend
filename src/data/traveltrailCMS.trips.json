@@ -1,0 +1,151 @@
+[{
+  "_id": {
+    "$oid": "67d97b157bf077a13fe9ec9d"
+  },
+  "name": "Divyansh Chaudhary",
+  "desc": "$2b$10$Y0dqFCX9Seoi31z.MtJv2edrYKnT/334EGvuqT4x6Zuw/y9VFatMC$2b$10$Y0dqFCX9Seoi31z.MtJv2edrYKnT/334EGvuqT4x6Zuw/y9VFatMC$2b$10$Y0dqFCX9Seoi31z.MtJv2edrYKnT/334EGvuqT4x6Zuw/y9VFatMC$2b$10$Y0dqFCX9Seoi31z.MtJv2edrYKnT/334EGvuqT4x6Zuw/y9VFatMC$2b$10$Y0dqFCX9Seoi31z.MtJv2edrYKnT/334EGvuqT4x6Zuw/y9VFatMC$2b$10$Y0dqFCX9Seoi31z.MtJv2edrYKnT/334EGvuqT4x6Zuw/y9VFatMC$2b$10$Y0dqFCX9Seoi31z.MtJv2edrYKnT/334EGvuqT4x6Zuw/y9VFatMC$2b$10$Y0dqFCX9Seoi31z.MtJv2edrYKnT/334EGvuqT4x6Zuw/y9VFatMC",
+  "price": 20450,
+  "daysCount": 5,
+  "nightsCount": 5,
+  "category": "",
+  "theme": "",
+  "themes": [
+    "Luxury"
+  ],
+  "inclusions": [
+    "Transportation"
+  ],
+  "exclusions": [
+    "Insurance",
+    "Optional Activities"
+  ],
+  "images": [
+    "https://picsum.photos/seed/picsum/200/300",
+    "https://picsum.photos/seed/picsum/200/300\n"
+  ],
+  "itineraries": [
+    {
+      "highlights": [
+        "qwqw",
+        "erer",
+        "erer"
+      ],
+      "dayTitle": "Day 1",
+      "shortDescription": "Overnight Journey to GB Road",
+      "description": "https://picsum.photos/seed/picsum/200/300\nhttps://picsum.photos/seed/picsum/200/300\nhttps://picsum.photos/seed/picsum/200/300\n"
+    }
+  ],
+  "availability": false,
+  "tripExpert": "",
+  "destination": "Delhi airport "
+},
+{
+  "_id": {
+    "$oid": "67db1c1333ebb8926f82e887"
+  },
+  "name": "TRAVEL TRAIL",
+  "desc": "AyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodha",
+  "price": 20450,
+  "daysCount": 2,
+  "nightsCount": 1,
+  "category": "",
+  "theme": "",
+  "themes": [
+    "City Break"
+  ],
+  "inclusions": [
+    "Meals"
+  ],
+  "exclusions": [
+    "Insurance"
+  ],
+  "images": [
+    "https://picsum.photos/id/237/200/300",
+    "https://picsum.photos/id/237/200/300",
+    "https://picsum.photos/id/237/200/300",
+    "https://picsum.photos/id/237/200/300"
+  ],
+  "itineraries": [
+    {
+      "highlights": [
+        "AyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodha"
+      ],
+      "dayTitle": "Day 1",
+      "shortDescription": "Overnight Journey to GB Road",
+      "description": "AyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodhaAyodhaAyodhaAyodhaAyodha AyodhaAyodhaAyodha"
+    }
+  ],
+  "availability": false,
+  "tripExpert": "",
+  "destination": "Ayodha"
+},
+{
+  "_id": {
+    "$oid": "67dbd5c82162d98f4f881d46"
+  },
+  "name": "Divyansh Chaudhary",
+  "desc": "sdadsasd",
+  "price": 33,
+  "daysCount": 3,
+  "nightsCount": 3,
+  "category": "",
+  "theme": "",
+  "themes": [
+    "Beach"
+  ],
+  "inclusions": [
+    "Flights"
+  ],
+  "exclusions": [
+    "Visa Fees"
+  ],
+  "images": [],
+  "itineraries": [
+    {
+      "highlights": [
+        "dfdf"
+      ],
+      "dayTitle": "Day 1",
+      "shortDescription": "Overnight Journey to GB Road",
+      "description": "adfsdf"
+    }
+  ],
+  "availability": false,
+  "tripExpert": "",
+  "destination": "Delhi airport "
+},
+{
+  "_id": {
+    "$oid": "67dbf36cdcd41a242fcd7702"
+  },
+  "name": "Dubai",
+  "desc": "asasas",
+  "price": 12,
+  "daysCount": 1,
+  "nightsCount": 1,
+  "category": "",
+  "theme": "",
+  "themes": [
+    "Beach"
+  ],
+  "inclusions": [
+    "Flights"
+  ],
+  "exclusions": [
+    "Personal Expenses"
+  ],
+  "images": [],
+  "itineraries": [
+    {
+      "highlights": [
+        "as"
+      ],
+      "dayTitle": "Day 1",
+      "shortDescription": "Overnight Journey to GB Road",
+      "description": "asasas"
+    }
+  ],
+  "availability": false,
+  "tripExpert": "",
+  "destination": "Ayodha"
+}]

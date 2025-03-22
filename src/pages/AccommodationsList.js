@@ -1,18 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid, GridToolbar, GridActionsCellItem } from "@mui/x-data-grid";
-import { CircularProgress, Alert, IconButton, Tooltip } from "@mui/material";
+import { 
+  CircularProgress, 
+  Alert, 
+  IconButton, 
+  Tooltip,
+  Box,
+  Typography,
+  Container,
+  useTheme
+} from "@mui/material";
 import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   Visibility as ViewIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/common/Navbar";
+import Footer from "../components/common/Footer";
 
 const AccommodationsList = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const theme = useTheme();
 
   // Add serial number column
   const columns = [
@@ -153,20 +165,57 @@ const AccommodationsList = () => {
     );
 
   return (
-    <div style={{ height: 600, width: "100%", padding: "20px" }}>
-      <DataGrid
-        getRowId={(row) => row._id}
-        rows={data}
-        columns={columns}
-        loading={loading}
-        components={{
-          Toolbar: GridToolbar,
+    <>
+      <Navbar />
+      <Container 
+        maxWidth="lg" 
+        sx={{
+          mt: theme.spacing(8), // Adjust this value based on your navbar height
+          mb: theme.spacing(4)
         }}
-        pageSize={10}
-        rowsPerPageOptions={[10, 25, 50]}
-        disableSelectionOnClick
-      />
-    </div>
+      >
+        <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
+          Accommodations List
+        </Typography>
+        
+        <Box
+          sx={{
+            height: "calc(100vh - 300px)",
+            width: "100%",
+            borderRadius: "8px",
+            overflow: "hidden",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+          }}
+        >
+          <DataGrid
+            getRowId={(row) => row._id}
+            rows={data}
+            columns={columns}
+            loading={loading}
+            components={{
+              Toolbar: GridToolbar,
+            }}
+            pageSize={10}
+            rowsPerPageOptions={[10, 25, 50]}
+            disableSelectionOnClick
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f5f5f5",
+                fontWeight: "bold",
+                color: "#333",
+              },
+              "& .MuiDataGrid-cell": {
+                borderBottom: "1px solid #e0e0e0",
+              },
+              "& .MuiDataGrid-row": {
+                cursor: "pointer",
+              },
+            }}
+          />
+        </Box>
+      </Container>
+      <Footer />
+    </>
   );
 };
 
