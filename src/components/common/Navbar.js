@@ -10,22 +10,24 @@ import PinDropIcon from "@mui/icons-material/PinDrop";
 import { Link } from "react-router-dom";
 import HamburgerMenu from "./HamburgerMenu";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useAuth } from '../../context/AuthContext';
-import Button from '@mui/material/Button';
+import { useAuth } from "../../context/AuthContext";
+import Button from "@mui/material/Button";
 
 export default function Navbar() {
-  const isSmallScreen = useMediaQuery('(max-width:600px)');
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
   const { isAuthenticated, logout } = useAuth();
 
   return (
-    <Box sx={{ flexGrow: 1, position: "fixed", zIndex: 1, width: "100%", top: 0 }}>
+    <Box
+      sx={{ flexGrow: 1, position: "fixed", zIndex: 1, width: "100%", top: 0 }}
+    >
       <AppBar
         position="static"
         sx={{
           backgroundColor: "white",
           boxShadow: "none",
           color: "black",
-          backgroundImage: 'linear-gradient(to right, #e0f7fa, #b2ebf2)',
+          backgroundImage: "linear-gradient(to right, #e0f7fa, #b2ebf2)",
         }}
       >
         <Toolbar>
@@ -39,7 +41,7 @@ export default function Navbar() {
             </Box>
           </Link>
           <Box sx={{ flexGrow: 1 }} />
-          
+
           {/* Common Elements */}
           <Typography>
             <PinDropIcon sx={{ mt: "8px", mr: "8px" }} />
@@ -55,20 +57,16 @@ export default function Navbar() {
 
           {/* Conditional Admin Elements */}
           {isAuthenticated ? (
-            <Box sx={{ display: "flex", alignItems: 'center' }}>
-              <Button 
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Button
                 component={Link}
                 to="/admin/cms"
                 color="inherit"
-                sx={{ ml: 2, textDecoration: 'none' }}
+                sx={{ ml: 2, textDecoration: "none" }}
               >
                 CMS
               </Button>
-              <Button 
-                color="inherit" 
-                onClick={logout}
-                sx={{ mx: 2 }}
-              >
+              <Button color="inherit" onClick={logout} sx={{ mx: 2 }}>
                 Logout
               </Button>
               <IconButton
@@ -81,15 +79,32 @@ export default function Navbar() {
               </IconButton>
             </Box>
           ) : (
-            <Box sx={{ display: "flex", alignItems: 'center' }}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
               <Typography
                 variant="h6"
                 component={Link}
                 to="/trips"
                 color="inherit"
-                sx={{ ml: 2, textDecoration: 'none', display: { xs: "none", md: "block" } }}
+                sx={{
+                  ml: 2,
+                  textDecoration: "none",
+                  display: { xs: "none", md: "block" },
+                }}
               >
                 Trips
+              </Typography>
+              <Typography
+                variant="h6"
+                component={Link}
+                to="/accommodations"
+                color="inherit"
+                sx={{
+                  ml: 2,
+                  textDecoration: "none",
+                  display: { xs: "none", md: "block" },
+                }}
+              >
+                Accommodations
               </Typography>
               {!isSmallScreen && (
                 <IconButton

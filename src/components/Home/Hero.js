@@ -43,7 +43,7 @@ const Hero = () => {
             ₹ 2999 /-
           </Typography>
         </Typography>
-        <Link to="/trips/1">
+        <Link to="/trips">
           <Button variant="contained" sx={{ backgroundColor: "#33bfff" }}>
             Book Now
           </Button>

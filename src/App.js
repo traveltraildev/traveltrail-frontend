@@ -31,6 +31,7 @@ import Dashboard from "./pages/Dashboard";
 
 import AccommodationsList from "./pages/AccommodationsList";
 import EditAccomodation from "./pages/admin/cms/EditAccomodation";
+import Accommodations from "./pages/Accommodations";
 
 // Create RequireAuth component
 const RequireAuth = ({ children }) => {
@@ -66,6 +67,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/trips" element={<Trips />} />
+            <Route path="/accommodations" element={<Accommodations />} />
             <Route
               path="/admin/cms/trips-list"
               element={
