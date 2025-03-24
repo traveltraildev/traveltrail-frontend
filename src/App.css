@@ -1,4 +1,3 @@
-/* --- START OF FILE App.css --- */
 .App {
   text-align: center;
 }
@@ -38,7 +37,6 @@
   }
 }
 
-/* Add these new styles */
 .app-container {
   background-color: var(--neutral-50);
   min-height: 100vh;
@@ -52,9 +50,8 @@
   margin: 0 auto;
   padding: var(--spacing-lg);
 }
-  
-  body {
-    margin: 0; /* Reset body margin to ensure gradient covers full viewport */
-    overflow-x: hidden; /* Prevent horizontal scrollbar if gradient extends slightly */
-  }
-  /* --- END OF FILE App.css --- */
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
