@@ -1,3 +1,4 @@
+// --- START OF FILE AccommodationsList.js ---
 import React, { useEffect, useState } from "react";
 import { DataGrid, GridToolbar, GridActionsCellItem } from "@mui/x-data-grid";
 import {
@@ -10,11 +11,7 @@ import {
   Container,
   useTheme,
 } from "@mui/material";
-import {
-  Delete as DeleteIcon,
-  Edit as EditIcon,
-  Visibility as ViewIcon,
-} from "@mui/icons-material";
+import { Delete as DeleteIcon, Edit as EditIcon, Visibility as ViewIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
@@ -47,7 +44,7 @@ const AccommodationsList = () => {
       field: "actions",
       headerName: "Actions",
       type: "actions",
-      width: 150,
+      width: 180,
       getActions: (params) => [
         <GridActionsCellItem
           icon={
@@ -89,25 +86,25 @@ const AccommodationsList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this accommodation?")) {
-      try {
-        const token = localStorage.getItem("adminToken");
-        const response = await fetch(
-          `http://localhost:5000/api/accommodations/${id}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+    if (!window.confirm("Are you sure you want to delete this accommodation?")) return;
 
-        if (!response.ok) throw new Error("Delete failed");
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch(
+        `http://localhost:5000/api/accommodations/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-        setData(data.filter((item) => item._id !== id));
-      } catch (error) {
-        setError(error.message);
-      }
+      if (!response.ok) throw new Error("Delete failed");
+
+      setData(data.filter((item) => item._id !== id));
+    } catch (error) {
+      setError(error.message || "Failed to delete accommodation");
     }
   };
 
@@ -148,7 +145,7 @@ const AccommodationsList = () => {
           }))
         );
       } catch (err) {
-        setError(err.message);
+        setError(err.message || "Failed to fetch accommodations");
       } finally {
         setLoading(false);
       }
@@ -159,7 +156,7 @@ const AccommodationsList = () => {
 
   if (error)
     return (
-      <Alert severity="error" sx={{ m: 2 }}>
+      <Alert severity="error" sx={{ m: 2, mt: 8 }}>
         {error}
       </Alert>
     );
@@ -170,11 +167,16 @@ const AccommodationsList = () => {
       <Container
         maxWidth="lg"
         sx={{
-          mt: theme.spacing(8), // Adjust this value based on your navbar height
+          mt: theme.spacing(8),
           mb: theme.spacing(4),
         }}
       >
-        <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{ mb: 4, fontWeight: 600 }}
+        >
           Accommodations List
         </Typography>
 
@@ -182,9 +184,10 @@ const AccommodationsList = () => {
           sx={{
             height: "calc(100vh - 300px)",
             width: "100%",
-            borderRadius: "8px",
+            borderRadius: "12px",
             overflow: "hidden",
             boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+            bgcolor: "background.paper",
           }}
         >
           <DataGrid
@@ -201,14 +204,21 @@ const AccommodationsList = () => {
             sx={{
               "& .MuiDataGrid-columnHeaders": {
                 backgroundColor: "#f5f5f5",
-                fontWeight: "bold",
+                fontWeight: 600,
                 color: "#333",
+                borderBottom: "1px solid #e0e0e0",
               },
               "& .MuiDataGrid-cell": {
                 borderBottom: "1px solid #e0e0e0",
               },
               "& .MuiDataGrid-row": {
                 cursor: "pointer",
+                "&:hover": {
+                  backgroundColor: "#f5f5f5",
+                },
+              },
+              "& .MuiDataGrid-actionsCell": {
+                justifyContent: "center",
               },
             }}
           />
@@ -220,3 +230,4 @@ const AccommodationsList = () => {
 };
 
 export default AccommodationsList;
+// --- END OF FILE AccommodationsList.js ---

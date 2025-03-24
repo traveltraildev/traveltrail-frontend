@@ -1,91 +1,82 @@
+// Replace the existing AdminLoginPage component with this
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Container, TextField, Button, Typography, Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const AdminLoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { login } = useAuth(); // Get login method from auth context
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.removeItem("adminToken"); // Clear any existing token
+    localStorage.removeItem("adminToken");
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/api/admin/login", {
-        // Add full URL
+      const response = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        // Handle server-side validation errors
-        setError(data.message || "Authentication failed");
+        const errorData = await response.json();
+        setError(errorData.message || "Authentication failed");
         return;
       }
 
-      // ✅ Critical Fix: Use adminToken instead of token
-      if (data.success && data.adminToken) {
-        localStorage.setItem("adminToken", data.adminToken);
-        await login(username, password); // Update auth context state
-        navigate("/admin/dashboard");
-      } else {
-        setError("Invalid server response");
-      }
+      const data = await response.json();
+      localStorage.setItem("adminToken", data.adminToken);
+      await login(username, password);
+      navigate("/admin/dashboard");
     } catch (error) {
-      console.error("Network error:", error);
+      console.error("Login error:", error);
       setError("Server connection failed");
     }
   };
 
   return (
-    <Container maxWidth="xs">
-      <Box sx={{ mt: 8, textAlign: "center" }}>
-        <Typography variant="h4" gutterBottom>
+    <Container maxWidth="xs" sx={{ mt: 8 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
           Admin Login
         </Typography>
-        <form onSubmit={handleSubmit}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%", mt: 3 }}>
           <TextField
             fullWidth
             label="Username"
-            margin="normal"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            margin="normal"
             required
           />
           <TextField
             fullWidth
             label="Password"
             type="password"
-            margin="normal"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            margin="normal"
             required
           />
-
           {error && (
             <Typography color="error" sx={{ mt: 2 }}>
               {error}
             </Typography>
           )}
-
           <Button
             type="submit"
-            fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            sx={{ mt: 2, width: "100%", bgcolor: "#1976d2", "&:hover": { bgcolor: "#115293" } }}
           >
             Sign In
           </Button>
-        </form>
+        </Box>
       </Box>
     </Container>
   );

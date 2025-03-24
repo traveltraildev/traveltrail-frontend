@@ -59,7 +59,7 @@ const TripsCard = () => {
             >
               <CardMedia
                 component="img"
-                height="250"
+                height="250px !important"
                 image={trip?.images[0] || "./images/defaultImg.png"}
                 alt={trip?.name || ""}
               />

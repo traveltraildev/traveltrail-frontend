@@ -1,6 +1,6 @@
-// --- START OF FILE ImageGallery.js ---
+// Replace the existing ImageGallery component with this
 import React, { useEffect, useState } from "react";
-import { Box, IconButton, Grid } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
@@ -21,8 +21,8 @@ const ImageGallery = ({ images }) => {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images?.length); // Simpler next index logic
-    }, 3000); // Increased interval to 3 seconds for slower slide
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images?.length);
+    }, 3000);
 
     return () => clearInterval(intervalId);
   }, [images?.length]);
@@ -33,19 +33,15 @@ const ImageGallery = ({ images }) => {
 
   return (
     <Box sx={{ position: "relative" }}>
-      {" "}
-      {/* Removed marginTop: "100px" */}
-      {/* Main large image */}
       <Box
         sx={{
           position: "relative",
           mb: 2,
           borderRadius: "12px",
           overflow: "hidden",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
         }}
       >
-        {" "}
-        {/* Added border-radius and overflow hidden */}
         {images?.length > 0 ? (
           <img
             src={images[currentImageIndex]}
@@ -53,26 +49,25 @@ const ImageGallery = ({ images }) => {
             style={{
               width: "100%",
               height: "auto",
-              maxHeight: "500px", // Increased max height slightly
+              maxHeight: "500px",
               objectFit: "cover",
-              display: "block", // Prevents extra space below image in some cases
+              display: "block",
             }}
           />
         ) : (
           ""
         )}
-        {/* Navigation buttons */}
         <IconButton
           onClick={handlePrevClick}
           sx={{
             position: "absolute",
             top: "50%",
-            left: "10px", // Adjusted position
+            left: "10px",
             transform: "translateY(-50%)",
             color: "#fff",
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Added background for better visibility
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
             "&:hover": {
-              backgroundColor: "rgba(0, 0, 0, 0.7)", // Hover effect
+              backgroundColor: "rgba(0, 0, 0, 0.7)",
             },
           }}
         >
@@ -83,51 +78,43 @@ const ImageGallery = ({ images }) => {
           sx={{
             position: "absolute",
             top: "50%",
-            right: "10px", // Adjusted position
-            color: "#fff",
+            right: "10px",
             transform: "translateY(-50%)",
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Added background
+            color: "#fff",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
             "&:hover": {
-              backgroundColor: "rgba(0, 0, 0, 0.7)", // Hover effect
+              backgroundColor: "rgba(0, 0, 0, 0.7)",
             },
           }}
         >
           <ArrowForwardIosIcon />
         </IconButton>
       </Box>
-      {/* Thumbnails */}
-      <Grid
-        container
-        spacing={2} // Increased spacing between thumbnails
-        justifyContent="center"
-      >
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
         {images?.map((image, index) => (
-          <Grid item key={index}>
-            <Box
-              component="img" // Changed to component="img" to directly render image
-              src={image}
-              alt={`Thumbnail ${index + 1}`}
-              onClick={() => handleThumbnailClick(index)}
-              sx={{
-                width: "60px", // Increased thumbnail size
-                height: "40px", // Increased thumbnail size
-                borderRadius: "8px", // Rounded thumbnails
-                objectFit: "cover",
-                cursor: "pointer",
-                opacity: currentImageIndex === index ? 1 : 0.6, // Opacity for current thumbnail
-                border:
-                  currentImageIndex === index ? "2px solid #33bfff" : "none", // Border for selected thumbnail
-                "&:hover": {
-                  opacity: 1, // Hover effect on thumbnails
-                },
-              }}
-            />
-          </Grid>
+          <Box
+            key={index}
+            component="img"
+            src={image}
+            alt={`Thumbnail ${index + 1}`}
+            onClick={() => handleThumbnailClick(index)}
+            sx={{
+              width: "60px",
+              height: "40px",
+              borderRadius: "8px",
+              objectFit: "cover",
+              cursor: "pointer",
+              border: currentImageIndex === index ? "2px solid #33bfff" : "none",
+              transition: "transform 0.3s ease",
+              "&:hover": {
+                transform: "scale(1.05)",
+              },
+            }}
+          />
         ))}
-      </Grid>
+      </Box>
     </Box>
   );
 };
 
 export default ImageGallery;
-// --- END OF FILE ImageGallery.js ---

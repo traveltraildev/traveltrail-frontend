@@ -1,8 +1,7 @@
-// --- START OF FILE AccommodationDetailsPage.js ---
+// Replace the existing AccommodationDetailsPage component with this
 import React, { useEffect, useState } from "react";
 import ImageGallery from "../components/TripDetails/ImageGallery";
 import { useParams } from "react-router-dom";
-import accommodationsData from "../data/accommodationsData";
 import {
   Box,
   Typography,
@@ -12,18 +11,11 @@ import {
   CardContent,
 } from "@mui/material";
 import BookNow from "../components/TripDetails/BookNow";
-import Navbar from "../components/common/Navbar";
-import Navbar2 from "../components/common/Navbar2";
-import Footer from "../components/common/Footer";
 import StickyAccommodationTitle from "../components/TripDetails/StickyAccommodationTitle";
 
 const AccommodationDetailsPage = ({ isMobile }) => {
   const { id } = useParams();
   const [accommodation, setAccommodation] = useState(null);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [id]);
 
   useEffect(() => {
     fetch(`/api/accommodations/${id}`)
@@ -45,7 +37,6 @@ const AccommodationDetailsPage = ({ isMobile }) => {
 
   return (
     <>
-      <Navbar />
       <StickyAccommodationTitle accommodation={accommodation} />
       <Container
         maxWidth="lg"
@@ -59,7 +50,6 @@ const AccommodationDetailsPage = ({ isMobile }) => {
               </Grid>
               <Grid item xs={12}>
                 <Box sx={{ padding: "20px" }}>
-                  {/* Overview Section */}
                   <Card elevation={2} sx={{ mb: 2, borderRadius: "15px" }}>
                     <CardContent sx={{ padding: "16px" }}>
                       <Typography
@@ -77,7 +67,6 @@ const AccommodationDetailsPage = ({ isMobile }) => {
                     </CardContent>
                   </Card>
 
-                  {/* Themes Section */}
                   <Card elevation={2} sx={{ mb: 2, borderRadius: "15px" }}>
                     <CardContent sx={{ padding: "16px" }}>
                       <Typography
@@ -95,7 +84,6 @@ const AccommodationDetailsPage = ({ isMobile }) => {
                     </CardContent>
                   </Card>
 
-                  {/* Inclusions Section */}
                   <Card elevation={2} sx={{ mb: 2, borderRadius: "15px" }}>
                     <CardContent sx={{ padding: "16px" }}>
                       <Typography
@@ -117,8 +105,8 @@ const AccommodationDetailsPage = ({ isMobile }) => {
                           <Typography
                             key={index}
                             sx={{
-                              backgroundColor: "skyblue",
-                              padding: "4px 8px",
+                              backgroundColor: "#e3f2fd",
+                              padding: "6px 10px",
                               borderRadius: "8px",
                               fontSize: "0.875rem",
                               textAlign: "center",
@@ -131,7 +119,6 @@ const AccommodationDetailsPage = ({ isMobile }) => {
                     </CardContent>
                   </Card>
 
-                  {/* Exclusions Section */}
                   <Card elevation={2} sx={{ borderRadius: "15px" }}>
                     <CardContent sx={{ padding: "16px" }}>
                       <Typography
@@ -153,8 +140,8 @@ const AccommodationDetailsPage = ({ isMobile }) => {
                           <Typography
                             key={index}
                             sx={{
-                              backgroundColor: "skyblue",
-                              padding: "4px 8px",
+                              backgroundColor: "#e3f2fd",
+                              padding: "6px 10px",
                               borderRadius: "8px",
                               fontSize: "0.875rem",
                               textAlign: "center",
@@ -188,11 +175,8 @@ const AccommodationDetailsPage = ({ isMobile }) => {
           </Grid>
         </Grid>
       </Container>
-      {!isMobile && <Footer />} {/* Conditionally render Footer for desktop */}
-      {isMobile && <Navbar2 />} {/* Conditionally render Navbar2 for mobile */}
     </>
   );
 };
 
 export default AccommodationDetailsPage;
-// --- END OF FILE AccommodationDetailsPage.js ---

@@ -1,3 +1,4 @@
+// Replace the existing Instagrams component with this
 import { Box, Typography } from "@mui/material";
 import React, { useState } from "react";
 import "./Instagram.css";
@@ -65,28 +66,6 @@ const Instagram = () => {
             ></iframe>
           ))}
         </Box>
-      </Box>
-
-      <Typography
-        variant="h5"
-        sx={{
-          padding: "20px",
-          fontWeight: "bold",
-          textAlign: "center",
-          marginTop: "40px",
-        }}
-      >
-        On Our Instagram
-      </Typography>
-      <Box sx={{ textAlign: "center" }}>
-        <img
-          src="./images/instaBtn.png"
-          alt=""
-          style={{
-            width: "100%",
-            height: "500px",
-          }}
-        />
       </Box>
     </Box>
   );
