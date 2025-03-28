@@ -404,16 +404,68 @@ const Accommodations = () => {
         />
 
         {/* Filter Chips */}
+
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
           <Chip
             label="Filters"
-            onClick={toggleFilterModal}
+            onClick={() => {
+              toggleFilterModal();
+              setActiveCategory("sort"); // Default to sort when "Filters" is clicked
+            }}
             variant="outlined"
             sx={{ cursor: "pointer" }}
           />
           <Chip
             label="Sort"
-            onClick={toggleFilterModal}
+            onClick={() => {
+              toggleFilterModal();
+              setActiveCategory("sort");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
+          />
+          <Chip
+            label="Price"
+            onClick={() => {
+              toggleFilterModal();
+              setActiveCategory("price");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
+          />
+          <Chip
+            label="Destinations"
+            onClick={() => {
+              toggleFilterModal();
+              setActiveCategory("destinations");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
+          />
+          <Chip
+            label="Themes"
+            onClick={() => {
+              toggleFilterModal();
+              setActiveCategory("themes");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
+          />
+          <Chip
+            label="Occupancy"
+            onClick={() => {
+              toggleFilterModal();
+              setActiveCategory("occupancy");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
+          />
+          <Chip
+            label="Amenities"
+            onClick={() => {
+              toggleFilterModal();
+              setActiveCategory("amenities");
+            }}
             variant="outlined"
             sx={{ cursor: "pointer" }}
           />
@@ -528,82 +580,67 @@ const Accommodations = () => {
           <Grid item key={accommodation.id} xs={12} sm={6} md={4}>
             <Card
               sx={{
-                borderRadius: 15,
+                borderRadius: "12px",
                 overflow: "hidden",
                 transition: "transform 0.3s ease",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
                 "&:hover": {
-                  boxShadow: 24,
-                  transform: "translateY(-5px)",
+                  boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
+                  transform: "translateY(-3px)",
                 },
                 bgcolor: "background.paper",
+                p: 1,
+                height: "100%",
               }}
             >
               <CardMedia
                 component="img"
-                height="200"
+                height="140" // Reduced image height
                 image={accommodation?.images?.[0] || "./images/defaultImg.png"}
                 alt={accommodation?.name || ""}
                 sx={{
                   objectFit: "cover",
                   width: "100%",
                 }}
-              ></CardMedia>
-              <CardContent sx={{ p: 3 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mb: 1,
-                  }}
-                >
-                  <Typography variant="h6" fontWeight="bold">
+              />
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ mb: 0.5 }}>
+                  <Typography variant="h6" fontWeight="600" gutterBottom noWrap>
                     {accommodation?.name}
                   </Typography>
-                  <Chip
-                    label={`${accommodation?.price} ₹`}
-                    color="primary"
-                    size="small"
-                    sx={{ fontWeight: "bold" }}
-                  />
                 </Box>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 2, lineHeight: 1.4 }}
-                >
-                  {accommodation?.overview?.substring(0, 100)}...
-                </Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
-                  {(accommodation?.themes || []).map((theme) => (
-                    <Chip
-                      key={theme}
-                      label={theme}
-                      size="small"
-                      variant="outlined"
-                      sx={{ fontSize: "0.75rem" }}
-                    />
-                  ))}
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="body2" color="text.secondary" noWrap>
+                    {accommodation?.destination}
+                  </Typography>
                 </Box>
                 <Box
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    mt: "auto",
                   }}
                 >
-                  <Typography variant="body2" color="text.secondary">
-                    {accommodation?.destination}
-                  </Typography>
+                  <Chip
+                    label={`${accommodation?.price} ₹`}
+                    color="primary"
+                    size="small"
+                    sx={{ fontWeight: "bold", fontSize: "0.9rem" }}
+                  />
                   <Button
                     component={Link}
-                    to={accommodation?._id}
+                    to={`/accommodations/${accommodation?._id}`}
                     variant="contained"
                     sx={{
                       px: 2,
                       py: 0.5,
                       fontSize: "0.875rem",
-                      bgcolor: "#004d40",
-                      "&:hover": { bgcolor: "#002c25" },
+                      bgcolor: "#2196f3",
+                      color: "white",
+                      "&:hover": { bgcolor: "#0d8bf2" },
+                      borderRadius: "25px",
+                      textTransform: "none",
                     }}
                   >
                     View Details
