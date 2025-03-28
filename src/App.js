@@ -166,10 +166,7 @@ function App() {
               element={<AddTripPage isMobile={isMobile} />}
             />{" "}
             {/* Pass isMobile prop */}
-            <Route
-              path="/admin/cms/edit-trip/:tripId"
-              element={<EditTripPage />}
-            />
+            <Route path="/admin/edit-trip/:tripId" element={<EditTripPage />} />
             {/* Other routes */}
             <Route
               path="/booking-confirmation"
