@@ -24,7 +24,7 @@ import {
   RadioGroup,
   useMediaQuery,
   Fade,
-  Autocomplete 
+  Autocomplete,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -44,6 +44,18 @@ const Accommodations = () => {
   const [allThemes, setAllThemes] = useState([]);
   const [allAmenities, setAllAmenities] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    filterAccommodations();
+  }, [
+    searchTerm,
+    priceRange,
+    selectedDestinations,
+    selectedThemes,
+    maxOccupancy,
+    selectedAmenities,
+    sortBy,
+  ]);
 
   useEffect(() => {
     const fetchAccommodations = async () => {
@@ -66,17 +78,23 @@ const Accommodations = () => {
     const fetchFilterOptions = async () => {
       try {
         // Fetch destinations
-        const destinationsResponse = await fetch("/api/accommodations/filters/destinations");
+        const destinationsResponse = await fetch(
+          "/api/accommodations/filters/destinations"
+        );
         const destinations = await destinationsResponse.json();
         setAllDestinations(destinations);
 
         // Fetch themes
-        const themesResponse = await fetch("/api/accommodations/filters/themes");
+        const themesResponse = await fetch(
+          "/api/accommodations/filters/themes"
+        );
         const themes = await themesResponse.json();
         setAllThemes(themes);
 
         // Fetch amenities
-        const amenitiesResponse = await fetch("/api/accommodations/filters/amenities");
+        const amenitiesResponse = await fetch(
+          "/api/accommodations/filters/amenities"
+        );
         const amenities = await amenitiesResponse.json();
         setAllAmenities(amenities);
       } catch (error) {
@@ -88,8 +106,14 @@ const Accommodations = () => {
   }, []);
 
   const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-    filterAccommodations();
+    const value = event.target.value;
+    setSearchTerm(value);
+
+    if (value.trim() === "") {
+      setFilteredAccommodations(accommodations);
+    } else {
+      filterAccommodations();
+    }
   };
 
   const handleSortChange = (event) => {
@@ -103,10 +127,10 @@ const Accommodations = () => {
   };
 
   const handleDestinationChange = (event) => {
-    setSelectedDestinations(prev => 
-      event.target.checked 
-        ? [...prev, event.target.value] 
-        : prev.filter(dest => dest !== event.target.value)
+    setSelectedDestinations((prev) =>
+      event.target.checked
+        ? [...prev, event.target.value]
+        : prev.filter((dest) => dest !== event.target.value)
     );
     filterAccommodations();
   };
@@ -114,7 +138,7 @@ const Accommodations = () => {
   const handleThemeChange = (event) => {
     const newThemes = event.target.checked
       ? [...selectedThemes, event.target.value]
-      : selectedThemes.filter(theme => theme !== event.target.value);
+      : selectedThemes.filter((theme) => theme !== event.target.value);
     setSelectedThemes(newThemes);
     filterAccommodations();
   };
@@ -127,7 +151,7 @@ const Accommodations = () => {
   const handleAmenitiesChange = (event) => {
     const newAmenities = event.target.checked
       ? [...selectedAmenities, event.target.value]
-      : selectedAmenities.filter(amenity => amenity !== event.target.value);
+      : selectedAmenities.filter((amenity) => amenity !== event.target.value);
     setSelectedAmenities(newAmenities);
     filterAccommodations();
   };
@@ -142,47 +166,49 @@ const Accommodations = () => {
 
   const filterAccommodations = () => {
     let filtered = [...accommodations];
-    
+
     // Search filter
     if (searchTerm.trim() !== "") {
-      filtered = filtered.filter(accommodation =>
+      filtered = filtered.filter((accommodation) =>
         accommodation.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Price filter
-    filtered = filtered.filter(accommodation =>
-      accommodation.price >= priceRange[0] && accommodation.price <= priceRange[1]
+    filtered = filtered.filter(
+      (accommodation) =>
+        accommodation.price >= priceRange[0] &&
+        accommodation.price <= priceRange[1]
     );
 
     // Destination filter
     if (selectedDestinations.length > 0) {
-      filtered = filtered.filter(accommodation => 
+      filtered = filtered.filter((accommodation) =>
         selectedDestinations.includes(accommodation.destination)
       );
     }
 
     // Theme filter
     if (selectedThemes.length > 0) {
-      filtered = filtered.filter(accommodation => 
-        selectedThemes.some(theme => 
-          (accommodation.themes || []).includes(theme) // Handle undefined
+      filtered = filtered.filter((accommodation) =>
+        selectedThemes.some(
+          (theme) => (accommodation.themes || []).includes(theme) // Handle undefined
         )
       );
     }
 
     // Occupancy filter
     if (maxOccupancy > 0) {
-      filtered = filtered.filter(accommodation =>
-        (accommodation.maxOccupancy || 0) >= maxOccupancy
+      filtered = filtered.filter(
+        (accommodation) => (accommodation.maxOccupancy || 0) >= maxOccupancy
       );
     }
 
     // Amenities filter
     if (selectedAmenities.length > 0) {
-      filtered = filtered.filter(accommodation => 
-        selectedAmenities.every(amenity => 
-          (accommodation.amenities || []).includes(amenity) // Handle undefined
+      filtered = filtered.filter((accommodation) =>
+        selectedAmenities.every(
+          (amenity) => (accommodation.amenities || []).includes(amenity) // Handle undefined
         )
       );
     }
@@ -202,23 +228,15 @@ const Accommodations = () => {
 
   // Filter content components
   const renderFilterContent = () => {
-    switch(activeFilterCategory) {
-      case 'sort':
+    switch (activeFilterCategory) {
+      case "sort":
         return (
           <Box sx={{ mt: 3 }}>
             <Typography variant="h6" gutterBottom>
               Sort By
             </Typography>
-            <RadioGroup
-              value={sortBy}
-              onChange={handleSortChange}
-              row
-            >
-              <FormControlLabel
-                value="name"
-                control={<Radio />}
-                label="Name"
-              />
+            <RadioGroup value={sortBy} onChange={handleSortChange} row>
+              <FormControlLabel value="name" control={<Radio />} label="Name" />
               <FormControlLabel
                 value="price-low"
                 control={<Radio />}
@@ -232,7 +250,7 @@ const Accommodations = () => {
             </RadioGroup>
           </Box>
         );
-      case 'price':
+      case "price":
         return (
           <Box sx={{ mt: 3 }}>
             <Typography variant="h6" gutterBelow>
@@ -246,28 +264,28 @@ const Accommodations = () => {
               max={10000}
               step={100}
               marks={[
-                { value: 0, label: '₹0' },
-                { value: 2000, label: '₹2000' },
-                { value: 4000, label: '₹4000' },
-                { value: 6000, label: '₹6000' },
-                { value: 8000, label: '₹8000' },
-                { value: 10000, label: '₹10000+' },
+                { value: 0, label: "₹0" },
+                { value: 2000, label: "₹2000" },
+                { value: 4000, label: "₹4000" },
+                { value: 6000, label: "₹6000" },
+                { value: 8000, label: "₹8000" },
+                { value: 10000, label: "₹10000+" },
               ]}
-              sx={{ width: '100%' }}
+              sx={{ width: "100%" }}
             />
           </Box>
         );
-      case 'destinations':
+      case "destinations":
         return (
           <Box sx={{ mt: 3 }}>
             <Typography variant="h6" gutterBelow>
               Destinations
             </Typography>
-            {allDestinations.map(destination => (
+            {allDestinations.map((destination) => (
               <FormControlLabel
                 key={destination}
                 control={
-                  <Checkbox 
+                  <Checkbox
                     checked={selectedDestinations.includes(destination)}
                     onChange={(e) => handleDestinationChange(e)}
                     value={destination}
@@ -278,17 +296,17 @@ const Accommodations = () => {
             ))}
           </Box>
         );
-      case 'themes':
+      case "themes":
         return (
           <Box sx={{ mt: 3 }}>
             <Typography variant="h6" gutterBelow>
               Themes
             </Typography>
-            {allThemes.map(theme => (
+            {allThemes.map((theme) => (
               <FormControlLabel
                 key={theme}
                 control={
-                  <Checkbox 
+                  <Checkbox
                     checked={selectedThemes.includes(theme)}
                     onChange={(e) => handleThemeChange(e)}
                     value={theme}
@@ -299,7 +317,7 @@ const Accommodations = () => {
             ))}
           </Box>
         );
-      case 'occupancy':
+      case "occupancy":
         return (
           <Box sx={{ mt: 3 }}>
             <Typography variant="h6" gutterBelow>
@@ -327,17 +345,17 @@ const Accommodations = () => {
             )}
           </Box>
         );
-      case 'amenities':
+      case "amenities":
         return (
           <Box sx={{ mt: 3 }}>
             <Typography variant="h6" gutterBelow>
               Amenities
             </Typography>
-            {allAmenities.map(amenity => (
+            {allAmenities.map((amenity) => (
               <FormControlLabel
                 key={amenity}
                 control={
-                  <Checkbox 
+                  <Checkbox
                     checked={selectedAmenities.includes(amenity)}
                     onChange={(e) => handleAmenitiesChange(e)}
                     value={amenity}
@@ -373,56 +391,58 @@ const Accommodations = () => {
           value={searchTerm}
           onChange={handleSearch}
           fullWidth
-          sx={{ 
-            mb: 2, 
-            borderRadius: '50px', // Rounded edges
-            overflow: 'hidden'
+          sx={{
+            mb: 2,
+            borderRadius: "50px", // Rounded edges
+            overflow: "hidden",
           }}
           InputProps={{
             style: {
-              borderRadius: '50px', // Rounded input field
+              borderRadius: "50px", // Rounded input field
             },
           }}
         />
-        
+
         {/* Filter Chips */}
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <Chip 
-            label="Filters" 
-            onClick={toggleFilterModal} 
-            variant="outlined" 
-            sx={{ cursor: 'pointer' }}
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+          <Chip
+            label="Filters"
+            onClick={toggleFilterModal}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
           />
-          <Chip 
-            label="Sort" 
-            onClick={toggleFilterModal} 
-            variant="outlined" 
-            sx={{ cursor: 'pointer' }}
+          <Chip
+            label="Sort"
+            onClick={toggleFilterModal}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
           />
         </Box>
       </Box>
 
       {/* Filter Modal */}
-      <Dialog 
-        open={isFilterModalOpen} 
+      <Dialog
+        open={isFilterModalOpen}
         onClose={toggleFilterModal}
         fullWidth
         maxWidth="md"
         PaperProps={{
           sx: {
-            borderRadius: '20px', // Rounded modal
-            overflow: 'hidden',
-            boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
-          }
+            borderRadius: "20px", // Rounded modal
+            overflow: "hidden",
+            boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
+          },
         }}
         TransitionComponent={Fade}
       >
-        <DialogTitle sx={{ 
-          backgroundColor: '#f5f5f5', 
-          py: 2,
-          px: 3,
-          borderRadius: '10px 10px 0 0'
-        }}>
+        <DialogTitle
+          sx={{
+            backgroundColor: "#f5f5f5",
+            py: 2,
+            px: 3,
+            borderRadius: "10px 10px 0 0",
+          }}
+        >
           Filter Options
         </DialogTitle>
         <DialogContent sx={{ p: 3 }}>
@@ -431,49 +451,49 @@ const Accommodations = () => {
               {/* Left Pane with Filter Categories */}
               <List>
                 <ListItem disablePadding>
-                  <ListItemButton 
-                    selected={activeFilterCategory === 'sort'}
-                    onClick={() => setActiveCategory('sort')}
+                  <ListItemButton
+                    selected={activeFilterCategory === "sort"}
+                    onClick={() => setActiveCategory("sort")}
                   >
                     <ListItemText primary="Sort By" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton 
-                    selected={activeFilterCategory === 'price'}
-                    onClick={() => setActiveCategory('price')}
+                  <ListItemButton
+                    selected={activeFilterCategory === "price"}
+                    onClick={() => setActiveCategory("price")}
                   >
                     <ListItemText primary="Price Range" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton 
-                    selected={activeFilterCategory === 'destinations'}
-                    onClick={() => setActiveCategory('destinations')}
+                  <ListItemButton
+                    selected={activeFilterCategory === "destinations"}
+                    onClick={() => setActiveCategory("destinations")}
                   >
                     <ListItemText primary="Destinations" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton 
-                    selected={activeFilterCategory === 'themes'}
-                    onClick={() => setActiveCategory('themes')}
+                  <ListItemButton
+                    selected={activeFilterCategory === "themes"}
+                    onClick={() => setActiveCategory("themes")}
                   >
                     <ListItemText primary="Themes" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton 
-                    selected={activeFilterCategory === 'occupancy'}
-                    onClick={() => setActiveCategory('occupancy')}
+                  <ListItemButton
+                    selected={activeFilterCategory === "occupancy"}
+                    onClick={() => setActiveCategory("occupancy")}
                   >
                     <ListItemText primary="Occupancy" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton 
-                    selected={activeFilterCategory === 'amenities'}
-                    onClick={() => setActiveCategory('amenities')}
+                  <ListItemButton
+                    selected={activeFilterCategory === "amenities"}
+                    onClick={() => setActiveCategory("amenities")}
                   >
                     <ListItemText primary="Amenities" />
                   </ListItemButton>
@@ -485,13 +505,15 @@ const Accommodations = () => {
             </Grid>
           </Grid>
         </DialogContent>
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'flex-end', 
-          px: 3, 
-          py: 2, 
-          borderTop: '1px solid #e0e0e0' 
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            px: 3,
+            py: 2,
+            borderTop: "1px solid #e0e0e0",
+          }}
+        >
           <Button onClick={toggleFilterModal} sx={{ mr: 1 }}>
             Cancel
           </Button>
@@ -505,57 +527,70 @@ const Accommodations = () => {
         {filteredAccommodations.map((accommodation) => (
           <Grid item key={accommodation.id} xs={12} sm={6} md={4}>
             <Card
-              sx={({
+              sx={{
                 borderRadius: 15,
-                overflow: 'hidden',
-                transition: 'transform 0.3s ease',
-                '&:hover': {
+                overflow: "hidden",
+                transition: "transform 0.3s ease",
+                "&:hover": {
                   boxShadow: 24,
-                  transform: 'translateY(-5px)'
+                  transform: "translateY(-5px)",
                 },
-                bgcolor: 'background.paper'
-              })}>
+                bgcolor: "background.paper",
+              }}
+            >
               <CardMedia
                 component="img"
                 height="200"
                 image={accommodation?.images?.[0] || "./images/defaultImg.png"}
                 alt={accommodation?.name || ""}
-                sx={({
-                  objectFit: 'cover',
-                  width: '100%'
-                })}>
-              </CardMedia>
+                sx={{
+                  objectFit: "cover",
+                  width: "100%",
+                }}
+              ></CardMedia>
               <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mb: 1,
+                  }}
+                >
                   <Typography variant="h6" fontWeight="bold">
                     {accommodation?.name}
                   </Typography>
-                  <Chip 
+                  <Chip
                     label={`${accommodation?.price} ₹`}
                     color="primary"
                     size="small"
-                    sx={{ fontWeight: 'bold' }}
+                    sx={{ fontWeight: "bold" }}
                   />
                 </Box>
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary" 
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
                   sx={{ mb: 2, lineHeight: 1.4 }}
                 >
                   {accommodation?.overview?.substring(0, 100)}...
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
                   {(accommodation?.themes || []).map((theme) => (
-                    <Chip 
+                    <Chip
                       key={theme}
                       label={theme}
                       size="small"
                       variant="outlined"
-                      sx={{ fontSize: '0.75rem' }}
+                      sx={{ fontSize: "0.75rem" }}
                     />
                   ))}
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
                   <Typography variant="body2" color="text.secondary">
                     {accommodation?.destination}
                   </Typography>
@@ -563,13 +598,14 @@ const Accommodations = () => {
                     component={Link}
                     to={accommodation?._id}
                     variant="contained"
-                    sx={({
-                      px: 2, 
-                      py: 0.5, 
-                      fontSize: '0.875rem',
-                      bgcolor: '#004d40',
-                      '&:hover': { bgcolor: '#002c25' }
-                    })}>
+                    sx={{
+                      px: 2,
+                      py: 0.5,
+                      fontSize: "0.875rem",
+                      bgcolor: "#004d40",
+                      "&:hover": { bgcolor: "#002c25" },
+                    }}
+                  >
                     View Details
                   </Button>
                 </Box>
