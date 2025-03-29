@@ -163,10 +163,13 @@ function App() {
             {/* ADD ROUTE FOR ADD TRIP PAGE */}
             <Route
               path="/admin/cms/add-trip"
-              element={<AddTripPage isMobile={isMobile} />}
+              element={ <RequireAuth> <AddTripPage isMobile={isMobile} /> </RequireAuth>}
             />{" "}
             {/* Pass isMobile prop */}
-            <Route path="/admin/edit-trip/:tripId" element={<EditTripPage />} />
+            <Route
+              path="/admin/edit-trip/:tripId"
+              element={ <RequireAuth> <EditTripPage /> </RequireAuth> }
+            />
             {/* Other routes */}
             <Route
               path="/booking-confirmation"

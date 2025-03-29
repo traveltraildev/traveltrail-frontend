@@ -1,4 +1,4 @@
-// Replace the existing HamburgerMenu component with this
+// --- START OF FILE HamburgerMenu.js ---
 import React from 'react';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -22,35 +22,31 @@ const HamburgerMenu = () => {
     <div>
       <IconButton
         size="large"
-        aria-label="Main Menu"
-        aria-controls="hamburger-menu"
-        aria-haspopup="true"
+        edge="end"
+        color="black"
         onClick={handleMenuOpen}
-        color="inherit"
       >
         <MenuIcon />
       </IconButton>
       <Menu
-        id="hamburger-menu"
         anchorEl={anchorEl}
         open={open}
         onClose={handleMenuClose}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-        }}
       >
+        <MenuItem onClick={handleMenuClose} component={Link} to="/">
+          Home
+        </MenuItem>
         <MenuItem onClick={handleMenuClose} component={Link} to="/about-us">
           About Us
         </MenuItem>
         <MenuItem onClick={handleMenuClose} component={Link} to="/contact-us">
           Contact Us
         </MenuItem>
-        <MenuItem
-          onClick={handleMenuClose}
-          component={Link}
-          to="/terms-and-conditions"
-        >
+        <MenuItem onClick={handleMenuClose} component={Link} to="/terms-and-conditions">
           Terms & Conditions
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose} component={Link} to="/admin/login">
+          Login
         </MenuItem>
       </Menu>
     </div>
@@ -58,3 +54,4 @@ const HamburgerMenu = () => {
 };
 
 export default HamburgerMenu;
+// --- END OF FILE ---

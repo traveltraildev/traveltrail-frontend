@@ -1,4 +1,3 @@
-// Replace the existing Home component with this
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/common/Navbar";
 import Hero from "../components/Home/Hero";
@@ -52,7 +51,7 @@ const Home = () => {
           Explore Featured Destinations
         </Typography>
         <Feature title="Trending Stays" data={accommodations} />
-        <Feature title="Popular Destinations" data={trips} />
+        <Feature title="Popular Trips" data={trips} />
         <Box sx={{ mt: 6 }}>
           <Instagram />
         </Box>
