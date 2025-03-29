@@ -5,36 +5,36 @@ import Feature from "../components/Home/Feature";
 import { Box, Container, Typography } from "@mui/material";
 import Instagram from "../components/Home/Instagrams";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const isMobile = useMediaQuery("(max-width:600px)");
-
-  const [accommodations, setAccommodations] = useState([]); // State to store accommodations data
-  const [trips, setTrips] = useState([]); // State to store accommodations data
-  const navigate = useNavigate();
+  const [accommodations, setAccommodations] = useState([]);
+  const [trips, setTrips] = useState([]);
 
   useEffect(() => {
-    const fetchAccommodations = async () => {
+    const fetchAccommodationsAndTrips = async () => {
       try {
-        const accomResp = await fetch("/api/accommodations");
-        const tripResp = await fetch("/api/trips");
-
-        if (!accomResp?.ok)
-          throw new Error(`HTTP error! status: ${accomResp?.status}`);
-
-        const data = await accomResp?.json();
-        setAccommodations(data?.data);
-        setTrips(data?.data);
+        const [accomResp, tripResp] = await Promise.all([
+          fetch("/api/accommodations"),
+          fetch("/api/trips"),
+        ]);
+  
+        if (!accomResp.ok) throw new Error(`HTTP error! status: ${accomResp.status}`);
+        if (!tripResp.ok) throw new Error(`HTTP error! status: ${tripResp.status}`);
+  
+        const dataAccommodations = await accomResp.json();
+        const dataTrips = await tripResp.json();
+  
+        setAccommodations(dataAccommodations.data);
+        setTrips(dataTrips);
       } catch (error) {
-        console.error("Error fetching accommodations:", error);
-        alert("Error loading accommodations. Check console.");
+        console.error("Error fetching accommodations or trips:", error);
       }
     };
-
-    fetchAccommodations();
+  
+    fetchAccommodationsAndTrips();
     window.scrollTo(0, 0);
-  }, [navigate]); // Add dependencies
+  }, []);
 
   return (
     <Box>
