@@ -103,6 +103,7 @@ const EditAboutUsPage = () => {
       {isMobile && <Navbar2 />}
     </>
   );
+  
 };
 
 export default EditAboutUsPage;
