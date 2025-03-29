@@ -18,20 +18,22 @@ const Home = () => {
           fetch("/api/accommodations"),
           fetch("/api/trips"),
         ]);
-  
-        if (!accomResp.ok) throw new Error(`HTTP error! status: ${accomResp.status}`);
-        if (!tripResp.ok) throw new Error(`HTTP error! status: ${tripResp.status}`);
-  
+
+        if (!accomResp.ok)
+          throw new Error(`HTTP error! status: ${accomResp.status}`);
+        if (!tripResp.ok)
+          throw new Error(`HTTP error! status: ${tripResp.status}`);
+
         const dataAccommodations = await accomResp.json();
         const dataTrips = await tripResp.json();
-  
+
         setAccommodations(dataAccommodations.data);
         setTrips(dataTrips);
       } catch (error) {
         console.error("Error fetching accommodations or trips:", error);
       }
     };
-  
+
     fetchAccommodationsAndTrips();
     window.scrollTo(0, 0);
   }, []);
@@ -50,8 +52,12 @@ const Home = () => {
         >
           Explore Featured Destinations
         </Typography>
-        <Feature title="Trending Stays" data={accommodations} />
-        <Feature title="Popular Trips" data={trips} />
+        <Feature
+          title="Trending Stays"
+          data={accommodations}
+          type={"accommodations"}
+        />
+        <Feature title="Popular Trips" data={trips} type={"trips"} />
         <Box sx={{ mt: 6 }}>
           <Instagram />
         </Box>
