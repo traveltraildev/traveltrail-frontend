@@ -1,42 +1,4 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
+/* App.css */
 .app-container {
   background-color: var(--neutral-50);
   min-height: 100vh;
@@ -58,7 +20,7 @@ body {
 
 /* Add these styles to your app.css */
 .navbar {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(224, 247, 250, 0.7));
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 248, 225, 0.7));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px); /* For Safari and older browsers */
   border-radius: 0 0 10px 10px;
@@ -68,7 +30,7 @@ body {
 }
 
 .navbar.scrolled {
-  background: linear-gradient(to bottom, #ffffff, #e0f7fa);
+  background: linear-gradient(to bottom, #ffffff, var(--primary-100));
 }
 
 .navbar-logo {

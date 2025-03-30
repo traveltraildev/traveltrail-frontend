@@ -1,4 +1,3 @@
-// --- START OF FILE Navbar.js ---
 import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -11,9 +10,16 @@ import { styled } from "@mui/material/styles";
 
 // Custom styled components
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundImage: "linear-gradient(to right, #e0f7fa, #b2ebf2)",
+  backgroundImage: "linear-gradient(to right, var(--primary-100), var(--primary-300))",
   backgroundColor: "transparent",
   boxShadow: "none",
+}));
+
+const Logo = styled(Box)(({ theme }) => ({
+  width: '120px', // Adjust the width as needed
+  height: '40px', // Adjust the height as needed
+  marginRight: '10px', // Add some spacing
+  objectFit: 'contain', // Maintain aspect ratio
 }));
 
 export default function Navbar() {
@@ -33,13 +39,13 @@ export default function Navbar() {
         <Toolbar sx={{ px: { xs: 1, md: 3 } }}>
           {/* Logo */}
           <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-            <Box>
+            <Logo>
               <img
-                src="/images/logo.jpg"
+                src="/images/logo.svg"
                 alt="Travel Trail"
-                style={{ height: "40px", width: "auto" }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
-            </Box>
+            </Logo>
           </Link>
 
           <Box sx={{ flexGrow: 1 }} />
@@ -65,4 +71,3 @@ export default function Navbar() {
     </Box>
   );
 }
-// --- END OF FILE ---
