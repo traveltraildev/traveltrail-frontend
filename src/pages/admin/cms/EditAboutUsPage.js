@@ -1,21 +1,19 @@
-// --- START OF FILE src/pages/admin/cms/EditAboutUsPage.js ---
 import React, { useState, useEffect } from "react";
 import { Container, Typography, TextField, Button, Box } from "@mui/material";
 import Navbar from "../../../components/common/Navbar";
 import Navbar2 from "../../../components/common/Navbar2";
 import Footer from "../../../components/common/Footer";
-// REMOVE CKEditor 5 Imports - Not needed in reverted version
-// import { CKEditor } from '@ckeditor/ckeditor5-react';
-// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import ReactQuill from 'react-quill'; // Import ReactQuill
+import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { getAuthHeader } from "../../../utils";
 
 const EditAboutUsPage = () => {
   const [pageContent, setPageContent] = useState({ title: "", content: "" });
   const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
-    // Fetch content from REAL backend API (no changes needed here)
-    fetch('/api/cms/pages/about-us')
+    fetch("/api/cms/pages/about-us")
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -33,18 +31,29 @@ const EditAboutUsPage = () => {
   }, []);
 
   const handleChange = (e) => {
-    setPageContent((prevData) => ({ ...prevData, [e.target.name]: e.target.value })); // Reverted handleChange
+    setPageContent((prevData) => ({
+      ...prevData,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleEditorChange = (content) => {
+    setPageContent((prevData) => ({
+      ...prevData,
+      content: content,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/cms/pages/about-us', {
-        method: 'PUT',
+      const response = await fetch("/api/cms/pages/about-us", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
         },
-        body: JSON.stringify(pageContent), // Send updated content in request body - NO CHANGE HERE
+        body: JSON.stringify(pageContent),
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -63,7 +72,11 @@ const EditAboutUsPage = () => {
         <Typography variant="h4" component="h1" align="center" gutterBottom>
           Edit About Us Page
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+        >
           <TextField
             label="Title"
             name="title"
@@ -72,16 +85,14 @@ const EditAboutUsPage = () => {
             fullWidth
             variant="outlined"
           />
-          {/* Reverted back to TextField for Content (HTML) */}
-          <TextField
-            label="Content (HTML)"
-            name="content"
-            multiline
-            rows={10}
+          <ReactQuill
             value={pageContent.content}
-            onChange={handleChange}
-            fullWidth
-            variant="outlined"
+            onChange={handleEditorChange}
+            modules={ReactQuill.modules}
+            formats={ReactQuill.formats}
+            theme="snow"
+            placeholder="Enter content..."
+            style={{ height: '300px' }}
           />
           <Button type="submit" variant="contained" color="primary">
             Save Changes
@@ -92,7 +103,7 @@ const EditAboutUsPage = () => {
       {isMobile && <Navbar2 />}
     </>
   );
+  
 };
 
 export default EditAboutUsPage;
-// --- END OF FILE src/pages/admin/cms/EditAboutUsPage.js ---

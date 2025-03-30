@@ -1,7 +1,7 @@
 // --- START OF FILE accommodationsData.js ---
 const accommodationsData = [
     {
-      name: "Luxury Beachfront Resort - Ocean View Suite",
+      name: "Platinum Beachfront Resort - Ocean View Suite",
       images: [
         "/images/accommodation1_1.jpg",
         "/images/accommodation1_2.jpg",

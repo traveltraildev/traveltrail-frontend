@@ -1,10 +1,5 @@
-// --- START OF FILE TermsAndConditionsPage.js ---
-import React, { useState, useEffect } from "react"; // <-- ADD THIS IMPORT STATEMENT
-import Navbar from "../components/common/Navbar";
-import Navbar2 from "../components/common/Navbar2";
-import Footer from "../components/common/Footer";
-import { Container, Typography, Box, Card, CardContent } from "@mui/material"; // ADDED Card and CardContent import
-//import cmsData from "../data/cmsData";
+import React, { useState, useEffect } from "react";
+import { Container, Typography, Box, Card } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 const TermsAndConditionsPage = () => {
@@ -34,34 +29,70 @@ const TermsAndConditionsPage = () => {
   }
 
   return (
-    <>
-      <Navbar />
-      <Container maxWidth="md" sx={{ paddingTop: "20px", paddingBottom: "20px", marginTop: "50px" }}> {/* UPDATED marginTop: "50px" */}
-        <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ fontWeight: 'bold' }}> {/* Bolder Heading */}
-          {pageContent.title}
-        </Typography>
+    <Container maxWidth="md" sx={{ mt: 8, mb: 4, px: 2 }}>
+      <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
+        {pageContent.title}
+      </Typography>
 
-        {/* Card wrapping the content Box */}
-        <Card elevation={3} sx={{ borderRadius: '12px' }}> {/* Card for content area, added elevation and borderRadius */}
-          <CardContent sx={{ padding: '32px' }}> {/* CardContent with increased padding */}
-            <Box
-              sx={{
-                textAlign: "left",
-                "& p": { mb: 2, color: 'text.secondary', fontSize: '1rem', lineHeight: 1.6 }, // Improved paragraph styling
-                "& a": { color: "primary.main", textDecoration: "none" },
-              }}
-            >
-              <div dangerouslySetInnerHTML={{ __html: pageContent.content }} />
-            </Box>
-          </CardContent>
-        </Card>
-
-      </Container>
-      <Footer />
-      {isMobile && <Navbar2 />}
-    </>
+      <Card elevation={3} sx={{ 
+        borderRadius: '12px', 
+        p: 4,
+        width: '100%',
+        maxWidth: '100%',
+        overflow: 'hidden',
+      }}>
+        <Box
+          sx={{
+            "& p": { 
+              mb: 2, 
+              color: 'text.secondary', 
+              fontSize: '1rem', 
+              lineHeight: 1.6,
+              overflowWrap: 'break-word',
+              wordBreak: 'break-word',
+              whiteSpace: 'normal',
+              maxWidth: '100%',
+              width: '100%',
+              textAlign: 'left', // Left-align text
+            },
+            "& a": { color: "primary.main", textDecoration: "none" },
+            "& ul": { 
+              pl: 4, // Add left padding for bullet points
+              ml: 2, // Add left margin for bullet points
+            },
+            "& ol": { 
+              pl: 4, // Add left padding for numbered lists
+              ml: 2, // Add left margin for numbered lists
+            },
+            "& li": { 
+              mb: 1, 
+              ml: 0, // Reset left margin for list items
+              textAlign: 'left', // Left-align list items
+            },
+            "& h1": { 
+              fontSize: '2rem', 
+              fontWeight: 'bold', 
+              mb: 2,
+              textAlign: 'center', // Center-align headings
+            },
+            "& h2": { 
+              fontSize: '1.5rem', 
+              fontWeight: 'bold', 
+              mb: 1.5,
+              textAlign: 'left', // Left-align subheadings
+            },
+            "& h3": { 
+              fontSize: '1.25rem', 
+              fontWeight: 'bold', 
+              mb: 1,
+              textAlign: 'left', // Left-align subheadings
+            },
+          }}
+          dangerouslySetInnerHTML={{ __html: pageContent.content }}
+        />
+      </Card>
+    </Container>
   );
 };
 
 export default TermsAndConditionsPage;
-// --- END OF FILE TermsAndConditionsPage.js ---

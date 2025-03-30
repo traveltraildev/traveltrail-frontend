@@ -1,25 +1,20 @@
-// --- START OF FILE TripDetails.js ---
+// Replace the existing TripDetails component with this
 import React, { useEffect, useState } from "react";
 import ImageGallery from "../components/TripDetails/ImageGallery";
 import { useParams } from "react-router-dom";
-// import trips from "../data/trips"; // Remove trips import - No longer needed
-import { Box, Typography, Container, Grid } from "@mui/material";
+import { Box, Container, Grid, Typography } from "@mui/material";
 import TripInfo from "../components/TripDetails/TripInfo";
 import BookNow from "../components/TripDetails/BookNow";
-import Navbar from "../components/common/Navbar";
-import Navbar2 from "../components/common/Navbar2";
-import Footer from "../components/common/Footer";
 import StickyTripTitle from "../components/TripDetails/StickyTripTitle";
 
-
 const TripDetails = ({ isMobile }) => {
-  const { id } = useParams(); // Get tripId from URL params
-  const [trip, setTrip] = useState(null); // Initialize trip state to null
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [trip, setTrip] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
 
   useEffect(() => {
-    setLoading(true); // Set loading to true before fetching
-    fetch(`/api/trips/${id}`) // Fetch specific trip data from backend API using tripId
+    setLoading(true);
+    fetch(`/api/trips/${id}`)
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -27,74 +22,55 @@ const TripDetails = ({ isMobile }) => {
         return response.json();
       })
       .then(data => {
-        setTrip(data); // Set fetched trip data to state
-        setLoading(false); // Set loading to false after successful fetch
+        setTrip(data);
+        setLoading(false);
       })
       .catch(error => {
         console.error("Error fetching trip details:", error);
         alert("Error loading trip details. Check console.");
-        setLoading(false); // Set loading to false even on error
+        setLoading(false);
       });
     window.scrollTo(0, 0);
-  }, [id]); // useEffect dependency on id - fetch data when id changes
+  }, [id]);
 
-  if (loading) { // Loading indicator
+  if (loading) {
     return (
-      <>
-        <Navbar />
-        <Container maxWidth="lg" sx={{ paddingTop: "20px", paddingBottom: "20px" }}>
-          <Typography variant="h6" align="center">Loading trip details...</Typography>
-        </Container>
-        <Footer />
-        <Navbar2 />
-      </>
+      <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
+        <Typography variant="h6" align="center">
+          Loading trip details...
+        </Typography>
+      </Container>
     );
   }
 
-  if (!trip) {  // Error handling if trip data is not found
+  if (!trip) {
     return (
-      <>
-        <Navbar />
-
-        <Container maxWidth="lg" sx={{ paddingTop: "20px", paddingBottom: "20px" }}>
-          <Typography variant="h6" align="center" color="error">Trip not found</Typography>
-        </Container>
-        <Footer />
-        <Navbar2 />
-      </>
+      <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
+        <Typography variant="h6" align="center" color="error">
+          Trip not found
+        </Typography>
+      </Container>
     );
   }
 
   return (
     <>
-      <Navbar />
-      {trip && <StickyTripTitle trip={trip} />}
-
-      <Container maxWidth="lg" sx={{ 
-        paddingTop: "100px", // Add space for sticky header 
-        paddingBottom: "20px" 
-      }}>
+      <StickyTripTitle trip={trip} />
+      <Container maxWidth="lg" sx={{ mt: "100px", pb: 4 }}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <ImageGallery images={trip.images} /> {/* Use dynamic trip images */}
+            <ImageGallery images={trip.images} />
           </Grid>
-
           <Grid item xs={12} md={8}>
-            <Box>
-              <TripInfo trip={trip} /> {/* Pass dynamic trip data to TripInfo */}
-            </Box>
+            <TripInfo trip={trip} />
           </Grid>
-
           <Grid item xs={12} md={4}>
-            <BookNow trip={trip} />{/* Pass dynamic trip data to BookNow */}
+            <BookNow trip={trip} />
           </Grid>
         </Grid>
       </Container>
-      <Footer />
-      {isMobile && <Navbar2 />}
     </>
   );
 };
 
 export default TripDetails;
-// --- END OF FILE TripDetails.js ---

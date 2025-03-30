@@ -1,112 +1,73 @@
-// --- START OF FILE Navbar.js ---
 import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import PinDropIcon from "@mui/icons-material/PinDrop";
 import { Link } from "react-router-dom";
 import HamburgerMenu from "./HamburgerMenu";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useAuth } from '../../context/AuthContext';
-import Button from '@mui/material/Button';
+import { styled } from "@mui/material/styles";
+
+// Custom styled components
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  backgroundImage: "linear-gradient(to right, var(--primary-100), var(--primary-300))",
+  backgroundColor: "transparent",
+  boxShadow: "none",
+}));
+
+const Logo = styled(Box)(({ theme }) => ({
+  width: '120px', // Adjust the width as needed
+  height: '40px', // Adjust the height as needed
+  marginRight: '10px', // Add some spacing
+  objectFit: 'contain', // Maintain aspect ratio
+}));
 
 export default function Navbar() {
-  const isSmallScreen = useMediaQuery('(max-width:600px)');
-  const { isAuthenticated, logout } = useAuth();
+  const isSmallScreen = useMediaQuery("(max-width:768px)");
 
   return (
-    <Box sx={{ flexGrow: 1, position: "fixed", zIndex: 1, width: "100%", top: 0 }}>
-      <AppBar
-        position="static"
-        sx={{
-          backgroundColor: "white",
-          boxShadow: "none",
-          color: "black",
-          backgroundImage: 'linear-gradient(to right, #e0f7fa, #b2ebf2)',
-        }}
-      >
-        <Toolbar>
-          <Link to="/">
-            <Box>
+    <Box
+      sx={{ 
+        flexGrow: 1, 
+        position: "fixed", 
+        zIndex: 1, 
+        width: "100%", 
+        top: 0,
+      }}
+    >
+      <StyledAppBar position="static">
+        <Toolbar sx={{ px: { xs: 1, md: 3 } }}>
+          {/* Logo */}
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <Logo>
               <img
-                src="/images/logo.jpg"
+                src="/images/logo.svg"
                 alt="Travel Trail"
-                style={{ height: "50px", width: "100%" }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
-            </Box>
+            </Logo>
           </Link>
-          <Box sx={{ flexGrow: 1 }} />
-          
-          {/* Common Elements */}
-          <Typography>
-            <PinDropIcon sx={{ mt: "8px", mr: "8px" }} />
-          </Typography>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ display: { sm: "block" } }}
-          >
-            Gurgaon
-          </Typography>
 
-          {/* Conditional Admin Elements */}
-          {isAuthenticated ? (
-            <Box sx={{ display: "flex", alignItems: 'center' }}>
-              <Button 
-                component={Link}
-                to="/admin/cms"
-                color="inherit"
-                sx={{ ml: 2, textDecoration: 'none' }}
-              >
-                CMS
-              </Button>
-              <Button 
-                color="inherit" 
-                onClick={logout}
-                sx={{ mx: 2 }}
-              >
-                Logout
-              </Button>
-              <IconButton
-                size="large"
-                edge="end"
-                aria-label="admin account"
-                color="inherit"
-              >
-                <AccountCircle />
-              </IconButton>
-            </Box>
-          ) : (
-            <Box sx={{ display: "flex", alignItems: 'center' }}>
-              <Typography
-                variant="h6"
-                component={Link}
-                to="/trips"
-                color="inherit"
-                sx={{ ml: 2, textDecoration: 'none', display: { xs: "none", md: "block" } }}
-              >
+          <Box sx={{ flexGrow: 1 }} />
+
+          {/* Primary Menu Items */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
+            <Link to="/trips" style={{ textDecoration: "none", color: "#333" }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
                 Trips
               </Typography>
-              {!isSmallScreen && (
-                <IconButton
-                  size="large"
-                  edge="end"
-                  aria-label="user account"
-                  color="inherit"
-                >
-                  <AccountCircle />
-                </IconButton>
-              )}
-              <HamburgerMenu />
-            </Box>
-          )}
+            </Link>
+            <Link to="/accommodations" style={{ textDecoration: "none", color: "#333" }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                Accommodations
+              </Typography>
+            </Link>
+          </Box>
+
+          {/* Hamburger Menu */}
+          <HamburgerMenu />
         </Toolbar>
-      </AppBar>
+      </StyledAppBar>
     </Box>
   );
 }
-// --- END OF FILE ---

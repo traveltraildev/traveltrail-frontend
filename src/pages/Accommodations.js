@@ -1,5 +1,4 @@
-// --- START OF FILE src/components/TripsCard.js ---
-
+// src/pages/Accommodations.js
 import React, { useEffect, useState } from "react";
 import {
   Card,
@@ -29,26 +28,21 @@ import {
 } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-const TripsCard = () => {
-  const [trips, setTrips] = useState([]);
-  const [filteredTrips, setFilteredTrips] = useState([]);
+const Accommodations = () => {
+  const [accommodations, setAccommodations] = useState([]);
+  const [filteredAccommodations, setFilteredAccommodations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [activeFilterCategory, setActiveFilterCategory] = useState("sort");
-  const [filterState, setFilterState] = useState({
-    sortBy: "name",
-    priceRange: [0, 1000000],
-    selectedDestinations: [],
-    selectedThemes: [],
-    selectedInclusions: [],
-    selectedExclusions: [],
-  });
-  const [filterOptions, setFilterOptions] = useState({
-    destinations: [],
-    themes: [],
-    inclusions: [],
-    exclusions: [],
-  });
+  const [activeFilterCategory, setActiveFilterCategory] = useState(null);
+  const [sortBy, setSortBy] = useState("name");
+  const [priceRange, setPriceRange] = useState([0, 10000]);
+  const [selectedDestinations, setSelectedDestinations] = useState([]);
+  const [selectedThemes, setSelectedThemes] = useState([]);
+  const [maxOccupancy, setMaxOccupancy] = useState(0);
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
+  const [allDestinations, setAllDestinations] = useState([]);
+  const [allThemes, setAllThemes] = useState([]);
+  const [allAmenities, setAllAmenities] = useState([]);
   const navigate = useNavigate();
 
   const location = useLocation();
@@ -60,51 +54,59 @@ const TripsCard = () => {
     }
   }, [preSearch]);
 
-  // Fetch trips data
   useEffect(() => {
-    const fetchTrips = async () => {
+    filterAccommodations();
+  }, [
+    searchTerm,
+    accommodations,
+    priceRange,
+    selectedDestinations,
+    selectedThemes,
+    maxOccupancy,
+    selectedAmenities,
+    sortBy,
+  ]);
+
+  useEffect(() => {
+    const fetchAccommodations = async () => {
       try {
-        const response = await fetch("/api/trips");
-        if (!response.ok) throw new Error("Failed to fetch trips");
+        const response = await fetch("/api/accommodations");
+        if (!response.ok) throw new Error("Failed to fetch accommodations");
         const data = await response.json();
-        setTrips(data);
-        setFilteredTrips(data);
+        setAccommodations(data.data || []); // Handle null case
+        setFilteredAccommodations(data.data || []);
       } catch (error) {
-        console.error("Error fetching trips:", error);
-        alert("Error loading trips. Check console.");
+        console.error("Error fetching accommodations:", error);
+        alert("Error loading accommodations. Check console.");
       }
     };
 
-    fetchTrips();
+    fetchAccommodations();
   }, [navigate]);
 
-  // Fetch filter options
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
-        const [
-          destinationsResponse,
-          themesResponse,
-          inclusionsResponse,
-          exclusionsResponse,
-        ] = await Promise.all([
-          fetch("/api/trips/filters/destinations"),
-          fetch("/api/trips/filters/themes"),
-          fetch("/api/trips/filters/inclusions"),
-          fetch("/api/trips/filters/exclusions"),
-        ]);
-
+        // Fetch destinations
+        const destinationsResponse = await fetch(
+          "/api/accommodations/filters/destinations"
+        );
         const destinations = await destinationsResponse.json();
-        const themes = await themesResponse.json();
-        const inclusions = await inclusionsResponse.json();
-        const exclusions = await exclusionsResponse.json();
+        setAllDestinations(destinations);
 
-        setFilterOptions({
-          destinations,
-          themes,
-          inclusions,
-          exclusions,
-        });
+        // Fetch themes
+        const themesResponse = await fetch(
+          "/api/accommodations/filters/themes"
+        );
+        const themes = await themesResponse.json();
+        setAllThemes(themes);
+
+        // Fetch amenities
+        const amenitiesResponse = await fetch(
+          "/api/accommodations/filters/amenities"
+        );
+        const amenities = await amenitiesResponse.json();
+        setAllAmenities(amenities);
       } catch (error) {
         console.error("Error fetching filter options:", error);
       }
@@ -113,97 +115,139 @@ const TripsCard = () => {
     fetchFilterOptions();
   }, []);
 
-  // Apply filters when any filter state changes
-  useEffect(() => {
-    applyFilters();
-  }, [filterState, trips, searchTerm]);
-
   const handleSearch = (event) => {
+    // const value = event.target.value;
+    // setSearchTerm(value);
+
+    // if (value.trim() === "") {
+    //   setFilteredAccommodations(accommodations);
+    // } else {
+    //   filterAccommodations();
+    // }
+
     setSearchTerm(event.target.value);
   };
 
-  const handleFilterChange = (newFilterState) => {
-    setFilterState((prev) => ({ ...prev, ...newFilterState }));
+  const handleSortChange = (event) => {
+    setSortBy(event.target.value);
+    filterAccommodations();
+  };
+
+  const handlePriceChange = (event, newValue) => {
+    setPriceRange(newValue);
+    filterAccommodations();
+  };
+
+  const handleDestinationChange = (event) => {
+    setSelectedDestinations((prev) =>
+      event.target.checked
+        ? [...prev, event.target.value]
+        : prev.filter((dest) => dest !== event.target.value)
+    );
+    filterAccommodations();
+  };
+
+  const handleThemeChange = (event) => {
+    const newThemes = event.target.checked
+      ? [...selectedThemes, event.target.value]
+      : selectedThemes.filter((theme) => theme !== event.target.value);
+    setSelectedThemes(newThemes);
+    filterAccommodations();
+  };
+
+  const handleOccupancyChange = (event) => {
+    setMaxOccupancy(event.target.value);
+    filterAccommodations();
+  };
+
+  const handleAmenitiesChange = (event) => {
+    const newAmenities = event.target.checked
+      ? [...selectedAmenities, event.target.value]
+      : selectedAmenities.filter((amenity) => amenity !== event.target.value);
+    setSelectedAmenities(newAmenities);
+    filterAccommodations();
   };
 
   const toggleFilterModal = () => {
     setIsFilterModalOpen(!isFilterModalOpen);
   };
 
-  const applyFilters = () => {
-    let filtered = [...trips];
+  const setActiveCategory = (category) => {
+    setActiveFilterCategory(category);
+  };
+
+  const filterAccommodations = () => {
+    let filtered = [...accommodations];
 
     // Search filter
     if (searchTerm.trim() !== "") {
-      filtered = filtered.filter((trip) =>
-        trip.name.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter((accommodation) =>
+        accommodation.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Price filter
     filtered = filtered.filter(
-      (trip) =>
-        trip.price >= filterState.priceRange[0] &&
-        trip.price <= filterState.priceRange[1]
+      (accommodation) =>
+        accommodation.price >= priceRange[0] &&
+        accommodation.price <= priceRange[1]
     );
 
     // Destination filter
-    if (filterState.selectedDestinations.length > 0) {
-      filtered = filtered.filter((trip) =>
-        filterState.selectedDestinations.includes(trip.destination)
+    if (selectedDestinations.length > 0) {
+      filtered = filtered.filter((accommodation) =>
+        selectedDestinations.includes(accommodation.destination)
       );
     }
 
     // Theme filter
-    if (filterState.selectedThemes.length > 0) {
-      filtered = filtered.filter((trip) =>
-        filterState.selectedThemes.some((theme) =>
-          (trip.themes || []).includes(theme)
+    if (selectedThemes.length > 0) {
+      filtered = filtered.filter((accommodation) =>
+        selectedThemes.some(
+          (theme) => (accommodation.themes || []).includes(theme) // Handle undefined
         )
       );
     }
 
-    // Inclusions filter
-    if (filterState.selectedInclusions.length > 0) {
-      filtered = filtered.filter((trip) =>
-        filterState.selectedInclusions.every((inclusion) =>
-          (trip.inclusions || []).includes(inclusion)
-        )
+    // Occupancy filter
+    if (maxOccupancy > 0) {
+      filtered = filtered.filter(
+        (accommodation) => (accommodation.maxOccupancy || 0) >= maxOccupancy
       );
     }
 
-    // Exclusions filter
-    if (filterState.selectedExclusions.length > 0) {
-      filtered = filtered.filter((trip) =>
-        filterState.selectedExclusions.every((exclusion) =>
-          (trip.exclusions || []).includes(exclusion)
+    // Amenities filter
+    if (selectedAmenities.length > 0) {
+      filtered = filtered.filter((accommodation) =>
+        selectedAmenities.every(
+          (amenity) => (accommodation.amenities || []).includes(amenity) // Handle undefined
         )
       );
     }
 
     // Sort
     filtered.sort((a, b) => {
-      if (filterState.sortBy === "price-low") {
+      if (sortBy === "price-low") {
         return a.price - b.price;
-      } else if (filterState.sortBy === "price-high") {
+      } else if (sortBy === "price-high") {
         return b.price - a.price;
       }
       return a.name.localeCompare(b.name);
     });
 
-    setFilteredTrips(filtered);
+    setFilteredAccommodations(filtered);
   };
 
+  // Filter content components
   const renderFilterContent = () => {
     switch (activeFilterCategory) {
       case "sort":
         return (
           <Box sx={{ mt: 3 }}>
-            <RadioGroup
-              value={filterState.sortBy}
-              onChange={(e) => handleFilterChange({ sortBy: e.target.value })}
-              row
-            >
+            <Typography variant="h6" gutterBottom>
+              Sort By
+            </Typography>
+            <RadioGroup value={sortBy} onChange={handleSortChange} row>
               <FormControlLabel value="name" control={<Radio />} label="Name" />
               <FormControlLabel
                 value="price-low"
@@ -221,11 +265,12 @@ const TripsCard = () => {
       case "price":
         return (
           <Box sx={{ mt: 3 }}>
+            <Typography variant="h6" gutterBelow>
+              Price Range
+            </Typography>
             <Slider
-              value={filterState.priceRange}
-              onChange={(e, newValue) =>
-                handleFilterChange({ priceRange: newValue })
-              }
+              value={priceRange}
+              onChange={handlePriceChange}
               valueLabelDisplay="auto"
               min={0}
               max={10000}
@@ -245,23 +290,17 @@ const TripsCard = () => {
       case "destinations":
         return (
           <Box sx={{ mt: 3 }}>
-            {filterOptions.destinations.map((destination) => (
+            <Typography variant="h6" gutterBelow>
+              Destinations
+            </Typography>
+            {allDestinations.map((destination) => (
               <FormControlLabel
                 key={destination}
                 control={
                   <Checkbox
-                    checked={filterState.selectedDestinations.includes(
-                      destination
-                    )}
-                    onChange={(e) =>
-                      handleFilterChange({
-                        selectedDestinations: e.target.checked
-                          ? [...filterState.selectedDestinations, destination]
-                          : filterState.selectedDestinations.filter(
-                              (d) => d !== destination
-                            ),
-                      })
-                    }
+                    checked={selectedDestinations.includes(destination)}
+                    onChange={(e) => handleDestinationChange(e)}
+                    value={destination}
                   />
                 }
                 label={destination}
@@ -272,21 +311,17 @@ const TripsCard = () => {
       case "themes":
         return (
           <Box sx={{ mt: 3 }}>
-            {filterOptions.themes.map((theme) => (
+            <Typography variant="h6" gutterBelow>
+              Themes
+            </Typography>
+            {allThemes.map((theme) => (
               <FormControlLabel
                 key={theme}
                 control={
                   <Checkbox
-                    checked={filterState.selectedThemes.includes(theme)}
-                    onChange={(e) =>
-                      handleFilterChange({
-                        selectedThemes: e.target.checked
-                          ? [...filterState.selectedThemes, theme]
-                          : filterState.selectedThemes.filter(
-                              (t) => t !== theme
-                            ),
-                      })
-                    }
+                    checked={selectedThemes.includes(theme)}
+                    onChange={(e) => handleThemeChange(e)}
+                    value={theme}
                   />
                 }
                 label={theme}
@@ -294,52 +329,51 @@ const TripsCard = () => {
             ))}
           </Box>
         );
-      case "inclusions":
+      case "occupancy":
         return (
           <Box sx={{ mt: 3 }}>
-            {filterOptions.inclusions.map((inclusion) => (
-              <FormControlLabel
-                key={inclusion}
-                control={
-                  <Checkbox
-                    checked={filterState.selectedInclusions.includes(inclusion)}
-                    onChange={(e) =>
-                      handleFilterChange({
-                        selectedInclusions: e.target.checked
-                          ? [...filterState.selectedInclusions, inclusion]
-                          : filterState.selectedInclusions.filter(
-                              (i) => i !== inclusion
-                            ),
-                      })
-                    }
-                  />
-                }
-                label={inclusion}
+            <Typography variant="h6" gutterBelow>
+              Occupancy
+            </Typography>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={maxOccupancy > 0}
+                  onChange={(e) => setMaxOccupancy(e.target.checked ? 2 : 0)}
+                />
+              }
+              label="Family-Friendly (2+ guests)"
+            />
+            {maxOccupancy > 0 && (
+              <Autocomplete
+                options={[2, 3, 4, 5, 6]}
+                value={maxOccupancy}
+                onChange={(e, value) => setMaxOccupancy(value)}
+                renderInput={(params) => (
+                  <TextField {...params} label="Minimum Occupancy" />
+                )}
+                sx={{ mt: 1 }}
               />
-            ))}
+            )}
           </Box>
         );
-      case "exclusions":
+      case "amenities":
         return (
           <Box sx={{ mt: 3 }}>
-            {filterOptions.exclusions.map((exclusion) => (
+            <Typography variant="h6" gutterBelow>
+              Amenities
+            </Typography>
+            {allAmenities.map((amenity) => (
               <FormControlLabel
-                key={exclusion}
+                key={amenity}
                 control={
                   <Checkbox
-                    checked={filterState.selectedExclusions.includes(exclusion)}
-                    onChange={(e) =>
-                      handleFilterChange({
-                        selectedExclusions: e.target.checked
-                          ? [...filterState.selectedExclusions, exclusion]
-                          : filterState.selectedExclusions.filter(
-                              (e) => e !== exclusion
-                            ),
-                      })
-                    }
+                    checked={selectedAmenities.includes(amenity)}
+                    onChange={(e) => handleAmenitiesChange(e)}
+                    value={amenity}
                   />
                 }
-                label={exclusion}
+                label={amenity}
               />
             ))}
           </Box>
@@ -359,7 +393,7 @@ const TripsCard = () => {
         color="#000"
         marginBottom={"30px"}
       >
-        Explore Your Next Adventure
+        Explore Your Accommodations
       </Typography>
 
       {/* Search Bar */}
@@ -371,23 +405,24 @@ const TripsCard = () => {
           fullWidth
           sx={{
             mb: 2,
-            borderRadius: "50px",
+            borderRadius: "50px", // Rounded edges
             overflow: "hidden",
           }}
           InputProps={{
             style: {
-              borderRadius: "50px",
+              borderRadius: "50px", // Rounded input field
             },
           }}
         />
 
         {/* Filter Chips */}
+
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
           <Chip
             label="Filters"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory("sort");
+              setActiveCategory("sort"); // Default to sort when "Filters" is clicked
             }}
             variant="outlined"
             sx={{ cursor: "pointer" }}
@@ -396,7 +431,7 @@ const TripsCard = () => {
             label="Sort"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory("sort");
+              setActiveCategory("sort");
             }}
             variant="outlined"
             sx={{ cursor: "pointer" }}
@@ -405,7 +440,7 @@ const TripsCard = () => {
             label="Price"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory("price");
+              setActiveCategory("price");
             }}
             variant="outlined"
             sx={{ cursor: "pointer" }}
@@ -414,7 +449,7 @@ const TripsCard = () => {
             label="Destinations"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory("destinations");
+              setActiveCategory("destinations");
             }}
             variant="outlined"
             sx={{ cursor: "pointer" }}
@@ -423,25 +458,25 @@ const TripsCard = () => {
             label="Themes"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory("themes");
+              setActiveCategory("themes");
             }}
             variant="outlined"
             sx={{ cursor: "pointer" }}
           />
           <Chip
-            label="Inclusions"
+            label="Occupancy"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory("inclusions");
+              setActiveCategory("occupancy");
             }}
             variant="outlined"
             sx={{ cursor: "pointer" }}
           />
           <Chip
-            label="Exclusions"
+            label="Amenities"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory("exclusions");
+              setActiveCategory("amenities");
             }}
             variant="outlined"
             sx={{ cursor: "pointer" }}
@@ -457,7 +492,7 @@ const TripsCard = () => {
         maxWidth="md"
         PaperProps={{
           sx: {
-            borderRadius: "20px",
+            borderRadius: "20px", // Rounded modal
             overflow: "hidden",
             boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
           },
@@ -482,7 +517,7 @@ const TripsCard = () => {
                 <ListItem disablePadding>
                   <ListItemButton
                     selected={activeFilterCategory === "sort"}
-                    onClick={() => setActiveFilterCategory("sort")}
+                    onClick={() => setActiveCategory("sort")}
                   >
                     <ListItemText primary="Sort By" />
                   </ListItemButton>
@@ -490,7 +525,7 @@ const TripsCard = () => {
                 <ListItem disablePadding>
                   <ListItemButton
                     selected={activeFilterCategory === "price"}
-                    onClick={() => setActiveFilterCategory("price")}
+                    onClick={() => setActiveCategory("price")}
                   >
                     <ListItemText primary="Price Range" />
                   </ListItemButton>
@@ -498,7 +533,7 @@ const TripsCard = () => {
                 <ListItem disablePadding>
                   <ListItemButton
                     selected={activeFilterCategory === "destinations"}
-                    onClick={() => setActiveFilterCategory("destinations")}
+                    onClick={() => setActiveCategory("destinations")}
                   >
                     <ListItemText primary="Destinations" />
                   </ListItemButton>
@@ -506,25 +541,25 @@ const TripsCard = () => {
                 <ListItem disablePadding>
                   <ListItemButton
                     selected={activeFilterCategory === "themes"}
-                    onClick={() => setActiveFilterCategory("themes")}
+                    onClick={() => setActiveCategory("themes")}
                   >
                     <ListItemText primary="Themes" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
                   <ListItemButton
-                    selected={activeFilterCategory === "inclusions"}
-                    onClick={() => setActiveFilterCategory("inclusions")}
+                    selected={activeFilterCategory === "occupancy"}
+                    onClick={() => setActiveCategory("occupancy")}
                   >
-                    <ListItemText primary="Inclusions" />
+                    <ListItemText primary="Occupancy" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
                   <ListItemButton
-                    selected={activeFilterCategory === "exclusions"}
-                    onClick={() => setActiveFilterCategory("exclusions")}
+                    selected={activeFilterCategory === "amenities"}
+                    onClick={() => setActiveCategory("amenities")}
                   >
-                    <ListItemText primary="Exclusions" />
+                    <ListItemText primary="Amenities" />
                   </ListItemButton>
                 </ListItem>
               </List>
@@ -546,16 +581,15 @@ const TripsCard = () => {
           <Button onClick={toggleFilterModal} sx={{ mr: 1 }}>
             Cancel
           </Button>
-          <Button variant="contained" onClick={applyFilters}>
+          <Button variant="contained" onClick={filterAccommodations}>
             Apply Filters
           </Button>
         </Box>
       </Dialog>
 
-      {/* Trips Grid */}
       <Grid container spacing={4} justifyContent="center">
-        {filteredTrips.map((trip) => (
-          <Grid item key={trip._id} xs={12} sm={6} md={4}>
+        {filteredAccommodations.map((accommodation) => (
+          <Grid item key={accommodation.id} xs={12} sm={6} md={4}>
             <Card
               sx={{
                 borderRadius: "12px",
@@ -573,9 +607,9 @@ const TripsCard = () => {
             >
               <CardMedia
                 component="img"
-                height="140"
-                image={trip?.images[0] || "./images/defaultImg.png"}
-                alt={trip?.name || ""}
+                height="140" // Reduced image height
+                image={accommodation?.images?.[0] || "./images/defaultImg.png"}
+                alt={accommodation?.name || ""}
                 sx={{
                   objectFit: "cover",
                   width: "100%",
@@ -584,12 +618,12 @@ const TripsCard = () => {
               <CardContent sx={{ p: 2 }}>
                 <Box sx={{ mb: 0.5 }}>
                   <Typography variant="h6" fontWeight="600" gutterBottom noWrap>
-                    {trip?.name || ""}
+                    {accommodation?.name}
                   </Typography>
                 </Box>
                 <Box sx={{ mb: 1 }}>
                   <Typography variant="body2" color="text.secondary" noWrap>
-                    {trip?.destination} (₹ {trip?.price || ""})
+                    {accommodation?.destination}
                   </Typography>
                 </Box>
                 <Box
@@ -601,14 +635,14 @@ const TripsCard = () => {
                   }}
                 >
                   <Chip
-                    label={`${trip?.price} ₹`}
+                    label={`${accommodation?.price} ₹`}
                     color="primary"
                     size="small"
                     sx={{ fontWeight: "bold", fontSize: "0.9rem" }}
                   />
                   <Button
                     component={Link}
-                    to={`/trips/${trip?._id}`}
+                    to={`/accommodations/${accommodation?._id}`}
                     variant="contained"
                     sx={{
                       px: 2,
@@ -633,5 +667,4 @@ const TripsCard = () => {
   );
 };
 
-export default TripsCard;
-// --- END OF FILE src/components/TripsCard.js ---
+export default Accommodations;

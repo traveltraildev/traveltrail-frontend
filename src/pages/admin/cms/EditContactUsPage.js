@@ -1,19 +1,19 @@
-// --- START OF FILE src/pages/admin/cms/EditContactUsPage.js ---
 import React, { useState, useEffect } from "react";
 import { Container, Typography, TextField, Button, Box } from "@mui/material";
 import Navbar from "../../../components/common/Navbar";
 import Navbar2 from "../../../components/common/Navbar2";
 import Footer from "../../../components/common/Footer";
-// import simulatedAPI from "../../../api/cmsAPI"; // REMOVE simulatedAPI import
+import ReactQuill from 'react-quill'; // Import ReactQuill
+import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { getAuthHeader } from "../../../utils";
 
 const EditContactUsPage = () => {
   const [pageContent, setPageContent] = useState({ title: "", content: "" });
   const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
-    // Fetch content from REAL backend API
-    fetch('/api/cms/pages/contact-us') // API GET request to backend - CORRECT API CALL for Contact Us Edit
+    fetch("/api/cms/pages/contact-us")
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -21,7 +21,7 @@ const EditContactUsPage = () => {
         return response.json();
       })
       .then(data => {
-        setPageContent(data); // Set fetched data to state
+        setPageContent(data);
       })
       .catch(error => {
         console.error("Error fetching Contact Us content:", error);
@@ -34,23 +34,28 @@ const EditContactUsPage = () => {
     setPageContent({ ...pageContent, [e.target.name]: e.target.value });
   };
 
+  const handleEditorChange = (content) => {
+    setPageContent({ ...pageContent, content: content });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/cms/pages/contact-us', { // API PUT request to backend - CORRECT API CALL for Contact Us Update
-        method: 'PUT',
+      const response = await fetch("/api/cms/pages/contact-us", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
         },
-        body: JSON.stringify(pageContent), // Send updated content in request body
+        body: JSON.stringify(pageContent),
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      alert("Contact Us page content updated successfully via API!"); // Success feedback
+      alert("Contact Us page content updated successfully via API!");
     } catch (error) {
       console.error("Error updating Contact Us content via API:", error);
-      alert("Error updating content via API. Check console."); // Error feedback
+      alert("Error updating content via API. Check console.");
     }
   };
 
@@ -61,7 +66,11 @@ const EditContactUsPage = () => {
         <Typography variant="h4" component="h1" align="center" gutterBottom>
           Edit Contact Us Page
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+        >
           <TextField
             label="Title"
             name="title"
@@ -70,15 +79,14 @@ const EditContactUsPage = () => {
             fullWidth
             variant="outlined"
           />
-          <TextField
-            label="Content (HTML)"
-            name="content"
-            multiline
-            rows={10}
+          <ReactQuill
             value={pageContent.content}
-            onChange={handleChange}
-            fullWidth
-            variant="outlined"
+            onChange={handleEditorChange}
+            modules={ReactQuill.modules}
+            formats={ReactQuill.formats}
+            theme="snow"
+            placeholder="Enter content..."
+            style={{ height: '300px' }}
           />
           <Button type="submit" variant="contained" color="primary">
             Save Changes
@@ -92,4 +100,3 @@ const EditContactUsPage = () => {
 };
 
 export default EditContactUsPage;
-// --- END OF FILE src/pages/admin/cms/EditContactUsPage.js ---
