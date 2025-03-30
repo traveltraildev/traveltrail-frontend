@@ -26,7 +26,7 @@ import {
   Fade,
   Autocomplete,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const Accommodations = () => {
   const [accommodations, setAccommodations] = useState([]);
@@ -45,10 +45,20 @@ const Accommodations = () => {
   const [allAmenities, setAllAmenities] = useState([]);
   const navigate = useNavigate();
 
+  const location = useLocation();
+  const preSearch = location?.state?.search;
+
+  useEffect(() => {
+    if (preSearch?.length > 0) {
+      setSearchTerm(preSearch);
+    }
+  }, [preSearch]);
+
   useEffect(() => {
     filterAccommodations();
   }, [
     searchTerm,
+    accommodations,
     priceRange,
     selectedDestinations,
     selectedThemes,
@@ -106,14 +116,16 @@ const Accommodations = () => {
   }, []);
 
   const handleSearch = (event) => {
-    const value = event.target.value;
-    setSearchTerm(value);
+    // const value = event.target.value;
+    // setSearchTerm(value);
 
-    if (value.trim() === "") {
-      setFilteredAccommodations(accommodations);
-    } else {
-      filterAccommodations();
-    }
+    // if (value.trim() === "") {
+    //   setFilteredAccommodations(accommodations);
+    // } else {
+    //   filterAccommodations();
+    // }
+
+    setSearchTerm(event.target.value);
   };
 
   const handleSortChange = (event) => {

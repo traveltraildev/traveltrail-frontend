@@ -25,9 +25,9 @@ import {
   RadioGroup,
   useMediaQuery,
   Fade,
-  Autocomplete
+  Autocomplete,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const TripsCard = () => {
   const [trips, setTrips] = useState([]);
@@ -37,19 +37,28 @@ const TripsCard = () => {
   const [activeFilterCategory, setActiveFilterCategory] = useState("sort");
   const [filterState, setFilterState] = useState({
     sortBy: "name",
-    priceRange: [0, 10000],
+    priceRange: [0, 1000000],
     selectedDestinations: [],
     selectedThemes: [],
     selectedInclusions: [],
-    selectedExclusions: []
+    selectedExclusions: [],
   });
   const [filterOptions, setFilterOptions] = useState({
     destinations: [],
     themes: [],
     inclusions: [],
-    exclusions: []
+    exclusions: [],
   });
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const preSearch = location?.state?.search;
+
+  useEffect(() => {
+    if (preSearch?.length > 0) {
+      setSearchTerm(preSearch);
+    }
+  }, [preSearch]);
 
   // Fetch trips data
   useEffect(() => {
@@ -77,12 +86,12 @@ const TripsCard = () => {
           destinationsResponse,
           themesResponse,
           inclusionsResponse,
-          exclusionsResponse
+          exclusionsResponse,
         ] = await Promise.all([
           fetch("/api/trips/filters/destinations"),
           fetch("/api/trips/filters/themes"),
           fetch("/api/trips/filters/inclusions"),
-          fetch("/api/trips/filters/exclusions")
+          fetch("/api/trips/filters/exclusions"),
         ]);
 
         const destinations = await destinationsResponse.json();
@@ -94,7 +103,7 @@ const TripsCard = () => {
           destinations,
           themes,
           inclusions,
-          exclusions
+          exclusions,
         });
       } catch (error) {
         console.error("Error fetching filter options:", error);
@@ -114,7 +123,7 @@ const TripsCard = () => {
   };
 
   const handleFilterChange = (newFilterState) => {
-    setFilterState(prev => ({ ...prev, ...newFilterState }));
+    setFilterState((prev) => ({ ...prev, ...newFilterState }));
   };
 
   const toggleFilterModal = () => {
@@ -123,49 +132,51 @@ const TripsCard = () => {
 
   const applyFilters = () => {
     let filtered = [...trips];
-    
+
     // Search filter
     if (searchTerm.trim() !== "") {
-      filtered = filtered.filter(trip =>
+      filtered = filtered.filter((trip) =>
         trip.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Price filter
-    filtered = filtered.filter(trip =>
-      trip.price >= filterState.priceRange[0] && trip.price <= filterState.priceRange[1]
+    filtered = filtered.filter(
+      (trip) =>
+        trip.price >= filterState.priceRange[0] &&
+        trip.price <= filterState.priceRange[1]
     );
 
     // Destination filter
     if (filterState.selectedDestinations.length > 0) {
-      filtered = filtered.filter(trip => 
+      filtered = filtered.filter((trip) =>
         filterState.selectedDestinations.includes(trip.destination)
       );
     }
 
     // Theme filter
     if (filterState.selectedThemes.length > 0) {
-      filtered = filtered.filter(trip => 
-        filterState.selectedThemes.some(theme => 
-          (trip.themes || []).includes(theme) 
+      filtered = filtered.filter((trip) =>
+        filterState.selectedThemes.some((theme) =>
+          (trip.themes || []).includes(theme)
         )
       );
     }
 
     // Inclusions filter
     if (filterState.selectedInclusions.length > 0) {
-      filtered = filtered.filter(trip => 
-        filterState.selectedInclusions.every(inclusion => 
-          (trip.inclusions || []).includes(inclusion) 
+      filtered = filtered.filter((trip) =>
+        filterState.selectedInclusions.every((inclusion) =>
+          (trip.inclusions || []).includes(inclusion)
         )
       );
     }
 
     // Exclusions filter
     if (filterState.selectedExclusions.length > 0) {
-      filtered = filtered.filter(trip => 
-        filterState.selectedExclusions.every(exclusion => 
-          (trip.exclusions || []).includes(exclusion) 
+      filtered = filtered.filter((trip) =>
+        filterState.selectedExclusions.every((exclusion) =>
+          (trip.exclusions || []).includes(exclusion)
         )
       );
     }
@@ -184,8 +195,8 @@ const TripsCard = () => {
   };
 
   const renderFilterContent = () => {
-    switch(activeFilterCategory) {
-      case 'sort':
+    switch (activeFilterCategory) {
+      case "sort":
         return (
           <Box sx={{ mt: 3 }}>
             <RadioGroup
@@ -193,11 +204,7 @@ const TripsCard = () => {
               onChange={(e) => handleFilterChange({ sortBy: e.target.value })}
               row
             >
-              <FormControlLabel
-                value="name"
-                control={<Radio />}
-                label="Name"
-              />
+              <FormControlLabel value="name" control={<Radio />} label="Name" />
               <FormControlLabel
                 value="price-low"
                 control={<Radio />}
@@ -211,42 +218,50 @@ const TripsCard = () => {
             </RadioGroup>
           </Box>
         );
-      case 'price':
+      case "price":
         return (
           <Box sx={{ mt: 3 }}>
             <Slider
               value={filterState.priceRange}
-              onChange={(e, newValue) => handleFilterChange({ priceRange: newValue })}
+              onChange={(e, newValue) =>
+                handleFilterChange({ priceRange: newValue })
+              }
               valueLabelDisplay="auto"
               min={0}
               max={10000}
               step={100}
               marks={[
-                { value: 0, label: '₹0' },
-                { value: 2000, label: '₹2000' },
-                { value: 4000, label: '₹4000' },
-                { value: 6000, label: '₹6000' },
-                { value: 8000, label: '₹8000' },
-                { value: 10000, label: '₹10000+' },
+                { value: 0, label: "₹0" },
+                { value: 2000, label: "₹2000" },
+                { value: 4000, label: "₹4000" },
+                { value: 6000, label: "₹6000" },
+                { value: 8000, label: "₹8000" },
+                { value: 10000, label: "₹10000+" },
               ]}
-              sx={{ width: '100%' }}
+              sx={{ width: "100%" }}
             />
           </Box>
         );
-      case 'destinations':
+      case "destinations":
         return (
           <Box sx={{ mt: 3 }}>
-            {filterOptions.destinations.map(destination => (
+            {filterOptions.destinations.map((destination) => (
               <FormControlLabel
                 key={destination}
                 control={
                   <Checkbox
-                    checked={filterState.selectedDestinations.includes(destination)}
-                    onChange={(e) => handleFilterChange({
-                      selectedDestinations: e.target.checked
-                        ? [...filterState.selectedDestinations, destination]
-                        : filterState.selectedDestinations.filter(d => d !== destination)
-                    })}
+                    checked={filterState.selectedDestinations.includes(
+                      destination
+                    )}
+                    onChange={(e) =>
+                      handleFilterChange({
+                        selectedDestinations: e.target.checked
+                          ? [...filterState.selectedDestinations, destination]
+                          : filterState.selectedDestinations.filter(
+                              (d) => d !== destination
+                            ),
+                      })
+                    }
                   />
                 }
                 label={destination}
@@ -254,20 +269,24 @@ const TripsCard = () => {
             ))}
           </Box>
         );
-      case 'themes':
+      case "themes":
         return (
           <Box sx={{ mt: 3 }}>
-            {filterOptions.themes.map(theme => (
+            {filterOptions.themes.map((theme) => (
               <FormControlLabel
                 key={theme}
                 control={
                   <Checkbox
                     checked={filterState.selectedThemes.includes(theme)}
-                    onChange={(e) => handleFilterChange({
-                      selectedThemes: e.target.checked
-                        ? [...filterState.selectedThemes, theme]
-                        : filterState.selectedThemes.filter(t => t !== theme)
-                    })}
+                    onChange={(e) =>
+                      handleFilterChange({
+                        selectedThemes: e.target.checked
+                          ? [...filterState.selectedThemes, theme]
+                          : filterState.selectedThemes.filter(
+                              (t) => t !== theme
+                            ),
+                      })
+                    }
                   />
                 }
                 label={theme}
@@ -275,20 +294,24 @@ const TripsCard = () => {
             ))}
           </Box>
         );
-      case 'inclusions':
+      case "inclusions":
         return (
           <Box sx={{ mt: 3 }}>
-            {filterOptions.inclusions.map(inclusion => (
+            {filterOptions.inclusions.map((inclusion) => (
               <FormControlLabel
                 key={inclusion}
                 control={
                   <Checkbox
                     checked={filterState.selectedInclusions.includes(inclusion)}
-                    onChange={(e) => handleFilterChange({
-                      selectedInclusions: e.target.checked
-                        ? [...filterState.selectedInclusions, inclusion]
-                        : filterState.selectedInclusions.filter(i => i !== inclusion)
-                    })}
+                    onChange={(e) =>
+                      handleFilterChange({
+                        selectedInclusions: e.target.checked
+                          ? [...filterState.selectedInclusions, inclusion]
+                          : filterState.selectedInclusions.filter(
+                              (i) => i !== inclusion
+                            ),
+                      })
+                    }
                   />
                 }
                 label={inclusion}
@@ -296,20 +319,24 @@ const TripsCard = () => {
             ))}
           </Box>
         );
-      case 'exclusions':
+      case "exclusions":
         return (
           <Box sx={{ mt: 3 }}>
-            {filterOptions.exclusions.map(exclusion => (
+            {filterOptions.exclusions.map((exclusion) => (
               <FormControlLabel
                 key={exclusion}
                 control={
                   <Checkbox
                     checked={filterState.selectedExclusions.includes(exclusion)}
-                    onChange={(e) => handleFilterChange({
-                      selectedExclusions: e.target.checked
-                        ? [...filterState.selectedExclusions, exclusion]
-                        : filterState.selectedExclusions.filter(e => e !== exclusion)
-                    })}
+                    onChange={(e) =>
+                      handleFilterChange({
+                        selectedExclusions: e.target.checked
+                          ? [...filterState.selectedExclusions, exclusion]
+                          : filterState.selectedExclusions.filter(
+                              (e) => e !== exclusion
+                            ),
+                      })
+                    }
                   />
                 }
                 label={exclusion}
@@ -342,107 +369,109 @@ const TripsCard = () => {
           value={searchTerm}
           onChange={handleSearch}
           fullWidth
-          sx={{ 
-            mb: 2, 
-            borderRadius: '50px', 
-            overflow: 'hidden'
+          sx={{
+            mb: 2,
+            borderRadius: "50px",
+            overflow: "hidden",
           }}
           InputProps={{
             style: {
-              borderRadius: '50px', 
+              borderRadius: "50px",
             },
           }}
         />
-        
+
         {/* Filter Chips */}
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <Chip 
-            label="Filters" 
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+          <Chip
+            label="Filters"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory('sort');
-            }} 
-            variant="outlined" 
-            sx={{ cursor: 'pointer' }}
+              setActiveFilterCategory("sort");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
           />
-          <Chip 
-            label="Sort" 
+          <Chip
+            label="Sort"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory('sort');
-            }} 
-            variant="outlined" 
-            sx={{ cursor: 'pointer' }}
+              setActiveFilterCategory("sort");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
           />
-          <Chip 
-            label="Price" 
+          <Chip
+            label="Price"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory('price');
-            }} 
-            variant="outlined" 
-            sx={{ cursor: 'pointer' }}
+              setActiveFilterCategory("price");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
           />
-          <Chip 
-            label="Destinations" 
+          <Chip
+            label="Destinations"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory('destinations');
-            }} 
-            variant="outlined" 
-            sx={{ cursor: 'pointer' }}
+              setActiveFilterCategory("destinations");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
           />
-          <Chip 
-            label="Themes" 
+          <Chip
+            label="Themes"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory('themes');
-            }} 
-            variant="outlined" 
-            sx={{ cursor: 'pointer' }}
+              setActiveFilterCategory("themes");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
           />
-          <Chip 
-            label="Inclusions" 
+          <Chip
+            label="Inclusions"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory('inclusions');
-            }} 
-            variant="outlined" 
-            sx={{ cursor: 'pointer' }}
+              setActiveFilterCategory("inclusions");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
           />
-          <Chip 
-            label="Exclusions" 
+          <Chip
+            label="Exclusions"
             onClick={() => {
               toggleFilterModal();
-              setActiveFilterCategory('exclusions');
-            }} 
-            variant="outlined" 
-            sx={{ cursor: 'pointer' }}
+              setActiveFilterCategory("exclusions");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
           />
         </Box>
       </Box>
 
       {/* Filter Modal */}
-      <Dialog 
-        open={isFilterModalOpen} 
+      <Dialog
+        open={isFilterModalOpen}
         onClose={toggleFilterModal}
         fullWidth
         maxWidth="md"
         PaperProps={{
           sx: {
-            borderRadius: '20px', 
-            overflow: 'hidden',
-            boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
-          }
+            borderRadius: "20px",
+            overflow: "hidden",
+            boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
+          },
         }}
         TransitionComponent={Fade}
       >
-        <DialogTitle sx={{ 
-          backgroundColor: '#f5f5f5', 
-          py: 2,
-          px: 3,
-          borderRadius: '10px 10px 0 0'
-        }}>
+        <DialogTitle
+          sx={{
+            backgroundColor: "#f5f5f5",
+            py: 2,
+            px: 3,
+            borderRadius: "10px 10px 0 0",
+          }}
+        >
           Filter Options
         </DialogTitle>
         <DialogContent sx={{ p: 3 }}>
@@ -451,49 +480,49 @@ const TripsCard = () => {
               {/* Left Pane with Filter Categories */}
               <List>
                 <ListItem disablePadding>
-                  <ListItemButton 
-                    selected={activeFilterCategory === 'sort'}
-                    onClick={() => setActiveFilterCategory('sort')}
+                  <ListItemButton
+                    selected={activeFilterCategory === "sort"}
+                    onClick={() => setActiveFilterCategory("sort")}
                   >
                     <ListItemText primary="Sort By" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton 
-                    selected={activeFilterCategory === 'price'}
-                    onClick={() => setActiveFilterCategory('price')}
+                  <ListItemButton
+                    selected={activeFilterCategory === "price"}
+                    onClick={() => setActiveFilterCategory("price")}
                   >
                     <ListItemText primary="Price Range" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton 
-                    selected={activeFilterCategory === 'destinations'}
-                    onClick={() => setActiveFilterCategory('destinations')}
+                  <ListItemButton
+                    selected={activeFilterCategory === "destinations"}
+                    onClick={() => setActiveFilterCategory("destinations")}
                   >
                     <ListItemText primary="Destinations" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton 
-                    selected={activeFilterCategory === 'themes'}
-                    onClick={() => setActiveFilterCategory('themes')}
+                  <ListItemButton
+                    selected={activeFilterCategory === "themes"}
+                    onClick={() => setActiveFilterCategory("themes")}
                   >
                     <ListItemText primary="Themes" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton 
-                    selected={activeFilterCategory === 'inclusions'}
-                    onClick={() => setActiveFilterCategory('inclusions')}
+                  <ListItemButton
+                    selected={activeFilterCategory === "inclusions"}
+                    onClick={() => setActiveFilterCategory("inclusions")}
                   >
                     <ListItemText primary="Inclusions" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                  <ListItemButton 
-                    selected={activeFilterCategory === 'exclusions'}
-                    onClick={() => setActiveFilterCategory('exclusions')}
+                  <ListItemButton
+                    selected={activeFilterCategory === "exclusions"}
+                    onClick={() => setActiveFilterCategory("exclusions")}
                   >
                     <ListItemText primary="Exclusions" />
                   </ListItemButton>
@@ -505,13 +534,15 @@ const TripsCard = () => {
             </Grid>
           </Grid>
         </DialogContent>
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'flex-end', 
-          px: 3, 
-          py: 2, 
-          borderTop: '1px solid #e0e0e0' 
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            px: 3,
+            py: 2,
+            borderTop: "1px solid #e0e0e0",
+          }}
+        >
           <Button onClick={toggleFilterModal} sx={{ mr: 1 }}>
             Cancel
           </Button>
@@ -533,11 +564,11 @@ const TripsCard = () => {
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
                 "&:hover": {
                   boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
-                  transform: "translateY(-3px)"
+                  transform: "translateY(-3px)",
                 },
                 bgcolor: "background.paper",
                 p: 1,
-                height: "100%"
+                height: "100%",
               }}
             >
               <CardMedia
@@ -547,7 +578,7 @@ const TripsCard = () => {
                 alt={trip?.name || ""}
                 sx={{
                   objectFit: "cover",
-                  width: "100%"
+                  width: "100%",
                 }}
               />
               <CardContent sx={{ p: 2 }}>
@@ -561,8 +592,15 @@ const TripsCard = () => {
                     {trip?.destination} (₹ {trip?.price || ""})
                   </Typography>
                 </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: "auto" }}>
-                  <Chip 
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mt: "auto",
+                  }}
+                >
+                  <Chip
                     label={`${trip?.price} ₹`}
                     color="primary"
                     size="small"
@@ -573,14 +611,14 @@ const TripsCard = () => {
                     to={`/trips/${trip?._id}`}
                     variant="contained"
                     sx={{
-                      px: 2, 
-                      py: 0.5, 
+                      px: 2,
+                      py: 0.5,
                       fontSize: "0.875rem",
                       bgcolor: "#2196f3",
                       color: "white",
                       "&:hover": { bgcolor: "#0d8bf2" },
                       borderRadius: "25px",
-                      textTransform: "none"
+                      textTransform: "none",
                     }}
                   >
                     View Details
