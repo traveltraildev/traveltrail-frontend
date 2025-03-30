@@ -55,7 +55,7 @@ const Hero = () => {
                     '&:hover': { bgcolor: '#e3f2fd' },
                   }}
                 >
-                  <ModeOfTravelIcon sx={{ fontSize: '24px', color: '#2196f3' }} />
+                  <ModeOfTravelIcon sx={{ fontSize: '24px', color: '#ff6f00' }} />
                   <Typography variant="body2" sx={{ mt: 0.5, color: '#333' }}>
                     Trips
                   </Typography>
@@ -75,7 +75,7 @@ const Hero = () => {
                     '&:hover': { bgcolor: '#e3f2fd' },
                   }}
                 >
-                  <HotelIcon sx={{ fontSize: '24px', color: '#2196f3' }} />
+                  <HotelIcon sx={{ fontSize: '24px', color: '#ff6f00' }} />
                   <Typography variant="body2" sx={{ mt: 0.5, color: '#333' }}>
                     Hotels
                   </Typography>
@@ -95,7 +95,7 @@ const Hero = () => {
                     '&:hover': { bgcolor: '#e3f2fd' },
                   }}
                 >
-                  <Diversity1Icon sx={{ fontSize: '24px', color: '#2196f3' }} />
+                  <Diversity1Icon sx={{ fontSize: '24px', color: '#ff6f00' }} />
                   <Typography variant="body2" sx={{ mt: 0.5, color: '#333' }}>
                     Group Trips
                   </Typography>
@@ -142,8 +142,8 @@ const Hero = () => {
                     px: 5,
                     py: 1.5,
                     borderRadius: '30px',
-                    backgroundColor: '#2196f3',
-                    '&:hover': { backgroundColor: '#0d47a1' },
+                    backgroundColor: '#ffa000',
+                    '&:hover': { backgroundColor: '#ff6f00' },
                     fontSize: '1rem',
                     fontWeight: 'bold',
                   }}
