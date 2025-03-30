@@ -87,7 +87,7 @@ const Hero = () => {
                         cursor: "pointer",
                         "&:hover": { bgcolor: "#fff8e1" },
                         backgroundColor:
-                          currentMenu === item?.title ? "#ffecb3" : "inherit",
+                          currentMenu === item?.title ? "#ffe082" : "inherit",
                       }}
                       onClick={() => handleCurrentMenu(item)}
                     >

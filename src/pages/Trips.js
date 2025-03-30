@@ -543,10 +543,12 @@ const TripsCard = () => {
             borderTop: "1px solid #e0e0e0",
           }}
         >
-          <Button onClick={toggleFilterModal} sx={{ mr: 1 }}>
+          <Button onClick={toggleFilterModal} sx={{  color: "#f57f17", mr: 1 }}>
             Cancel
           </Button>
-          <Button variant="contained" onClick={applyFilters}>
+          <Button sx={{
+            bgcolor: "#f57f17",
+          }}variant="contained" onClick={applyFilters}>
             Apply Filters
           </Button>
         </Box>

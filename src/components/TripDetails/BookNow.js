@@ -213,8 +213,8 @@ const BookNow = ({ trip }) => {
           disabled={loading}
           sx={{
             mt: 3,
-            bgcolor: "#1976d2",
-            "&:hover": { bgcolor: "#115293" },
+            bgcolor: "#f57f17",
+            "&:hover": { bgcolor: "#ff8f00" },
             width: "100%",
             py: 1.5,
           }}
