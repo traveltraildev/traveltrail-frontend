@@ -23,21 +23,23 @@ const Hero = () => {
         mt: 8, // Add top margin to push below navbar
       }}
     >
-      <Paper
-        elevation={3}
-        sx={{
-          mx: 2,
-          mt: 2,
-          p: 2,
-          borderRadius: '10px',
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-          maxWidth: '1200px',
-          margin: '0 auto',
-        }}
-      >
-        <Grid container spacing={2}>
-          {/* Icon Navigation */}
-          <Grid item xs={12} sx={{ mb: 2 }}>
+      <Grid container spacing={2} justifyContent="center" alignItems="center">
+        {/* Icon Card */}
+        <Grid item xs={12} md={6}>
+          <Paper
+            elevation={3}
+            sx={{
+              mx: 2,
+              mt: 2,
+              p: 2,
+              borderRadius: '10px',
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              maxWidth: '500px',
+              position: 'relative',
+              zIndex: 1,
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            }}
+          >
             <Grid container spacing={2} justifyContent="center">
               <Grid item>
                 <Box
@@ -100,40 +102,59 @@ const Hero = () => {
                 </Box>
               </Grid>
             </Grid>
-          </Grid>
-
-          {/* Search Field */}
-          <Grid item xs={12} sx={{ mt: 3 }}>
-            <TextField
-              label="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              fullWidth
-              variant="outlined"
-              sx={{ borderRadius: '8px' }}
-            />
-          </Grid>
-
-          {/* Search Button */}
-          <Grid item xs={12} sx={{ mt: 2, textAlign: 'center' }}>
-            <Button
-              variant="contained"
-              onClick={handleSearch}
-              sx={{
-                px: 5,
-                py: 1.5,
-                borderRadius: '30px',
-                backgroundColor: '#2196f3',
-                '&:hover': { backgroundColor: '#0d47a1' },
-                fontSize: '1rem',
-                fontWeight: 'bold',
-              }}
-            >
-              SEARCH
-            </Button>
-          </Grid>
+          </Paper>
         </Grid>
-      </Paper>
+
+        {/* Search Card */}
+        <Grid item xs={12} md={10}>
+          <Paper
+            elevation={3}
+            sx={{
+              mx: 2,
+              mt: { xs: 2, md: '-50px' }, // Negative margin to overlap
+              p: 2,
+              borderRadius: '10px',
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              width: '100%',
+              maxWidth: '1200px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <Grid container spacing={2} p={3}>
+              {/* Search Field */}
+              <Grid item xs={12}>
+                <TextField
+                  label="Search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  fullWidth
+                  variant="outlined"
+                  sx={{ borderRadius: '8px' }}
+                />
+              </Grid>
+
+              {/* Search Button */}
+              <Grid item xs={12} sx={{ mt: 2, textAlign: 'center' }}>
+                <Button
+                  variant="contained"
+                  onClick={handleSearch}
+                  sx={{
+                    px: 5,
+                    py: 1.5,
+                    borderRadius: '30px',
+                    backgroundColor: '#2196f3',
+                    '&:hover': { backgroundColor: '#0d47a1' },
+                    fontSize: '1rem',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  SEARCH
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
     </Box>
   );
 };
