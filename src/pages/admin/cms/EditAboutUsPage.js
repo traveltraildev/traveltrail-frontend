@@ -48,7 +48,7 @@ const EditAboutUsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/cms/pages/about-us", {
+      const response = await fetch(aboutUsPage, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
