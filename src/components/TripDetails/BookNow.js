@@ -17,6 +17,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { getAuthHeader } from "../../utils";
+import { sheetProxy } from "../../endpoints";
 
 const BookNow = ({ trip }) => {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ const BookNow = ({ trip }) => {
     }
 
     try {
-      const response = await fetch("/api/sheets-proxy", {
+      const response = await fetch(sheetProxy, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...getAuthHeader() },
         body: JSON.stringify({
@@ -183,9 +184,7 @@ const BookNow = ({ trip }) => {
               label="Adults"
               type="number"
               value={formData.adultAttendees}
-              onChange={(e) =>
-                handleChange("adultAttendees", e.target.value)
-              }
+              onChange={(e) => handleChange("adultAttendees", e.target.value)}
               fullWidth
               size="small"
               inputProps={{ min: 1 }}
@@ -196,9 +195,7 @@ const BookNow = ({ trip }) => {
               label="Children"
               type="number"
               value={formData.childAttendees}
-              onChange={(e) =>
-                handleChange("childAttendees", e.target.value)
-              }
+              onChange={(e) => handleChange("childAttendees", e.target.value)}
               fullWidth
               size="small"
               inputProps={{ min: 0 }}
@@ -209,7 +206,9 @@ const BookNow = ({ trip }) => {
         <Button
           type="submit"
           variant="contained"
-          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+          startIcon={
+            loading ? <CircularProgress size={20} color="inherit" /> : null
+          }
           disabled={loading}
           sx={{
             mt: 3,

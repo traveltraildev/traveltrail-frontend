@@ -28,6 +28,7 @@ import {
   Autocomplete,
 } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { getAllTrips } from "../endpoints";
 
 const TripsCard = () => {
   const [trips, setTrips] = useState([]);
@@ -64,7 +65,7 @@ const TripsCard = () => {
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        const response = await fetch("/api/trips");
+        const response = await fetch(getAllTrips);
         if (!response.ok) throw new Error("Failed to fetch trips");
         const data = await response.json();
         setTrips(data);
@@ -88,10 +89,10 @@ const TripsCard = () => {
           inclusionsResponse,
           exclusionsResponse,
         ] = await Promise.all([
-          fetch("/api/trips/filters/destinations"),
-          fetch("/api/trips/filters/themes"),
-          fetch("/api/trips/filters/inclusions"),
-          fetch("/api/trips/filters/exclusions"),
+          fetch(`${getAllTrips}/filters/destinations`),
+          fetch(`${getAllTrips}/filters/themes`),
+          fetch(`${getAllTrips}/filters/inclusions`),
+          fetch(`${getAllTrips}/filters/exclusions`),
         ]);
 
         const destinations = await destinationsResponse.json();
@@ -543,12 +544,16 @@ const TripsCard = () => {
             borderTop: "1px solid #e0e0e0",
           }}
         >
-          <Button onClick={toggleFilterModal} sx={{  color: "#f57f17", mr: 1 }}>
+          <Button onClick={toggleFilterModal} sx={{ color: "#f57f17", mr: 1 }}>
             Cancel
           </Button>
-          <Button sx={{
-            bgcolor: "#f57f17",
-          }}variant="contained" onClick={applyFilters}>
+          <Button
+            sx={{
+              bgcolor: "#f57f17",
+            }}
+            variant="contained"
+            onClick={applyFilters}
+          >
             Apply Filters
           </Button>
         </Box>

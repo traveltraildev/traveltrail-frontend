@@ -3,27 +3,28 @@ import { Container, Typography, TextField, Button, Box } from "@mui/material";
 import Navbar from "../../../components/common/Navbar";
 import Navbar2 from "../../../components/common/Navbar2";
 import Footer from "../../../components/common/Footer";
-import ReactQuill from 'react-quill'; // Import ReactQuill
-import 'react-quill/dist/quill.snow.css'; // Import Quill styles
+import ReactQuill from "react-quill"; // Import ReactQuill
+import "react-quill/dist/quill.snow.css"; // Import Quill styles
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { getAuthHeader } from "../../../utils";
+import { contactUsPage } from "../../../endpoints";
 
 const EditContactUsPage = () => {
   const [pageContent, setPageContent] = useState({ title: "", content: "" });
   const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
-    fetch("/api/cms/pages/contact-us")
-      .then(response => {
+    fetch(contactUsPage)
+      .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         setPageContent(data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching Contact Us content:", error);
         alert("Error loading content from API. Check console.");
       });
@@ -41,7 +42,7 @@ const EditContactUsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/cms/pages/contact-us", {
+      const response = await fetch(contactUsPage, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +87,7 @@ const EditContactUsPage = () => {
             formats={ReactQuill.formats}
             theme="snow"
             placeholder="Enter content..."
-            style={{ height: '300px' }}
+            style={{ height: "300px" }}
           />
           <Button type="submit" variant="contained" color="primary">
             Save Changes

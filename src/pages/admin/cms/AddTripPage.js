@@ -9,19 +9,47 @@ import {
   Box,
   CircularProgress,
   Autocomplete,
-  Grid
+  Grid,
 } from "@mui/material";
 import Navbar from "../../../components/common/Navbar";
 import Navbar2 from "../../../components/common/Navbar2";
 import Footer from "../../../components/common/Footer";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import ItineraryDayForm from "./ItineraryDayForm";
+import { getAllTrips } from "../../../endpoints";
 
 // Define options for Autocomplete components
-const themeOptions = ["Adventure", "Beach", "City Break", "Cultural", "Family", "Hiking", "Luxury", "Nature", "Romantic", "Wildlife"];
-const inclusionOptions = ["Accommodation", "Flights", "Meals", "Sightseeing Tours", "Transportation", "Activities", "Entrance Fees", "Guide Services"];
-const exclusionOptions = ["Personal Expenses", "Visa Fees", "Insurance", "Optional Activities", "Souvenirs", "Tips/Gratuities"];
+const themeOptions = [
+  "Adventure",
+  "Beach",
+  "City Break",
+  "Cultural",
+  "Family",
+  "Hiking",
+  "Luxury",
+  "Nature",
+  "Romantic",
+  "Wildlife",
+];
+const inclusionOptions = [
+  "Accommodation",
+  "Flights",
+  "Meals",
+  "Sightseeing Tours",
+  "Transportation",
+  "Activities",
+  "Entrance Fees",
+  "Guide Services",
+];
+const exclusionOptions = [
+  "Personal Expenses",
+  "Visa Fees",
+  "Insurance",
+  "Optional Activities",
+  "Souvenirs",
+  "Tips/Gratuities",
+];
 
 const AddTripPage = ({ isMobile }) => {
   const [formData, setFormData] = useState({
@@ -36,23 +64,23 @@ const AddTripPage = ({ isMobile }) => {
     exclusions: [],
     images: [],
     itineraries: [{ highlights: [] }],
-    availability: true
+    availability: true,
   });
   const [loading, setLoading] = useState(false);
   const [itenaryDays, setItenaryDays] = useState([0]);
   const navigate = useNavigate();
 
   const handleChange = (name, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleChangeDayData = (dayIndex, updatedDayData) => {
     const updatedItineraries = [...formData.itineraries];
     updatedItineraries[dayIndex] = updatedDayData;
-    setFormData(prev => ({ ...prev, itineraries: updatedItineraries }));
+    setFormData((prev) => ({ ...prev, itineraries: updatedItineraries }));
   };
 
   const handleAddHighlight = (dayIndex, highlightText) => {
@@ -61,22 +89,22 @@ const AddTripPage = ({ isMobile }) => {
         ? { ...day, highlights: [...(day.highlights || []), highlightText] }
         : day
     );
-    setFormData(prev => ({ ...prev, itineraries: updatedItineraries }));
+    setFormData((prev) => ({ ...prev, itineraries: updatedItineraries }));
   };
 
   const handleAddDay = () => {
-    setItenaryDays(prev => [...prev, prev.length]);
-    setFormData(prev => ({
+    setItenaryDays((prev) => [...prev, prev.length]);
+    setFormData((prev) => ({
       ...prev,
-      itineraries: [...prev.itineraries, { highlights: [] }]
+      itineraries: [...prev.itineraries, { highlights: [] }],
     }));
   };
 
   const handleRemoveDay = (dayIndex) => {
-    setItenaryDays(prev => prev.filter((_, i) => i !== dayIndex));
-    setFormData(prev => ({
+    setItenaryDays((prev) => prev.filter((_, i) => i !== dayIndex));
+    setFormData((prev) => ({
       ...prev,
-      itineraries: prev.itineraries.filter((_, i) => i !== dayIndex)
+      itineraries: prev.itineraries.filter((_, i) => i !== dayIndex),
     }));
   };
 
@@ -85,18 +113,18 @@ const AddTripPage = ({ isMobile }) => {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/trips", {
+      const response = await fetch(getAllTrips, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem('adminToken')}`
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
         body: JSON.stringify({
           ...formData,
           price: parseInt(formData.price),
           daysCount: parseInt(formData.daysCount),
-          nightsCount: parseInt(formData.nightsCount)
-        })
+          nightsCount: parseInt(formData.nightsCount),
+        }),
       });
 
       if (!response.ok) {
@@ -249,7 +277,9 @@ const AddTripPage = ({ isMobile }) => {
                 multiple
                 options={inclusionOptions}
                 value={formData.inclusions}
-                onChange={(event, newValue) => handleChange("inclusions", newValue)}
+                onChange={(event, newValue) =>
+                  handleChange("inclusions", newValue)
+                }
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -277,7 +307,9 @@ const AddTripPage = ({ isMobile }) => {
                 multiple
                 options={exclusionOptions}
                 value={formData.exclusions}
-                onChange={(event, newValue) => handleChange("exclusions", newValue)}
+                onChange={(event, newValue) =>
+                  handleChange("exclusions", newValue)
+                }
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -307,8 +339,11 @@ const AddTripPage = ({ isMobile }) => {
                 multiline
                 rows={3}
                 value={formData.images.join(", ")}
-                onChange={(e) => 
-                  handleChange("images", e.target.value.split(",").map(url => url.trim()))
+                onChange={(e) =>
+                  handleChange(
+                    "images",
+                    e.target.value.split(",").map((url) => url.trim())
+                  )
                 }
                 fullWidth
                 sx={{ mb: 2 }}

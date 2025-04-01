@@ -10,6 +10,7 @@ import {
   CircularProgress,
   InputAdornment,
 } from "@mui/material";
+import { getAllAccommodations } from "../../../endpoints";
 
 const EditAccomodation = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const EditAccomodation = () => {
   }, [id]);
 
   useEffect(() => {
-    fetch(`/api/accommodations/${id}`)
+    fetch(`${getAllAccommodations}/${id}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -138,7 +139,7 @@ const EditAccomodation = () => {
         exclusions: formData.exclusions.filter((excl) => excl.trim() !== ""),
       };
 
-      const response = await fetch(`/api/accommodations/${id}`, {
+      const response = await fetch(`${getAllAccommodations}/${id}`, {
         method: "Put",
         headers: {
           Authorization: `Bearer ${token}`,

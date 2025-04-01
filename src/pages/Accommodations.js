@@ -27,6 +27,7 @@ import {
   Autocomplete,
 } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { getAllAccommodations } from "../endpoints";
 
 const Accommodations = () => {
   const [accommodations, setAccommodations] = useState([]);
@@ -70,7 +71,7 @@ const Accommodations = () => {
   useEffect(() => {
     const fetchAccommodations = async () => {
       try {
-        const response = await fetch("/api/accommodations");
+        const response = await fetch(getAllAccommodations);
         if (!response.ok) throw new Error("Failed to fetch accommodations");
         const data = await response.json();
         setAccommodations(data.data || []); // Handle null case
@@ -89,21 +90,21 @@ const Accommodations = () => {
       try {
         // Fetch destinations
         const destinationsResponse = await fetch(
-          "/api/accommodations/filters/destinations"
+          `${getAllAccommodations}/filters/destinations`
         );
         const destinations = await destinationsResponse.json();
         setAllDestinations(destinations);
 
         // Fetch themes
         const themesResponse = await fetch(
-          "/api/accommodations/filters/themes"
+          `${getAllAccommodations}/filters/themes`
         );
         const themes = await themesResponse.json();
         setAllThemes(themes);
 
         // Fetch amenities
         const amenitiesResponse = await fetch(
-          "/api/accommodations/filters/amenities"
+          `${getAllAccommodations}/filters/amenities`
         );
         const amenities = await amenitiesResponse.json();
         setAllAmenities(amenities);
