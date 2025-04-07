@@ -7,14 +7,40 @@ import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate();
   const [currentMenu, setCurrentMenu] = useState("trips");
+  const [currentPath, setCurrentPath] = useState("trips");
+  const navigate = useNavigate();
 
   const handleSearch = () => {
-    // navigate("/trips");
-
-    navigate("/trips", { state: { search: searchQuery } });
+    navigate(`/${currentPath}`, { state: { search: searchQuery } });
+    console.log("Search initiated with:", searchQuery);
   };
+
+  const handleCurrentMenu = (item) => {
+    setCurrentMenu(item?.title);
+    setCurrentPath(item?.path);
+  };
+
+  const options = [
+    {
+      title: "trips",
+      path: "trips",
+      label: "Trips",
+      icon: <ModeOfTravelIcon sx={{ fontSize: "24px", color: "#ff6f00" }} />,
+    },
+    {
+      title: "accommodations",
+      path: "accommodations",
+      label: "Stays",
+      icon: <HotelIcon sx={{ fontSize: "24px", color: "#ff6f00" }} />,
+    },
+    {
+      title: "groups",
+      path: "trips",
+      label: "Groups",
+      icon: <Diversity1Icon sx={{ fontSize: "24px", color: "#ff6f00" }} />,
+    },
+  ];
 
   return (
     <Box

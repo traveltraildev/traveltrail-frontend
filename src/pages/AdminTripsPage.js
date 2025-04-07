@@ -20,6 +20,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
+import { getAllTrips } from "../endpoints";
 
 const AdminTripsPage = () => {
   const [data, setData] = useState([]);
@@ -80,7 +81,7 @@ const AdminTripsPage = () => {
     if (window.confirm("Are you sure you want to delete this trip?")) {
       try {
         const token = localStorage.getItem("adminToken");
-        const response = await fetch(`/api/trips/${id}`, {
+        const response = await fetch(`${getAllTrips}/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -111,7 +112,7 @@ const AdminTripsPage = () => {
         return;
       }
 
-      const response = await fetch("/api/trips", {
+      const response = await fetch(getAllTrips, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

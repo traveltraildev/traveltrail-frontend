@@ -12,13 +12,14 @@ import {
 } from "@mui/material";
 import BookNow from "../components/TripDetails/BookNow";
 import StickyAccommodationTitle from "../components/TripDetails/StickyAccommodationTitle";
+import { getAllAccommodations } from "../endpoints";
 
 const AccommodationDetailsPage = ({ isMobile }) => {
   const { id } = useParams();
   const [accommodation, setAccommodation] = useState(null);
 
   useEffect(() => {
-    fetch(`/api/accommodations/${id}`)
+    fetch(`${getAllAccommodations}/${id}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

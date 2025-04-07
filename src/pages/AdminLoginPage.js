@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { adminLogin } from "../endpoints";
 
 const AdminLoginPage = () => {
   const [username, setUsername] = useState("");
@@ -18,7 +19,7 @@ const AdminLoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/admin/login", {
+      const response = await fetch(adminLogin, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -42,11 +43,22 @@ const AdminLoginPage = () => {
 
   return (
     <Container maxWidth="xs" sx={{ mt: 8 }}>
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
+      <Box
+        sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      >
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{ fontWeight: "bold" }}
+        >
           Admin Login
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%", mt: 3 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ width: "100%", mt: 3 }}
+        >
           <TextField
             fullWidth
             label="Username"
@@ -72,7 +84,12 @@ const AdminLoginPage = () => {
           <Button
             type="submit"
             variant="contained"
-            sx={{ mt: 2, width: "100%", bgcolor: "#1976d2", "&:hover": { bgcolor: "#115293" } }}
+            sx={{
+              mt: 2,
+              width: "100%",
+              bgcolor: "#1976d2",
+              "&:hover": { bgcolor: "#115293" },
+            }}
           >
             Sign In
           </Button>

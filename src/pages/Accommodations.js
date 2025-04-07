@@ -26,7 +26,8 @@ import {
   Fade,
   Autocomplete,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { getAllAccommodations } from "../endpoints";
 
 const Accommodations = () => {
   const [accommodations, setAccommodations] = useState([]);
@@ -45,10 +46,20 @@ const Accommodations = () => {
   const [allAmenities, setAllAmenities] = useState([]);
   const navigate = useNavigate();
 
+  const location = useLocation();
+  const preSearch = location?.state?.search;
+
+  useEffect(() => {
+    if (preSearch?.length > 0) {
+      setSearchTerm(preSearch);
+    }
+  }, [preSearch]);
+
   useEffect(() => {
     filterAccommodations();
   }, [
     searchTerm,
+    accommodations,
     priceRange,
     selectedDestinations,
     selectedThemes,
@@ -60,7 +71,7 @@ const Accommodations = () => {
   useEffect(() => {
     const fetchAccommodations = async () => {
       try {
-        const response = await fetch("/api/accommodations");
+        const response = await fetch(getAllAccommodations);
         if (!response.ok) throw new Error("Failed to fetch accommodations");
         const data = await response.json();
         setAccommodations(data.data || []); // Handle null case
@@ -79,21 +90,21 @@ const Accommodations = () => {
       try {
         // Fetch destinations
         const destinationsResponse = await fetch(
-          "/api/accommodations/filters/destinations"
+          `${getAllAccommodations}/filters/destinations`
         );
         const destinations = await destinationsResponse.json();
         setAllDestinations(destinations);
 
         // Fetch themes
         const themesResponse = await fetch(
-          "/api/accommodations/filters/themes"
+          `${getAllAccommodations}/filters/themes`
         );
         const themes = await themesResponse.json();
         setAllThemes(themes);
 
         // Fetch amenities
         const amenitiesResponse = await fetch(
-          "/api/accommodations/filters/amenities"
+          `${getAllAccommodations}/filters/amenities`
         );
         const amenities = await amenitiesResponse.json();
         setAllAmenities(amenities);
@@ -106,14 +117,16 @@ const Accommodations = () => {
   }, []);
 
   const handleSearch = (event) => {
-    const value = event.target.value;
-    setSearchTerm(value);
+    // const value = event.target.value;
+    // setSearchTerm(value);
 
-    if (value.trim() === "") {
-      setFilteredAccommodations(accommodations);
-    } else {
-      filterAccommodations();
-    }
+    // if (value.trim() === "") {
+    //   setFilteredAccommodations(accommodations);
+    // } else {
+    //   filterAccommodations();
+    // }
+
+    setSearchTerm(event.target.value);
   };
 
   const handleSortChange = (event) => {

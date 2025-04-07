@@ -11,10 +11,15 @@ import {
   Container,
   useTheme,
 } from "@mui/material";
-import { Delete as DeleteIcon, Edit as EditIcon, Visibility as ViewIcon } from "@mui/icons-material";
+import {
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  Visibility as ViewIcon,
+} from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
+import { getAllAccommodations } from "../endpoints";
 
 const AccommodationsList = () => {
   const [data, setData] = useState([]);
@@ -86,19 +91,17 @@ const AccommodationsList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this accommodation?")) return;
+    if (!window.confirm("Are you sure you want to delete this accommodation?"))
+      return;
 
     try {
       const token = localStorage.getItem("adminToken");
-      const response = await fetch(
-        `http://localhost:5000/api/accommodations/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${getAllAccommodations}/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) throw new Error("Delete failed");
 
@@ -117,14 +120,11 @@ const AccommodationsList = () => {
       }
 
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/accommodations",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(getAllAccommodations, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (response.status === 401) {
           localStorage.removeItem("adminToken");

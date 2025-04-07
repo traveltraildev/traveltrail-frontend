@@ -14,6 +14,7 @@ import {
   Autocomplete,
 } from "@mui/material";
 import ItineraryDayForm from "./ItineraryDayForm";
+import { getAllTrips } from "../../../endpoints";
 
 // Options for Autocomplete components
 const themeOptions = [
@@ -49,7 +50,7 @@ const EditTripPage = () => {
   useEffect(() => {
     const fetchTripData = async () => {
       try {
-        const response = await fetch(`/api/trips/${tripId}`);
+        const response = await fetch(`${getAllTrips}/${tripId}`);
         if (!response.ok) throw new Error("Failed to fetch trip");
         const data = await response.json();
         setTripData({
@@ -154,7 +155,7 @@ const EditTripPage = () => {
       // Remove MongoDB _id from the update data
       delete tripToUpdate._id;
 
-      const response = await fetch(`/api/trips/${tripId}`, {
+      const response = await fetch(`${getAllTrips}/${tripId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

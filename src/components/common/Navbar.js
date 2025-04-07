@@ -11,7 +11,7 @@ import { styled } from "@mui/material/styles";
 // Custom styled components
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundImage:
-    "linear-gradient(to right, var(--primary-100), var(--primary-300))",
+    "linear-gradient(to right, var(--primary-100), var(--primary-100))",
   backgroundColor: "transparent",
   boxShadow: "none",
 }));

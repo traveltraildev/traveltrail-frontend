@@ -30,7 +30,7 @@ const BookingConfirmation = () => {
             variant="contained"
             color="success"
             startIcon={<WhatsAppIcon />}
-            href={`https://wa.me/919808007842?text=${encodeURIComponent(whatsappMessage)}`}
+            href={`https://wa.me/917060400357?text=${encodeURIComponent(whatsappMessage)}`}
             target="_blank"
             sx={{ px: 4, py: 2 }}
           >

@@ -17,6 +17,7 @@ import Footer from "../../../components/common/Footer";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useNavigate } from "react-router-dom";
 import ItineraryDayForm from "./ItineraryDayForm";
+import { getAllTrips } from "../../../endpoints";
 
 // Define options for Autocomplete components
 const themeOptions = [
@@ -136,7 +137,7 @@ const AddTripPage = ({ isMobile }) => {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/trips", {
+      const response = await fetch(getAllTrips, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

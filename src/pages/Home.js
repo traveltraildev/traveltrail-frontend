@@ -5,6 +5,7 @@ import Feature from "../components/Home/Feature";
 import { Box, Container, Typography } from "@mui/material";
 import Instagram from "../components/Home/Instagrams";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { getAllAccommodations, getAllTrips } from "../endpoints";
 
 const Home = () => {
   const isMobile = useMediaQuery("(max-width:600px)");
@@ -15,8 +16,8 @@ const Home = () => {
     const fetchAccommodationsAndTrips = async () => {
       try {
         const [accomResp, tripResp] = await Promise.all([
-          fetch("/api/accommodations"),
-          fetch("/api/trips"),
+          fetch(getAllAccommodations),
+          fetch(getAllTrips),
         ]);
 
         if (!accomResp.ok)
