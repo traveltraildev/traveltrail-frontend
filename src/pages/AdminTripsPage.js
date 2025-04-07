@@ -10,13 +10,14 @@ import {
   Typography,
   Container,
   useTheme,
+  Button,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   Visibility as ViewIcon,
 } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 
@@ -81,7 +82,7 @@ const AdminTripsPage = () => {
         const token = localStorage.getItem("adminToken");
         const response = await fetch(`/api/trips/${id}`, {
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
           method: "DELETE",
         });
@@ -112,7 +113,7 @@ const AdminTripsPage = () => {
 
       const response = await fetch("/api/trips", {
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -123,10 +124,12 @@ const AdminTripsPage = () => {
       }
 
       const result = await response.json();
-      setData(result.map(item => ({
-        ...item,
-        id: item._id,
-      })));
+      setData(
+        result.map((item) => ({
+          ...item,
+          id: item._id,
+        }))
+      );
     } catch (error) {
       setError("Failed to fetch trips");
     } finally {
@@ -140,9 +143,21 @@ const AdminTripsPage = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Trip Management
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "20px",
+        }}
+      >
+        <Typography variant="h4" gutterBottom>
+          Trip Management
+        </Typography>
+        <Link to={"/admin/cms/add-trip"}>
+          <Button variant="contained">Add New Trip</Button>
+        </Link>
+      </Box>
       {loading ? (
         <CircularProgress />
       ) : (

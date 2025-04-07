@@ -103,6 +103,17 @@ const EditTripPage = () => {
     }));
   };
 
+  const handleRemoveHighlight = (dayIndex, highlightIndex) => {
+    setTripData((prev) => {
+      const updatedItineraries = [...prev.itineraries];
+      const day = updatedItineraries[dayIndex];
+      if (day && day.highlights) {
+        day.highlights.splice(highlightIndex, 1); // Remove the highlight by index
+      }
+      return { ...prev, itineraries: updatedItineraries };
+    });
+  };
+
   const handleAddDay = () => {
     setTripData((prev) => ({
       ...prev,
@@ -354,6 +365,7 @@ const EditTripPage = () => {
                   dayData={day}
                   onChangeDayData={handleItineraryChange}
                   onAddHighlight={handleAddHighlight}
+                  onRemoveHighlight={handleRemoveHighlight}
                   onDeleteDay={handleDeleteDay}
                 />
               ))}
