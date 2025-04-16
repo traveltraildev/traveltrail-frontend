@@ -25,10 +25,14 @@ import {
   RadioGroup,
   useMediaQuery,
   Fade,
-  Autocomplete,
+  IconButton,
 } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getAllTrips } from "../endpoints";
+import BookNow from "../components/TripDetails/BookNow";
+import { Close } from "@mui/icons-material";
+
+
 
 const TripsCard = () => {
   const [trips, setTrips] = useState([]);
@@ -36,6 +40,7 @@ const TripsCard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activeFilterCategory, setActiveFilterCategory] = useState("sort");
+  const [selectedTrip, setSelectedTrip] = useState(null);
 
   const location = useLocation();
   const preSearchData = location.state;
@@ -569,82 +574,222 @@ const TripsCard = () => {
       </Dialog>
 
       {/* Trips Grid */}
-      <Grid container spacing={4} justifyContent="center">
-        {filteredTrips?.map((trip) => (
-          <Grid item key={trip._id} xs={12} sm={6} md={4}>
-            <Card
-              sx={{
-                borderRadius: "12px",
-                overflow: "hidden",
-                transition: "transform 0.3s ease",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                "&:hover": {
-                  boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
-                  transform: "translateY(-3px)",
-                },
-                bgcolor: "background.paper",
-                p: 1,
-                height: "100%",
+      <Grid container spacing={2} justifyContent="center">
+  {filteredTrips?.map((trip) => (
+    <Grid item key={trip._id} xs={12} sm={6} md={4} sx={{ display: 'flex' }}>
+      <Card sx={{
+        width: '100%',
+        height: { xs: 300, sm: 340 }, // Responsive height
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "12px",
+        overflow: "hidden",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        bgcolor: "background.paper",
+        '&:hover': {
+          boxShadow: { sm: "0 8px 16px rgba(0, 0, 0, 0.1)" },
+          transform: { sm: "translateY(-3px)" }
+        },
+        transition: { sm: "transform 0.3s ease" }
+      }}>
+        {/* Image Section */}
+        <Box sx={{
+          position: 'relative',
+          width: '100%',
+          pt: { xs: '50%', sm: '56.25%' }, // Adjusted aspect ratio
+          overflow: 'hidden',
+          bgcolor: 'grey.100'
+        }}>
+          <CardMedia
+            component="img"
+            image={trip?.images[0] || "./images/defaultImg.png"}
+            alt={trip?.name || ""}
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+          <Chip
+            label={`${trip?.daysCount} days`}
+            size="small"
+            sx={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              bgcolor: 'rgba(0,0,0,0.7)',
+              color: '#fff8e1',
+              fontWeight: 600,
+              fontSize: { xs: '0.7rem', sm: '0.8rem' }
+            }}
+          />
+        </Box>
+
+        <CardContent sx={{ 
+          p: { xs: 1.5, sm: 2 },
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: { xs: 0.5, sm: 1 }
+        }}>
+          {/* Trip Info */}
+          <Box sx={{ 
+            flex: 1,
+            mb: { xs: 0.5, sm: 1 }
+          }}>
+            <Typography 
+              variant="body1" 
+              fontWeight="600" 
+              sx={{ 
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                color: '#212121',
+                fontSize: { xs: '0.9rem', sm: '1rem' }
               }}
             >
-              <CardMedia
-                component="img"
-                height="140"
-                image={trip?.images[0] || "./images/defaultImg.png"}
-                alt={trip?.name || ""}
-                sx={{
-                  objectFit: "cover",
-                  width: "100%",
-                }}
-              />
-              <CardContent sx={{ p: 2 }}>
-                <Box sx={{ mb: 0.5 }}>
-                  <Typography variant="h6" fontWeight="600" gutterBottom noWrap>
-                    {trip?.name || ""}
-                  </Typography>
-                </Box>
-                <Box sx={{ mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {trip?.destination} (₹ {trip?.price || ""})
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    mt: "auto",
-                  }}
-                >
-                  <Chip
-                    label={`${trip?.price} ₹`}
-                    color="primary"
-                    size="small"
-                    sx={{ fontWeight: "bold", fontSize: "0.9rem" }}
-                  />
-                  <Button
-                    component={Link}
-                    to={`/trips/${trip?._id}`}
-                    variant="contained"
-                    sx={{
-                      px: 2,
-                      py: 0.5,
-                      fontSize: "0.875rem",
-                      bgcolor: "#2196f3",
-                      color: "white",
-                      "&:hover": { bgcolor: "#0d8bf2" },
-                      borderRadius: "25px",
-                      textTransform: "none",
-                    }}
-                  >
-                    View Details
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+              {trip?.name || ""}
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                display: '-webkit-box',
+                WebkitLineClamp: 1,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                color: '#616161',
+                fontSize: { xs: '0.8rem', sm: '0.875rem' }
+              }}
+            >
+              {trip?.destination}
+            </Typography>
+          </Box>
+
+          {/* Price Section */}
+          <Box sx={{ 
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            color: '#f57f17',
+            mb: { xs: 0.5, sm: 1 }
+          }}>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                fontWeight: 500,
+                fontSize: { xs: '0.7rem', sm: '0.75rem' }
+              }}
+            >
+              Starts from
+            </Typography>
+            <Typography 
+              variant="subtitle1" 
+              fontWeight="600"
+              sx={{ 
+                fontSize: { xs: '0.9rem', sm: '1rem' },
+                lineHeight: 1.2
+              }}
+            >
+              ₹{trip?.price?.toLocaleString()}
+            </Typography>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                opacity: 0.8
+              }}
+            >
+              /person
+            </Typography>
+          </Box>
+
+          {/* Action Buttons */}
+          <Box sx={{ 
+            display: 'flex',
+            gap: 1,
+            mt: 'auto'
+          }}>
+            <Button
+  variant="contained"
+  size="small"
+  fullWidth
+  onClick={() => setSelectedTrip(trip)}
+  sx={{
+    borderRadius: "8px",
+    textTransform: "none",
+    bgcolor: '#f57f17',
+    color: '#fff',
+    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+    py: { xs: 0.5, sm: 0.75 },
+    '&:hover': { 
+      bgcolor: '#ff6f00',
+      boxShadow: 1
+    }
+  }}
+>
+  Book Now
+</Button>
+            <Button
+              component={Link}
+              to={`/trips/${trip?._id}`}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{
+                borderRadius: "6px",
+                textTransform: "none",
+                borderColor: '#ffc107',
+                color: '#ffc107',
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                py: { xs: 0.5, sm: 0.75 },
+                '&:hover': {
+                  borderColor: '#ffa000',
+                  color: '#ffa000',
+                  bgcolor: '#fff8e1'
+                }
+              }}
+            >
+              View
+            </Button>
+          </Box>
+        </CardContent>
+       </Card>
+       </Grid>
+      ))}
+     </Grid>
+     <Dialog
+  open={!!selectedTrip}
+  onClose={() => setSelectedTrip(null)}
+  fullWidth
+  maxWidth="md"
+  PaperProps={{
+    sx: {
+      borderRadius: "16px",
+      overflow: "visible",
+      backgroundColor: "#fff8e1",
+    },
+  }}
+>
+  <Box sx={{ position: "absolute", right: 16, top: 16 }}>
+    <IconButton 
+      onClick={() => setSelectedTrip(null)}
+      sx={{ color: "#f57f17" }}
+    >
+      <Close />
+    </IconButton>
+  </Box>
+  
+  <Box sx={{ p: { xs: 2, md: 4 } }}>
+    <BookNow 
+      trip={selectedTrip} 
+      onSuccess={() => setSelectedTrip(null)}
+    />
+  </Box>
+</Dialog>
     </Box>
   );
 };

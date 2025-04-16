@@ -8,7 +8,7 @@ const StickyTripTitle = ({ trip }) => {
       elevation={3}
       sx={{
         position: "fixed",
-        top: { xs: "56px", sm: "64px" },
+        top: { xs: "556px", sm: "64px" },
         left: "50%",
         transform: "translateX(-50%)",
         zIndex: 1100,
