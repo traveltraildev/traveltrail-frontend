@@ -26,15 +26,90 @@ import {
   useMediaQuery,
   Fade,
   IconButton,
+  AppBar, 
+  Toolbar
 } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getAllTrips } from "../endpoints";
 import BookNow from "../components/TripDetails/BookNow";
 import { Close } from "@mui/icons-material";
+import { styled, useTheme } from "@mui/material/styles";
+import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import Slide from '@mui/material/Slide';
+import { useScrollTrigger } from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import { debounce } from '@mui/material/utils';
+import { motion } from "framer-motion";
 
 
+
+const CollapsibleHeader = styled(AppBar)(({ theme }) => ({
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  backdropFilter: 'blur(8px)',
+  backgroundColor: alpha(theme.palette.background.paper, 0.8),
+}));
+
+const MobileHeader = styled('div')(({ theme }) => ({
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  zIndex: 1100,
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  padding: theme.spacing(1.5, '7%'),
+  backgroundColor: alpha(theme.palette.background.paper, 0.97),
+  backdropFilter: 'blur(8px)',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  boxShadow: theme.shadows[2],
+}));
+
+
+const FloatingSearch = styled('div')(({ theme }) => ({
+  position: 'fixed',
+  top: 56, // Height of mobile header
+  left: 0,
+  right: 0,
+  zIndex: 1099,
+  padding: theme.spacing(1, '7%'),
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: theme.shadows[2],
+}));
+
+const Logo = styled(Box)(({ theme }) => ({
+  width: "120px", // Adjust the width as needed
+  height: "40px", // Adjust the height as needed
+  marginRight: "10px", // Add some spacing
+  objectFit: "contain", // Maintain aspect ratio
+}));
 
 const TripsCard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [headerState, setHeaderState] = useState({
+    isScrolledTop: true,
+    isExpanded: true,
+    scrollPosition: 0
+  });
+
+  // Debounced scroll handler
+  const handleScroll = debounce(() => {
+    const currentScroll = window.scrollY;
+    const isTop = currentScroll < 10;
+    const isScrollingUp = currentScroll < headerState.scrollPosition;
+    const pastThreshold = currentScroll > 100;
+
+    setHeaderState(prev => ({
+      scrollPosition: currentScroll,
+      isScrolledTop: isTop,
+      isExpanded: isTop || (isScrollingUp && pastThreshold)
+    }));
+  }, 50);
+
+
   const [trips, setTrips] = useState([]);
   const [filteredTrips, setFilteredTrips] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -61,6 +136,9 @@ const TripsCard = () => {
   });
   const navigate = useNavigate();
 
+  const [isNavbarVisible, setIsNavbarVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
   const preSearch = location?.state?.search;
 
   useEffect(() => {
@@ -68,6 +146,30 @@ const TripsCard = () => {
       setSearchTerm(preSearch);
     }
   }, [preSearch]);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (!isMobile) return;
+
+    let lastScroll = 0;
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+      const isScrollingUp = currentScroll < lastScroll;
+
+      setShowMobileSearch(isScrollingUp && currentScroll > 100);
+      setIsNavbarVisible(currentScroll < 50 || isScrollingUp);
+      lastScroll = currentScroll;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isMobile]);
 
   // Fetch trips data
   useEffect(() => {
@@ -365,104 +467,206 @@ const TripsCard = () => {
   };
 
   return (
-    <Box sx={{ padding: "100px 7%", backgroundColor: "#f5f5f5" }}>
-      <Typography
-        variant="h4"
-        textAlign="center"
-        gutterBottom
-        fontWeight="bold"
-        color="#000"
-        marginBottom={"30px"}
-      >
-        Explore Your Next Adventure
-      </Typography>
+    <Box sx={{ 
+      padding: "100px 7%", 
+      backgroundColor: "#f5f5f5",
+      pt: { xs: headerState.isExpanded ? '160px' : '100px', sm: '100px' },
+      transition: 'padding-top 0.3s ease'
+    }}>
+      {/* Mobile Header */}
+      {isMobile && (
+        <MobileHeader sx={{
+          transform: `translateY(${headerState.isExpanded ? 0 : '-100%'})`,
+          height: headerState.isScrolledTop ? 88 : 56
+        }}>
+          {/* Logo with scale animation */}
+          <motion.div
+            animate={{ scale: headerState.isScrolledTop ? 1 : 0.9 }}
+            transition={{ duration: 0.3 }}
+          >
+             <Logo>
+              <img
+                src="/images/mainLogo.svg"
+                alt="Travel Trail"
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              />
+            </Logo>
+          </motion.div>
 
-      {/* Search Bar */}
-      <Box sx={{ mb: 4 }}>
-        <TextField
-          label="Search by name"
-          value={searchTerm}
-          onChange={handleSearch}
-          fullWidth
-          sx={{
-            mb: 2,
-            borderRadius: "50px",
-            overflow: "hidden",
-          }}
-          InputProps={{
-            style: {
-              borderRadius: "50px",
-            },
-          }}
-        />
+          {/* Search Bar with width animation */}
+          <motion.div
+            style={{ flexGrow: 1 }}
+            animate={{ 
+              opacity: headerState.isExpanded ? 1 : 0,
+              width: headerState.isExpanded ? 'auto' : 0
+            }}
+          >
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Search trips..."
+              value={searchTerm}
+              onChange={handleSearch}
+              InputProps={{
+                sx: {
+                  borderRadius: 28,
+                  backgroundColor: alpha(theme.palette.common.white, 0.9),
+                  height: 40
+                },
+                startAdornment: <SearchIcon sx={{ mr: 1 }} />
+              }}
+            />
+          </motion.div>
 
-        {/* Filter Chips */}
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-          <Chip
-            label="Filters"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("sort");
+          {/* Menu Button with fade animation */}
+          <Fade in={!headerState.isScrolledTop}>
+            <IconButton sx={{ flexShrink: 0 }}>
+              <MenuIcon />
+            </IconButton>
+          </Fade>
+        </MobileHeader>
+      )}
+      {/* Desktop Header */}
+      {!isMobile && (
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Typography
+            variant="h3"
+            gutterBottom
+            fontWeight="bold"
+            sx={{ 
+              mb: 4,
+              background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
             }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Sort"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("sort");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Price"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("price");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Destinations"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("destinations");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Themes"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("themes");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Inclusions"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("inclusions");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Exclusions"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("exclusions");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
+          >
+            Explore Adventures
+          </Typography>
+          
+          <Box sx={{ 
+            position: 'relative',
+            maxWidth: 600,
+            mx: 'auto',
+            mb: 4
+          }}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Search trips by name..."
+              value={searchTerm}
+              onChange={handleSearch}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 4,
+                  boxShadow: 3,
+                  pr: 1,
+                  backgroundColor: 'background.paper'
+                }
+              }}
+              InputProps={{
+                endAdornment: (
+                  <IconButton
+                    sx={{ 
+                      bgcolor: 'primary.main',
+                      '&:hover': { bgcolor: 'primary.dark' }
+                    }}
+                  >
+                    <SearchIcon sx={{ color: 'common.white' }} />
+                  </IconButton>
+                )
+              }}
+            />
+          </Box>
         </Box>
+      )}
+
+      {/* Filter Chips */}
+
+      <Slide 
+        in={headerState.isExpanded} 
+        direction="down" 
+        mountOnEnter 
+        unmountOnExit
+      >
+      <Box
+        sx={{
+          display: "flex",
+          gap: 1,
+          flexWrap: { xs: "nowrap", sm: "wrap" },
+          overflowX: { xs: "auto", sm: "visible" },
+          pb: 1,
+          mx: { xs: "-7%", sm: 0 },
+          px: { xs: "7%", sm: 0 },
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        }}
+      >
+        <Chip
+          label="Filters"
+          onClick={() => {
+            toggleFilterModal();
+            setActiveFilterCategory("sort");
+          }}
+          variant="outlined"
+          sx={{ cursor: "pointer" }}
+        />
+        <Chip
+          label="Sort"
+          onClick={() => {
+            toggleFilterModal();
+            setActiveFilterCategory("sort");
+          }}
+          variant="outlined"
+          sx={{ cursor: "pointer" }}
+        />
+        <Chip
+          label="Price"
+          onClick={() => {
+            toggleFilterModal();
+            setActiveFilterCategory("price");
+          }}
+          variant="outlined"
+          sx={{ cursor: "pointer" }}
+        />
+        <Chip
+          label="Destinations"
+          onClick={() => {
+            toggleFilterModal();
+            setActiveFilterCategory("destinations");
+          }}
+          variant="outlined"
+          sx={{ cursor: "pointer" }}
+        />
+        <Chip
+          label="Themes"
+          onClick={() => {
+            toggleFilterModal();
+            setActiveFilterCategory("themes");
+          }}
+          variant="outlined"
+          sx={{ cursor: "pointer" }}
+        />
+        <Chip
+          label="Inclusions"
+          onClick={() => {
+            toggleFilterModal();
+            setActiveFilterCategory("inclusions");
+          }}
+          variant="outlined"
+          sx={{ cursor: "pointer" }}
+        />
+        <Chip
+          label="Exclusions"
+          onClick={() => {
+            toggleFilterModal();
+            setActiveFilterCategory("exclusions");
+          }}
+          variant="outlined"
+          sx={{ cursor: "pointer" }}
+        />
       </Box>
+      </Slide>
 
       {/* Filter Modal */}
       <Dialog
@@ -575,221 +779,240 @@ const TripsCard = () => {
 
       {/* Trips Grid */}
       <Grid container spacing={2} justifyContent="center">
-  {filteredTrips?.map((trip) => (
-    <Grid item key={trip._id} xs={12} sm={6} md={4} sx={{ display: 'flex' }}>
-      <Card sx={{
-        width: '100%',
-        height: { xs: 300, sm: 340 }, // Responsive height
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: "12px",
-        overflow: "hidden",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-        bgcolor: "background.paper",
-        '&:hover': {
-          boxShadow: { sm: "0 8px 16px rgba(0, 0, 0, 0.1)" },
-          transform: { sm: "translateY(-3px)" }
-        },
-        transition: { sm: "transform 0.3s ease" }
-      }}>
-        {/* Image Section */}
-        <Box sx={{
-          position: 'relative',
-          width: '100%',
-          pt: { xs: '50%', sm: '56.25%' }, // Adjusted aspect ratio
-          overflow: 'hidden',
-          bgcolor: 'grey.100'
-        }}>
-          <CardMedia
-            component="img"
-            image={trip?.images[0] || "./images/defaultImg.png"}
-            alt={trip?.name || ""}
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-          />
-          <Chip
-            label={`${trip?.daysCount} days`}
-            size="small"
-            sx={{
-              position: 'absolute',
-              top: 8,
-              left: 8,
-              bgcolor: 'rgba(0,0,0,0.7)',
-              color: '#fff8e1',
-              fontWeight: 600,
-              fontSize: { xs: '0.7rem', sm: '0.8rem' }
-            }}
-          />
+        {filteredTrips?.map((trip) => (
+          <Grid
+            item
+            key={trip._id}
+            xs={12}
+            sm={6}
+            md={4}
+            sx={{ display: "flex" }}
+          >
+            <Card
+              sx={{
+                width: "100%",
+                height: { xs: 300, sm: 340 }, // Responsive height
+                display: "flex",
+                flexDirection: "column",
+                borderRadius: "12px",
+                overflow: "hidden",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                bgcolor: "background.paper",
+                "&:hover": {
+                  boxShadow: { sm: "0 8px 16px rgba(0, 0, 0, 0.1)" },
+                  transform: { sm: "translateY(-3px)" },
+                },
+                transition: { sm: "transform 0.3s ease" },
+              }}
+            >
+              {/* Image Section */}
+              <Box
+                sx={{
+                  position: "relative",
+                  width: "100%",
+                  pt: { xs: "50%", sm: "56.25%" }, // Adjusted aspect ratio
+                  overflow: "hidden",
+                  bgcolor: "grey.100",
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  image={trip?.images[0] || "./images/defaultImg.png"}
+                  alt={trip?.name || ""}
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+                <Chip
+                  label={`${trip?.daysCount} days`}
+                  size="small"
+                  sx={{
+                    position: "absolute",
+                    top: 8,
+                    left: 8,
+                    bgcolor: "rgba(0,0,0,0.7)",
+                    color: "#fff8e1",
+                    fontWeight: 600,
+                    fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                  }}
+                />
+              </Box>
+
+              <CardContent
+                sx={{
+                  p: { xs: 1.5, sm: 2 },
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: { xs: 0.5, sm: 1 },
+                }}
+              >
+                {/* Trip Info */}
+                <Box
+                  sx={{
+                    flex: 1,
+                    mb: { xs: 0.5, sm: 1 },
+                  }}
+                >
+                  <Typography
+                    variant="body1"
+                    fontWeight="600"
+                    sx={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      color: "#212121",
+                      fontSize: { xs: "0.9rem", sm: "1rem" },
+                    }}
+                  >
+                    {trip?.name || ""}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 1,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      color: "#616161",
+                      fontSize: { xs: "0.8rem", sm: "0.875rem" },
+                    }}
+                  >
+                    {trip?.destination}
+                  </Typography>
+                </Box>
+
+                {/* Price Section */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                    color: "#f57f17",
+                    mb: { xs: 0.5, sm: 1 },
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: { xs: "0.7rem", sm: "0.75rem" },
+                    }}
+                  >
+                    Starts from
+                  </Typography>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight="600"
+                    sx={{
+                      fontSize: { xs: "0.9rem", sm: "1rem" },
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    ₹{trip?.price?.toLocaleString()}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontSize: { xs: "0.7rem", sm: "0.75rem" },
+                      opacity: 0.8,
+                    }}
+                  >
+                    /person
+                  </Typography>
+                </Box>
+
+                {/* Action Buttons */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    mt: "auto",
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    size="small"
+                    fullWidth
+                    onClick={() => setSelectedTrip(trip)}
+                    sx={{
+                      borderRadius: "8px",
+                      textTransform: "none",
+                      bgcolor: "#f57f17",
+                      color: "#fff",
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                      py: { xs: 0.5, sm: 0.75 },
+                      "&:hover": {
+                        bgcolor: "#ff6f00",
+                        boxShadow: 1,
+                      },
+                    }}
+                  >
+                    Book Now
+                  </Button>
+                  <Button
+                    component={Link}
+                    to={`/trips/${trip?._id}`}
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    sx={{
+                      borderRadius: "6px",
+                      textTransform: "none",
+                      borderColor: "#ffc107",
+                      color: "#ffc107",
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                      py: { xs: 0.5, sm: 0.75 },
+                      "&:hover": {
+                        borderColor: "#ffa000",
+                        color: "#ffa000",
+                        bgcolor: "#fff8e1",
+                      },
+                    }}
+                  >
+                    View
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+      <Dialog
+        open={!!selectedTrip}
+        onClose={() => setSelectedTrip(null)}
+        fullWidth
+        maxWidth="md"
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            overflow: "visible",
+            backgroundColor: "#fff8e1",
+          },
+        }}
+      >
+        <Box sx={{ position: "absolute", right: 16, top: 16 }}>
+          <IconButton
+            onClick={() => setSelectedTrip(null)}
+            sx={{ color: "#f57f17" }}
+          >
+            <Close />
+          </IconButton>
         </Box>
 
-        <CardContent sx={{ 
-          p: { xs: 1.5, sm: 2 },
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: { xs: 0.5, sm: 1 }
-        }}>
-          {/* Trip Info */}
-          <Box sx={{ 
-            flex: 1,
-            mb: { xs: 0.5, sm: 1 }
-          }}>
-            <Typography 
-              variant="body1" 
-              fontWeight="600" 
-              sx={{ 
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                color: '#212121',
-                fontSize: { xs: '0.9rem', sm: '1rem' }
-              }}
-            >
-              {trip?.name || ""}
-            </Typography>
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                display: '-webkit-box',
-                WebkitLineClamp: 1,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                color: '#616161',
-                fontSize: { xs: '0.8rem', sm: '0.875rem' }
-              }}
-            >
-              {trip?.destination}
-            </Typography>
-          </Box>
-
-          {/* Price Section */}
-          <Box sx={{ 
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            color: '#f57f17',
-            mb: { xs: 0.5, sm: 1 }
-          }}>
-            <Typography 
-              variant="caption" 
-              sx={{ 
-                fontWeight: 500,
-                fontSize: { xs: '0.7rem', sm: '0.75rem' }
-              }}
-            >
-              Starts from
-            </Typography>
-            <Typography 
-              variant="subtitle1" 
-              fontWeight="600"
-              sx={{ 
-                fontSize: { xs: '0.9rem', sm: '1rem' },
-                lineHeight: 1.2
-              }}
-            >
-              ₹{trip?.price?.toLocaleString()}
-            </Typography>
-            <Typography 
-              variant="caption" 
-              sx={{ 
-                fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                opacity: 0.8
-              }}
-            >
-              /person
-            </Typography>
-          </Box>
-
-          {/* Action Buttons */}
-          <Box sx={{ 
-            display: 'flex',
-            gap: 1,
-            mt: 'auto'
-          }}>
-            <Button
-  variant="contained"
-  size="small"
-  fullWidth
-  onClick={() => setSelectedTrip(trip)}
-  sx={{
-    borderRadius: "8px",
-    textTransform: "none",
-    bgcolor: '#f57f17',
-    color: '#fff',
-    fontSize: { xs: '0.75rem', sm: '0.875rem' },
-    py: { xs: 0.5, sm: 0.75 },
-    '&:hover': { 
-      bgcolor: '#ff6f00',
-      boxShadow: 1
-    }
-  }}
->
-  Book Now
-</Button>
-            <Button
-              component={Link}
-              to={`/trips/${trip?._id}`}
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{
-                borderRadius: "6px",
-                textTransform: "none",
-                borderColor: '#ffc107',
-                color: '#ffc107',
-                fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                py: { xs: 0.5, sm: 0.75 },
-                '&:hover': {
-                  borderColor: '#ffa000',
-                  color: '#ffa000',
-                  bgcolor: '#fff8e1'
-                }
-              }}
-            >
-              View
-            </Button>
-          </Box>
-        </CardContent>
-       </Card>
-       </Grid>
-      ))}
-     </Grid>
-     <Dialog
-  open={!!selectedTrip}
-  onClose={() => setSelectedTrip(null)}
-  fullWidth
-  maxWidth="md"
-  PaperProps={{
-    sx: {
-      borderRadius: "16px",
-      overflow: "visible",
-      backgroundColor: "#fff8e1",
-    },
-  }}
->
-  <Box sx={{ position: "absolute", right: 16, top: 16 }}>
-    <IconButton 
-      onClick={() => setSelectedTrip(null)}
-      sx={{ color: "#f57f17" }}
-    >
-      <Close />
-    </IconButton>
-  </Box>
-  
-  <Box sx={{ p: { xs: 2, md: 4 } }}>
-    <BookNow 
-      trip={selectedTrip} 
-      onSuccess={() => setSelectedTrip(null)}
-    />
-  </Box>
-</Dialog>
+        <Box sx={{ p: { xs: 2, md: 4 } }}>
+          <BookNow
+            trip={selectedTrip}
+            onSuccess={() => setSelectedTrip(null)}
+          />
+        </Box>
+      </Dialog>
     </Box>
   );
 };

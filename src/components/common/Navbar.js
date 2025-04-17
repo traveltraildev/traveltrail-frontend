@@ -19,7 +19,7 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 const Logo = styled(Box)(({ theme }) => ({
   width: "120px", // Adjust the width as needed
   height: "40px", // Adjust the height as needed
-  marginRight: "10px", // Add some spacing
+  marginRight: "0px", // Add some spacing
   objectFit: "contain", // Maintain aspect ratio
 }));
 
