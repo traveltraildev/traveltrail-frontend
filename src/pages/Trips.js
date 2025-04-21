@@ -26,54 +26,51 @@ import {
   useMediaQuery,
   Fade,
   IconButton,
-  AppBar, 
-  Toolbar
+  AppBar,
+  Toolbar,
 } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getAllTrips } from "../endpoints";
 import BookNow from "../components/TripDetails/BookNow";
 import { Close } from "@mui/icons-material";
 import { styled, useTheme } from "@mui/material/styles";
-import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
-import Slide from '@mui/material/Slide';
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import Slide from "@mui/material/Slide";
 import { useScrollTrigger } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import { debounce } from '@mui/material/utils';
+import { debounce } from "@mui/material/utils";
 import { motion } from "framer-motion";
 
-
-
 const CollapsibleHeader = styled(AppBar)(({ theme }) => ({
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  backdropFilter: 'blur(8px)',
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  backdropFilter: "blur(8px)",
   backgroundColor: alpha(theme.palette.background.paper, 0.8),
 }));
 
-const MobileHeader = styled('div')(({ theme }) => ({
-  position: 'fixed',
+const MobileHeader = styled("div")(({ theme }) => ({
+  position: "fixed",
   top: 0,
   left: 0,
   right: 0,
   zIndex: 1100,
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
   gap: theme.spacing(1),
-  padding: theme.spacing(1.5, '7%'),
+  padding: theme.spacing(1.5, "7%"),
   backgroundColor: alpha(theme.palette.background.paper, 0.97),
-  backdropFilter: 'blur(8px)',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  backdropFilter: "blur(8px)",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   boxShadow: theme.shadows[2],
 }));
 
-
-const FloatingSearch = styled('div')(({ theme }) => ({
-  position: 'fixed',
+const FloatingSearch = styled("div")(({ theme }) => ({
+  position: "fixed",
   top: 56, // Height of mobile header
   left: 0,
   right: 0,
   zIndex: 1099,
-  padding: theme.spacing(1, '7%'),
+  padding: theme.spacing(1, "7%"),
   backgroundColor: theme.palette.background.paper,
   boxShadow: theme.shadows[2],
 }));
@@ -92,7 +89,7 @@ const TripsCard = () => {
   const [headerState, setHeaderState] = useState({
     isScrolledTop: true,
     isExpanded: true,
-    scrollPosition: 0
+    scrollPosition: 0,
   });
 
   // Debounced scroll handler
@@ -102,13 +99,12 @@ const TripsCard = () => {
     const isScrollingUp = currentScroll < headerState.scrollPosition;
     const pastThreshold = currentScroll > 100;
 
-    setHeaderState(prev => ({
+    setHeaderState((prev) => ({
       scrollPosition: currentScroll,
       isScrolledTop: isTop,
-      isExpanded: isTop || (isScrollingUp && pastThreshold)
+      isExpanded: isTop || (isScrollingUp && pastThreshold),
     }));
   }, 50);
-
 
   const [trips, setTrips] = useState([]);
   const [filteredTrips, setFilteredTrips] = useState([]);
@@ -149,9 +145,9 @@ const TripsCard = () => {
 
   useEffect(() => {
     if (!isMobile) return;
-    
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [isMobile]);
 
   useEffect(() => {
@@ -167,8 +163,8 @@ const TripsCard = () => {
       lastScroll = currentScroll;
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [isMobile]);
 
   // Fetch trips data
@@ -467,24 +463,28 @@ const TripsCard = () => {
   };
 
   return (
-    <Box sx={{ 
-      padding: "100px 7%", 
-      backgroundColor: "#f5f5f5",
-      pt: { xs: headerState.isExpanded ? '160px' : '100px', sm: '100px' },
-      transition: 'padding-top 0.3s ease'
-    }}>
+    <Box
+      sx={{
+        padding: "100px 7%",
+        backgroundColor: "#f5f5f5",
+        pt: { xs: headerState.isExpanded ? "160px" : "100px", sm: "100px" },
+        transition: "padding-top 0.3s ease",
+      }}
+    >
       {/* Mobile Header */}
       {isMobile && (
-        <MobileHeader sx={{
-          transform: `translateY(${headerState.isExpanded ? 0 : '-100%'})`,
-          height: headerState.isScrolledTop ? 88 : 56
-        }}>
+        <MobileHeader
+          sx={{
+            transform: `translateY(${headerState.isExpanded ? 0 : "-100%"})`,
+            height: headerState.isScrolledTop ? 88 : 56,
+          }}
+        >
           {/* Logo with scale animation */}
           <motion.div
             animate={{ scale: headerState.isScrolledTop ? 1 : 0.9 }}
             transition={{ duration: 0.3 }}
           >
-             <Logo>
+            <Logo>
               <img
                 src="/images/mainLogo.svg"
                 alt="Travel Trail"
@@ -496,9 +496,9 @@ const TripsCard = () => {
           {/* Search Bar with width animation */}
           <motion.div
             style={{ flexGrow: 1 }}
-            animate={{ 
+            animate={{
               opacity: headerState.isExpanded ? 1 : 0,
-              width: headerState.isExpanded ? 'auto' : 0
+              width: headerState.isExpanded ? "auto" : 0,
             }}
           >
             <TextField
@@ -511,9 +511,9 @@ const TripsCard = () => {
                 sx: {
                   borderRadius: 28,
                   backgroundColor: alpha(theme.palette.common.white, 0.9),
-                  height: 40
+                  height: 40,
                 },
-                startAdornment: <SearchIcon sx={{ mr: 1 }} />
+                startAdornment: <SearchIcon sx={{ mr: 1 }} />,
               }}
             />
           </motion.div>
@@ -528,27 +528,29 @@ const TripsCard = () => {
       )}
       {/* Desktop Header */}
       {!isMobile && (
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Box sx={{ textAlign: "center", mb: 4 }}>
           <Typography
             variant="h3"
             gutterBottom
             fontWeight="bold"
-            sx={{ 
+            sx={{
               mb: 4,
               background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
             }}
           >
             Explore Adventures
           </Typography>
-          
-          <Box sx={{ 
-            position: 'relative',
-            maxWidth: 600,
-            mx: 'auto',
-            mb: 4
-          }}>
+
+          <Box
+            sx={{
+              position: "relative",
+              maxWidth: 600,
+              mx: "auto",
+              mb: 4,
+            }}
+          >
             <TextField
               fullWidth
               variant="outlined"
@@ -556,24 +558,24 @@ const TripsCard = () => {
               value={searchTerm}
               onChange={handleSearch}
               sx={{
-                '& .MuiOutlinedInput-root': {
+                "& .MuiOutlinedInput-root": {
                   borderRadius: 4,
                   boxShadow: 3,
                   pr: 1,
-                  backgroundColor: 'background.paper'
-                }
+                  backgroundColor: "background.paper",
+                },
               }}
               InputProps={{
                 endAdornment: (
                   <IconButton
-                    sx={{ 
-                      bgcolor: 'primary.main',
-                      '&:hover': { bgcolor: 'primary.dark' }
+                    sx={{
+                      bgcolor: "primary.main",
+                      "&:hover": { bgcolor: "primary.dark" },
                     }}
                   >
-                    <SearchIcon sx={{ color: 'common.white' }} />
+                    <SearchIcon sx={{ color: "common.white" }} />
                   </IconButton>
-                )
+                ),
               }}
             />
           </Box>
@@ -582,90 +584,90 @@ const TripsCard = () => {
 
       {/* Filter Chips */}
 
-      <Slide 
-        in={headerState.isExpanded} 
-        direction="down" 
-        mountOnEnter 
+      <Slide
+        in={headerState.isExpanded}
+        direction="down"
+        mountOnEnter
         unmountOnExit
       >
-      <Box
-        sx={{
-          display: "flex",
-          gap: 1,
-          flexWrap: { xs: "nowrap", sm: "wrap" },
-          overflowX: { xs: "auto", sm: "visible" },
-          pb: 1,
-          mx: { xs: "-7%", sm: 0 },
-          px: { xs: "7%", sm: 0 },
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-        }}
-      >
-        <Chip
-          label="Filters"
-          onClick={() => {
-            toggleFilterModal();
-            setActiveFilterCategory("sort");
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            flexWrap: { xs: "nowrap", sm: "wrap" },
+            overflowX: { xs: "auto", sm: "visible" },
+            pb: 1,
+            mx: { xs: "-7%", sm: 0 },
+            px: { xs: "7%", sm: 0 },
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
           }}
-          variant="outlined"
-          sx={{ cursor: "pointer" }}
-        />
-        <Chip
-          label="Sort"
-          onClick={() => {
-            toggleFilterModal();
-            setActiveFilterCategory("sort");
-          }}
-          variant="outlined"
-          sx={{ cursor: "pointer" }}
-        />
-        <Chip
-          label="Price"
-          onClick={() => {
-            toggleFilterModal();
-            setActiveFilterCategory("price");
-          }}
-          variant="outlined"
-          sx={{ cursor: "pointer" }}
-        />
-        <Chip
-          label="Destinations"
-          onClick={() => {
-            toggleFilterModal();
-            setActiveFilterCategory("destinations");
-          }}
-          variant="outlined"
-          sx={{ cursor: "pointer" }}
-        />
-        <Chip
-          label="Themes"
-          onClick={() => {
-            toggleFilterModal();
-            setActiveFilterCategory("themes");
-          }}
-          variant="outlined"
-          sx={{ cursor: "pointer" }}
-        />
-        <Chip
-          label="Inclusions"
-          onClick={() => {
-            toggleFilterModal();
-            setActiveFilterCategory("inclusions");
-          }}
-          variant="outlined"
-          sx={{ cursor: "pointer" }}
-        />
-        <Chip
-          label="Exclusions"
-          onClick={() => {
-            toggleFilterModal();
-            setActiveFilterCategory("exclusions");
-          }}
-          variant="outlined"
-          sx={{ cursor: "pointer" }}
-        />
-      </Box>
+        >
+          <Chip
+            label="Filters"
+            onClick={() => {
+              toggleFilterModal();
+              setActiveFilterCategory("sort");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
+          />
+          <Chip
+            label="Sort"
+            onClick={() => {
+              toggleFilterModal();
+              setActiveFilterCategory("sort");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
+          />
+          <Chip
+            label="Price"
+            onClick={() => {
+              toggleFilterModal();
+              setActiveFilterCategory("price");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
+          />
+          <Chip
+            label="Destinations"
+            onClick={() => {
+              toggleFilterModal();
+              setActiveFilterCategory("destinations");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
+          />
+          <Chip
+            label="Themes"
+            onClick={() => {
+              toggleFilterModal();
+              setActiveFilterCategory("themes");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
+          />
+          <Chip
+            label="Inclusions"
+            onClick={() => {
+              toggleFilterModal();
+              setActiveFilterCategory("inclusions");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
+          />
+          <Chip
+            label="Exclusions"
+            onClick={() => {
+              toggleFilterModal();
+              setActiveFilterCategory("exclusions");
+            }}
+            variant="outlined"
+            sx={{ cursor: "pointer" }}
+          />
+        </Box>
       </Slide>
 
       {/* Filter Modal */}
@@ -791,7 +793,7 @@ const TripsCard = () => {
             <Card
               sx={{
                 width: "100%",
-                height: { xs: 300, sm: 340 }, // Responsive height
+                height: { xs: "100%" },
                 display: "flex",
                 flexDirection: "column",
                 borderRadius: "12px",

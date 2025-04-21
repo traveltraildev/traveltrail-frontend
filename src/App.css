@@ -18,6 +18,13 @@ body {
   overflow-x: hidden;
 }
 
+a,
+Link {
+  text-decoration: none;
+  color: inherit;
+  text-decoration-line: none;
+}
+
 /* Add these styles to your app.css */
 .navbar {
   background: linear-gradient(to bottom, #ffa000, #ffeb3b);

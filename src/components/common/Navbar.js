@@ -31,7 +31,7 @@ export default function Navbar() {
       sx={{
         flexGrow: 1,
         position: "fixed",
-        zIndex: 1,
+        zIndex: (theme) => theme.zIndex.drawer + 2,
         width: "100%",
         top: 0,
       }}

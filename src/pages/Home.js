@@ -81,7 +81,11 @@ const Home = () => {
 
         // Show 7 trips and 3 accommodations
         setTrips(tripsData.slice(0, 7));
-        setAccommodations(accommodationsData.slice(0, 3));
+        if (accommodations?.length > 4) {
+          setAccommodations(accommodationsData?.data?.slice(0, 3));
+        } else {
+          setAccommodations(accommodationsData?.data);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
         // Consider adding error state handling here
@@ -95,12 +99,14 @@ const Home = () => {
 
   if (loading) {
     return (
-      <Box sx={{ 
-        display: "flex", 
-        justifyContent: "center", 
-        alignItems: "center", 
-        minHeight: "100vh" 
-      }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
         <CircularProgress size={60} thickness={4} />
       </Box>
     );
@@ -109,7 +115,10 @@ const Home = () => {
   return (
     <ThemeProvider theme={theme}>
       <Navbar />
-      <Container maxWidth="xl" sx={{ py: { xs: 4, md: 8 }, px: { xs: 2, md: 4 } }}>
+      <Container
+        maxWidth="xl"
+        sx={{ py: { xs: 4, md: 8 }, px: { xs: 2, md: 4 } }}
+      >
         {/* Hero Section */}
         <Box sx={{ mb: { xs: 6, md: 8 }, borderRadius: 4, overflow: "hidden" }}>
           <Hero backgroundImage="/images/hero.webp" />
@@ -122,23 +131,34 @@ const Home = () => {
               <TripCard key={trip._id} trip={trip} />
             ))}
           </HorizontalScrollContainer>
-          <SectionButton href="/trips" text="See All Trips" />
+          <Link href="/trips">
+            <SectionButton text="See All Trips" />
+          </Link>
         </SectionWrapper>
 
         {/* Featured Accommodations Section */}
         <SectionWrapper title="Featured Stays">
           <HorizontalScrollContainer>
-            {accommodations.length > 0 ? (
-              accommodations.map((accommodation) => (
-                <AccommodationCard key={accommodation._id} accommodation={accommodation} />
+            {accommodations?.length > 0 ? (
+              accommodations?.map((accommodation) => (
+                <AccommodationCard
+                  key={accommodation._id}
+                  accommodation={accommodation}
+                />
               ))
             ) : (
-              <Typography variant="body1" color="text.secondary" sx={{ mx: 'auto', py: 4 }}>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{ mx: "auto", py: 4 }}
+              >
                 No accommodations available at the moment
               </Typography>
             )}
           </HorizontalScrollContainer>
-          <SectionButton href="/accommodations" text="Browse All Stays" />
+          <Link href="/accommodations">
+            <SectionButton text="Browse All Stays" />
+          </Link>
         </SectionWrapper>
 
         {/* Value Proposition Section */}
@@ -173,28 +193,35 @@ const Home = () => {
 // Reusable Components ==============================================
 
 const SectionWrapper = ({ title, children, bgColor }) => (
-  <Box sx={{ 
-    mb: { xs: 6, md: 8 },
-    py: 6,
-    px: { xs: 2, md: 4 },
-    backgroundColor: bgColor,
-    borderRadius: 4
-  }}>
-    <Typography variant="h4" component="h2" gutterBottom sx={{ 
-      textAlign: "center", 
-      mb: 4,
-      position: "relative",
-      "&::after": {
-        content: '""',
-        display: "block",
-        width: "60px",
-        height: "4px",
-        backgroundColor: "primary.main",
-        mx: "auto",
-        mt: 3,
-        borderRadius: 2
-      }
-    }}>
+  <Box
+    sx={{
+      mb: { xs: 6, md: 8 },
+      py: 6,
+      px: { xs: 2, md: 4 },
+      backgroundColor: bgColor,
+      borderRadius: 4,
+    }}
+  >
+    <Typography
+      variant="h4"
+      component="h2"
+      gutterBottom
+      sx={{
+        textAlign: "center",
+        mb: 4,
+        position: "relative",
+        "&::after": {
+          content: '""',
+          display: "block",
+          width: "60px",
+          height: "4px",
+          backgroundColor: "primary.main",
+          mx: "auto",
+          mt: 3,
+          borderRadius: 2,
+        },
+      }}
+    >
       {title}
     </Typography>
     {children}
@@ -202,95 +229,97 @@ const SectionWrapper = ({ title, children, bgColor }) => (
 );
 
 const HorizontalScrollContainer = ({ children }) => (
-  <Box sx={{
-    display: "flex",
-    overflowX: "auto",
-    gap: 4,
-    py: 2,
-    scrollbarWidth: "thin",
-    "&::-webkit-scrollbar": {
-      height: "8px",
-    },
-    "&::-webkit-scrollbar-thumb": {
-      backgroundColor: "primary.main",
-      borderRadius: "4px",
-    },
-    "&::-webkit-scrollbar-track": {
-      backgroundColor: "background.default",
-    }
-  }}>
+  <Box
+    sx={{
+      display: "flex",
+      overflowX: "auto",
+      gap: 4,
+      py: 2,
+      scrollbarWidth: "thin",
+      "&::-webkit-scrollbar": {
+        height: "8px",
+      },
+      "&::-webkit-scrollbar-thumb": {
+        backgroundColor: "primary.main",
+        borderRadius: "4px",
+      },
+      "&::-webkit-scrollbar-track": {
+        backgroundColor: "background.default",
+      },
+    }}
+  >
     {children}
   </Box>
 );
 
 const TripCard = ({ trip }) => (
   <Box sx={{ minWidth: 300, flexShrink: 0, maxWidth: { xs: "80vw", sm: 400 } }}>
-    <Card sx={{
-      height: "100%",
-      display: "flex",
-      flexDirection: "column",
-      "&:hover": {
-        transform: "translateY(-8px)",
-        boxShadow: 3,
-      }
-    }}>
+    <Card
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        "&:hover": {
+          transform: "translateY(-8px)",
+          boxShadow: 3,
+        },
+      }}
+    >
       <CardMedia
         component="img"
         sx={{
-          height: 250,
+          height: 200,
           width: "100%",
           objectFit: "cover",
         }}
-        image={trip.images[0] || "/images/placeholder.jpg"}
-        alt={trip.name}
+        image={trip?.images[0] || "/images/placeholder.jpg"}
+        alt={trip?.name}
       />
-      <CardContent sx={{ flexGrow: 1, p: 3 }}>
+      <CardContent sx={{ flexGrow: 1 }}>
         <Typography variant="h6" gutterBottom sx={{ fontWeight: 700 }}>
-          {trip.name}
+          {trip?.name}
         </Typography>
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          {trip.destination}
+          {trip?.destination}
         </Typography>
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
           <Chip label={`${trip.daysCount} Days`} size="small" />
           <Typography variant="body1" fontWeight={600}>
-            ₹{trip.price.toLocaleString()}/person
+            ₹{trip?.price?.toLocaleString()}/person
           </Typography>
         </Box>
         <Typography variant="body2" color="text.secondary" paragraph>
-          {trip.desc.substring(0, 120)}...
+          {trip?.desc?.substring(0, 120)}...
         </Typography>
       </CardContent>
-      <Box sx={{ p: 2 }}>
-        <Button
-          fullWidth
-          variant="contained"
-          component={Link}
-          to={`/trips/${trip._id}`}
-          sx={{ py: 1 }}
-        >
+      <Link href={`/trips/${trip._id}`}>
+        <Button fullWidth variant="contained" component={Link} sx={{ py: 1 }}>
           Explore Trip
         </Button>
-      </Box>
+      </Link>
     </Card>
   </Box>
 );
 
 const AccommodationCard = ({ accommodation }) => (
   <Box sx={{ minWidth: 300, flexShrink: 0, maxWidth: { xs: "80vw", sm: 400 } }}>
-    <Card sx={{
-      height: "100%",
-      display: "flex",
-      flexDirection: "column",
-      "&:hover": {
-        transform: "translateY(-8px)",
-        boxShadow: 3,
-      }
-    }}>
+    <Card
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        "&:hover": {
+          transform: "translateY(-8px)",
+          boxShadow: 3,
+        },
+      }}
+    >
       <CardMedia
         component="img"
-        sx={{ height: 250, width: "100%", objectFit: "cover" }}
-        image={accommodation.images[0] || "/images/accommodation-placeholder.jpg"}
+        sx={{ height: 200, width: "100%", objectFit: "cover" }}
+        image={
+          accommodation.images[0] || "/images/accommodation-placeholder.jpg"
+        }
         alt={accommodation.name}
       />
       <CardContent sx={{ flexGrow: 1, p: 3 }}>
@@ -307,20 +336,22 @@ const AccommodationCard = ({ accommodation }) => (
           </Typography>
         </Box>
         <Typography variant="body2" color="text.secondary" paragraph>
-          {accommodation.overview.substring(0, 120)}...
+          {accommodation?.overview?.substring(0, 120)}...
         </Typography>
       </CardContent>
       <Box sx={{ p: 2 }}>
-        <Button
-          fullWidth
-          variant="outlined"
-          color="primary"
-          component={Link}
-          to={`/accommodations/${accommodation._id}`}
-          sx={{ py: 1 }}
-        >
-          View Details
-        </Button>
+        <Link href={`/accommodations/${accommodation._id}`}>
+          {" "}
+          <Button
+            fullWidth
+            variant="outlined"
+            color="primary"
+            component={Link}
+            sx={{ py: 1 }}
+          >
+            View Details
+          </Button>
+        </Link>
       </Box>
     </Card>
   </Box>
@@ -374,28 +405,37 @@ const TestimonialCard = ({ text, author, location }) => (
 );
 
 const NewsletterSection = () => (
-  <Box sx={{
-    py: 6,
-    px: { xs: 2, md: 4 },
-    bgcolor: "primary.main",
-    color: "white",
-    borderRadius: 4,
-    textAlign: "center"
-  }}>
-    <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 700 }}>
+  <Box
+    sx={{
+      py: 6,
+      px: { xs: 2, md: 4 },
+      bgcolor: "primary.main",
+      color: "white",
+      borderRadius: 4,
+      textAlign: "center",
+    }}
+  >
+    <Typography
+      variant="h5"
+      component="h2"
+      gutterBottom
+      sx={{ fontWeight: 700 }}
+    >
       Join Our Travel Community
     </Typography>
     <Typography variant="body1" sx={{ mb: 4, maxWidth: 600, mx: "auto" }}>
       Get exclusive deals, insider tips, and inspiration delivered to your inbox
     </Typography>
-    <Box sx={{ 
-      display: "flex", 
-      gap: 2, 
-      justifyContent: "center",
-      flexDirection: { xs: "column", sm: "row" },
-      maxWidth: 600,
-      mx: "auto"
-    }}>
+    <Box
+      sx={{
+        display: "flex",
+        gap: 2,
+        justifyContent: "center",
+        flexDirection: { xs: "column", sm: "row" },
+        maxWidth: 600,
+        mx: "auto",
+      }}
+    >
       <TextField
         variant="outlined"
         placeholder="Enter your email"
@@ -404,8 +444,8 @@ const NewsletterSection = () => (
           bgcolor: "background.paper",
           borderRadius: "8px",
           "& .MuiOutlinedInput-root": {
-            borderRadius: "8px"
-          }
+            borderRadius: "8px",
+          },
         }}
       />
       <Button
@@ -416,7 +456,7 @@ const NewsletterSection = () => (
           py: 1.5,
           borderRadius: "8px",
           fontSize: "1.1rem",
-          whiteSpace: "nowrap"
+          whiteSpace: "nowrap",
         }}
       >
         Subscribe
@@ -431,31 +471,34 @@ const valueProps = [
   {
     image: "/images/expert (2).png",
     title: "Expertly Curated Trips",
-    content: "Our travel experts design unforgettable experiences tailored to your preferences."
+    content:
+      "Our travel experts design unforgettable experiences tailored to your preferences.",
   },
   {
     image: "/images/money.png",
     title: "Best Price Guarantee",
-    content: "We negotiate directly with providers to bring you the best possible rates."
+    content:
+      "We negotiate directly with providers to bring you the best possible rates.",
   },
   {
     image: "/images/call.png",
     title: "24/7 Travel Support",
-    content: "Our dedicated team is always available to assist you during your journey."
-  }
+    content:
+      "Our dedicated team is always available to assist you during your journey.",
+  },
 ];
 
 const testimonials = [
   {
     text: "The trip was perfectly organized from start to finish. The accommodations were amazing and the local guides were knowledgeable and friendly.",
     author: "Sarah Johnson",
-    location: "Rishikesh Adventure Trip"
+    location: "Rishikesh Adventure Trip",
   },
   {
     text: "Stayed at the Platinum Beachfront Resort and it exceeded all expectations. The service was impeccable and the location was perfect.",
     author: "Michael Chen",
-    location: "Goa Beach Vacation"
-  }
+    location: "Goa Beach Vacation",
+  },
 ];
 
 export default Home;

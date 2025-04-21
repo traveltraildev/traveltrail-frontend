@@ -48,7 +48,10 @@ const Hero = ({ backgroundImage }) => {
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        height: { xs: 400, md: 600 },
+        // height: { xs: 400, md: 600 },
+        height: "100%",
+        paddingTop: "68px",
+        paddingBottom: "68px",
         position: "relative",
         display: "flex",
         flexDirection: "column",
@@ -72,14 +75,28 @@ const Hero = ({ backgroundImage }) => {
         variant="h2"
         component="h1"
         gutterBottom
-        sx={{ fontWeight: "bold", color: "white", fontSize: { xs: "2.5rem", md: "3.5rem" }, zIndex: 1 }}
+        sx={{
+          fontWeight: "bold",
+          color: "white",
+          fontSize: { xs: "1.5rem", md: "3.5rem" },
+          zIndex: 1,
+        }}
       >
         Explore Your Next Adventure
       </Typography>
 
       <Box sx={{ zIndex: 1 }}>
-        <Grid container spacing={2} justifyContent="center" sx={{ mt: 4 }}>
-          <Grid item xs={7} sx={{ maxWidth: "fit-content", margin: "0 auto" }}>
+        <Grid container justifyContent="center" sx={{ mt: 4, zIndex: 1 }}>
+          <Grid
+            item
+            xs={7}
+            sx={{
+              maxWidth: "fit-content",
+              margin: "0 auto",
+              mb: -7,
+              zIndex: 2,
+            }}
+          >
             <Paper
               elevation={2}
               sx={{
@@ -108,10 +125,7 @@ const Hero = ({ backgroundImage }) => {
                   onClick={() => handleCurrentMenu(item)}
                 >
                   {item.icon}
-                  <Typography
-                    variant="body2"
-                    sx={{ mt: 0.5, color: "#333" }}
-                  >
+                  <Typography variant="body2" sx={{ mt: 0.5, color: "#333" }}>
                     {item.label}
                   </Typography>
                 </Box>
@@ -119,7 +133,7 @@ const Hero = ({ backgroundImage }) => {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} sx={{ mt: 4 }}>
+          <Grid item xs={12}>
             <Paper
               elevation={3}
               sx={{
@@ -127,6 +141,7 @@ const Hero = ({ backgroundImage }) => {
                 borderRadius: "10px",
                 backgroundColor: "rgba(255, 255, 255, 0.9)",
                 width: "100%",
+                paddingTop: "80px",
               }}
             >
               <TextField

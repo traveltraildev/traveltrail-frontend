@@ -56,7 +56,9 @@ const TripDetails = ({ isMobile }) => {
 
   return (
     <>
-      <StickyTripTitle trip={trip} />
+      <Box sx={{ width: { sm: "400px", xs: "100%" }, margin: "0px auto" }}>
+        <StickyTripTitle trip={trip} />
+      </Box>
       <Container maxWidth="lg" sx={{ mt: "100px", pb: 4 }}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
