@@ -1,74 +1,145 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { adminCheckout, adminLogin } from "../endpoints";
+// src/context/AuthContext.js
+import React from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { adminCheckout, adminLogin } from '../endpoints';
+import { BASE_URL } from '../endpoints';
+import { getAuthHeader } from '../utils';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // Combine state into a single object
   const [authState, setAuthState] = useState({
     isAuthenticated: false,
     loading: true,
+    user: null
   });
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = localStorage.getItem("adminToken");
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem('userToken') || localStorage.getItem('adminToken');
+      if (!token) return null;
 
-      if (!token) {
-        setAuthState({ isAuthenticated: false, loading: false });
-        return;
-      }
-
-      try {
-        const response = await fetch(adminCheckout, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        setAuthState({
-          isAuthenticated: response.ok,
-          loading: false,
-        });
-
-        if (!response.ok) {
-          localStorage.removeItem("adminToken");
+      const response = await fetch(`${BASE_URL}/api/users/profile`, {
+        headers: {
+          ...getAuthHeader()
         }
-      } catch (error) {
-        console.error("Auth check failed:", error);
-        localStorage.removeItem("adminToken");
-        setAuthState({ isAuthenticated: false, loading: false });
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.user;
+      }
+      throw new Error('Failed to fetch user data');
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      // Check for admin authentication
+      const adminToken = localStorage.getItem('adminToken');
+      if (adminToken) {
+        try {
+          const response = await fetch(adminCheckout, {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            setAuthState({
+              isAuthenticated: true,
+              loading: false,
+              user: { role: 'admin' }
+            });
+          } else {
+            localStorage.removeItem('adminToken');
+            checkUserAuth();
+          }
+        } catch (error) {
+          console.error('Admin auth check failed:', error);
+          localStorage.removeItem('adminToken');
+          checkUserAuth();
+        }
+      } else {
+        checkUserAuth();
       }
     };
 
-    checkAuth();
+    const checkUserAuth = async () => {
+      const userToken = localStorage.getItem('userToken');
+      if (userToken) {
+        const user = await fetchUserData();
+        if (user) {
+          setAuthState({
+            isAuthenticated: true,
+            loading: false,
+            user: { ...user, role: 'user' }
+          });
+        } else {
+          setAuthState({
+            isAuthenticated: false,
+            loading: false,
+            user: null
+          });
+        }
+      } else {
+        setAuthState({
+          isAuthenticated: false,
+          loading: false,
+          user: null
+        });
+      }
+    };
+
+    initializeAuth();
   }, []);
 
-  const login = async (username, password) => {
+  const login = async (username, password, isAdmin = false) => {
     try {
-      const response = await fetch(adminLogin, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch(isAdmin ? adminLogin : `${BASE_URL}/api/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("adminToken", data.adminToken); // Match server response key
-        setAuthState({ isAuthenticated: true, loading: false });
+        const token = isAdmin ? 'adminToken' : 'userToken';
+        localStorage.setItem(token, data.token);
+        
+        if (isAdmin) {
+          setAuthState({ isAuthenticated: true, loading: false, user: { role: 'admin' } });
+        } else {
+          fetchUserData().then(user => {
+            if (user) {
+              localStorage.setItem('user', JSON.stringify(user));
+              setAuthState({
+                isAuthenticated: true,
+                loading: false,
+                user: { ...user, role: 'user' }
+              });
+            }
+          });
+        }
+        
         return true;
       }
       return false;
     } catch (error) {
-      console.error("Login error:", error);
+      console.error('Login error:', error);
       return false;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("adminToken");
-    setAuthState({ isAuthenticated: false, loading: false });
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('user');
+    setAuthState({ isAuthenticated: false, loading: false, user: null });
   };
 
   return (
@@ -76,8 +147,9 @@ export const AuthProvider = ({ children }) => {
       value={{
         isAuthenticated: authState.isAuthenticated,
         loading: authState.loading,
+        user: authState.user,
         login,
-        logout,
+        logout
       }}
     >
       {children}

@@ -33,6 +33,12 @@ import AccommodationsList from "./pages/AccommodationsList";
 import EditAccomodation from "./pages/admin/cms/EditAccomodation";
 import Accommodations from "./pages/Accommodations";
 
+import UserProfilePage from './pages/UserProfilePage';
+import EditProfilePage from './pages/EditProfilePage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
+
+import RegisterPage from "./pages/RegisterPage";
+
 // Create RequireAuth component
 const RequireAuth = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -175,6 +181,12 @@ function App() {
               path="/booking-confirmation"
               element={<BookingConfirmation />}
             />
+            <Route path="/register" element={<RegisterPage />} />
+
+
+<Route path="/profile" element={<UserProfilePage />} />
+  <Route path="/edit-profile" element={<EditProfilePage />} />
+  <Route path="/change-password" element={<ChangePasswordPage />} />
           </Routes>
           {!isMobile && <Footer />}
         </Router>

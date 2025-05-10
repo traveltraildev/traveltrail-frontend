@@ -1,16 +1,17 @@
-// Replace the existing AdminLoginPage component with this
-import React, { useState, useEffect } from "react";
-import { Container, TextField, Button, Typography, Box } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { adminLogin } from "../endpoints";
+// src/pages/AdminLoginPage.js
+import React, { useState, useEffect } from 'react';
+import { Container, TextField, Button, Typography, Box, Divider } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { adminLogin } from '../endpoints';
 
 const AdminLoginPage = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isAdmin, setIsAdmin] = useState(true);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     localStorage.removeItem("adminToken");
@@ -18,82 +19,68 @@ const AdminLoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+
     try {
-      const response = await fetch(adminLogin, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.message || "Authentication failed");
-        return;
+      const success = await login(username, password, isAdmin);
+      if (success) {
+        navigate(isAdmin ? '/admin/dashboard' : '/profile');
+      } else {
+        setError('Login failed. Please check your credentials.');
       }
-
-      const data = await response.json();
-      localStorage.setItem("adminToken", data.adminToken);
-      await login(username, password);
-      navigate("/admin/dashboard");
     } catch (error) {
-      console.error("Login error:", error);
-      setError("Server connection failed");
+      console.error('Login error:', error);
+      setError('Login failed. Please try again.');
     }
   };
 
   return (
     <Container maxWidth="xs" sx={{ mt: 8 }}>
-      <Box
-        sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-      >
-        <Typography
-          variant="h4"
-          component="h1"
-          gutterBottom
-          sx={{ fontWeight: "bold" }}
-        >
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+        <Typography variant="body2" onClick={() => setIsAdmin(true)}>
           Admin Login
         </Typography>
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{ width: "100%", mt: 3 }}
+        <Divider orientation="vertical" flexItem />
+        <Typography variant="body2" onClick={() => setIsAdmin(false)}>
+          User Login
+        </Typography>
+      </Box>
+      
+      <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+        {error && (
+          <Typography color="error" sx={{ mt: 2, mb: 2 }}>
+            {error}
+          </Typography>
+        )}
+        <TextField
+          fullWidth
+          label="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          margin="normal"
+          required
+        />
+        <TextField
+          fullWidth
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          margin="normal"
+          required
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          sx={{
+            mt: 2,
+            bgcolor: 'var(--primary-500)',
+            '&:hover': { bgcolor: 'var(--primary-600)' },
+          }}
         >
-          <TextField
-            fullWidth
-            label="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            margin="normal"
-            required
-          />
-          <TextField
-            fullWidth
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            margin="normal"
-            required
-          />
-          {error && (
-            <Typography color="error" sx={{ mt: 2 }}>
-              {error}
-            </Typography>
-          )}
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{
-              mt: 2,
-              width: "100%",
-              bgcolor: "#1976d2",
-              "&:hover": { bgcolor: "#115293" },
-            }}
-          >
-            Sign In
-          </Button>
-        </Box>
+          Sign In
+        </Button>
       </Box>
     </Container>
   );

@@ -66,6 +66,9 @@ export default function Navbar() {
                 Accommodations
               </Typography>
             </Link>
+            <Link to="/profile" style={{ textDecoration: 'none', color: 'white' }}>
+    <Typography variant="subtitle1" sx={{ p: 2 }}>Profile</Typography>
+  </Link>
           </Box>
 
           {/* Hamburger Menu */}
