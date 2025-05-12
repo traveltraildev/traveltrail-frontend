@@ -3,7 +3,7 @@ import { Container, Typography, Box, TextField, Button, Link } from '@mui/materi
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const AdminLoginPage = () => {
+const LoginPage = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -17,9 +17,9 @@ const AdminLoginPage = () => {
     setError(null);
 
     try {
-      const success = await login(formData.username, formData.password, true);
+      const success = await login(formData.username, formData.password, false);
       if (success) {
-        navigate('/admin/dashboard');
+        navigate('/profile');
       } else {
         setError('Invalid credentials or login failed');
       }
@@ -43,7 +43,7 @@ const AdminLoginPage = () => {
         }}
       >
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'var(--primary-500)' }}>
-          Admin Login
+          User Login
         </Typography>
 
         {error && (
@@ -83,9 +83,16 @@ const AdminLoginPage = () => {
         </Button>
 
         <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
-          Need to login as a user?{' '}
-          <Link href="/login" sx={{ color: 'var(--primary-500)' }}>
-            User Login
+          Need to Join Trishelta?{' '}
+          <Link href="/register" sx={{ color: 'var(--primary-500)' }}>
+            Sign Up
+          </Link>
+        </Typography>
+
+        <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
+          Need to login as an admin?{' '}
+          <Link href="/admin/login" sx={{ color: 'var(--primary-500)' }}>
+            Admin Login
           </Link>
         </Typography>
       </Box>
@@ -93,4 +100,4 @@ const AdminLoginPage = () => {
   );
 };
 
-export default AdminLoginPage;
+export default LoginPage;

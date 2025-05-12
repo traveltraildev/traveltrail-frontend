@@ -28,7 +28,6 @@ const UserProfilePage = () => {
   return (
     <Box sx={{ pt: 12, pb: 8, backgroundColor: 'var(--neutral-50)' }}>
       <Container maxWidth="md">
-        {/* Profile Header */}
         <Box
           sx={{
             backgroundColor: 'white',
@@ -52,17 +51,14 @@ const UserProfilePage = () => {
           </Typography>
         </Box>
 
-        {/* Profile Content */}
         <Grid container spacing={4}>
-          {/* Personal Information Section */}
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <Box
               sx={{
                 backgroundColor: 'white',
                 p: 4,
                 borderRadius: '12px',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                mb: 4,
               }}
             >
               <Typography
@@ -75,8 +71,7 @@ const UserProfilePage = () => {
             </Box>
           </Grid>
 
-          {/* Booking History Section */}
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <Box
               sx={{
                 backgroundColor: 'white',
@@ -91,7 +86,7 @@ const UserProfilePage = () => {
               >
                 Booking History
               </Typography>
-              <UserBookingHistory userId={user._id} />
+              <UserBookingHistory userId={user?._id} />
             </Box>
           </Grid>
         </Grid>
