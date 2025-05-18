@@ -31,6 +31,8 @@ const themeOptions = [
   "Nature",
   "Romantic",
   "Wildlife",
+  "Honeymoon",
+  "Spritual",
 ];
 const inclusionOptions = [
   "Accommodation",

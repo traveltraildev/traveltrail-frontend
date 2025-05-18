@@ -37,11 +37,14 @@ import EditProfilePage from './pages/EditProfilePage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
+import Logout from './pages/Logout';
+
 
 // Components
 import Navbar from './components/common/Navbar';
 import Navbar2 from './components/common/Navbar2';
 import Footer from './components/common/Footer';
+
 
 // Context
 import RequireAuth from './components/common/RequireAuth';
@@ -80,6 +83,7 @@ function App() {
               <Route path="/cookie-policy" element={<CookiePolicyPage />} />
               <Route path="/accessibility-statement" element={<AccessibilityStatementPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/logout" element={<Logout />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/booking-confirmation" element={<BookingConfirmation />} />
               <Route path="/admin/login" element={<AdminLoginPage />} /> {/* Admin Login moved to Public Routes */}
