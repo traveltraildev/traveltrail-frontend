@@ -10,7 +10,7 @@
 // export const tacPage = BASE_URL + "/api/cms/pages/terms-and-conditions";
 
 // src/utils/endpoints.js
-export const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+export const BASE_URL = process.env.REACT_APP_API_URL || "https://backend-alpha-topaz.vercel.app";
 
 export const getAllTrips = BASE_URL + "/api/trips";
 export const getAllAccommodations = BASE_URL + "/api/accommodations";

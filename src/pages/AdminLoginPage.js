@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Typography, Box, TextField, Button, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useAdminAuth } from '../context/AdminAuthContext';
 
 const AdminLoginPage = () => {
   const [formData, setFormData] = useState({
@@ -10,14 +11,15 @@ const AdminLoginPage = () => {
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { login } = useAuth(); // Access login via useAuth
+  const { adminLogin } = useAdminAuth(); // Access adminLogin via useAdminAuth
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Executing AdminLoginPage handleSubmit'); // Add this
     setError(null);
 
     try {
-      const success = await login(formData.username, formData.password, true);
+      const success = await adminLogin(formData.username, formData.password);
       if (success) {
         navigate('/admin/dashboard');
       } else {

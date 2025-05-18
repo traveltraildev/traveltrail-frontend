@@ -146,17 +146,19 @@ const Footer = () => {
                 Terms of Use
               </Link>
               <Link
-                href="/privacy-policy" // Update when created
+                component={RouterLink}
+                to="/privacy-policy"
                 variant="body2"
                 sx={linkStyles(theme)}
               >
                 Privacy Policy
               </Link>
               <Link
-                href="/cookie-policy" // Update when created
+                component={RouterLink}
+                to="/cookie-policy"
                 variant="body2"
                 sx={linkStyles(theme)}
-              >
+            >
                 Cookie Policy
               </Link>
             </Box>
@@ -202,7 +204,7 @@ const Footer = () => {
             © {new Date().getFullYear()} Trishelta. All rights reserved.
             {!isMobile && ' | '}
             <Link 
-              component={RouterLink}
+              component={RouterLink} // Ensure this is using RouterLink
               to="/accessibility" // Update when created
               sx={{
                 color: theme.palette.text.secondary,

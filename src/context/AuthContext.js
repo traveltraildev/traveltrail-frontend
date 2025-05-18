@@ -1,8 +1,40 @@
 import React from 'react';
 import { createContext, useContext, useState, useEffect } from 'react';
-import { adminCheckout } from '../endpoints';
 import { BASE_URL } from '../endpoints';
-import { getAuthHeader } from '../utils';
+
+// Basic implementation of getAuthHeader - retrieves user token from localStorage
+const getAuthHeader = () => {
+  const token = localStorage.getItem('userToken');
+  if (token) {
+    return {
+      'Authorization': `Bearer ${token}`
+    };
+  }
+  return {};
+};
+// Function to fetch user data based on token
+// Moved outside the component to avoid redefining on each render
+const fetchUserData = async () => {
+  try {
+    const token = localStorage.getItem('userToken');
+    if (!token) return null;
+
+    const response = await fetch(`${BASE_URL}/api/users/profile`, { // Assuming this endpoint exists
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.user;
+    }
+    throw new Error('Failed to fetch user data');
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return null;
+  }
+};
 
 const AuthContext = createContext();
 
@@ -13,132 +45,72 @@ export const AuthProvider = ({ children }) => {
     user: null,
   });
 
-  const fetchUserData = async () => {
-    try {
-      const token = localStorage.getItem('userToken');
-      if (!token) return null;
+  // Effect to check for user token and fetch user data on initial load
+  useEffect(() => {
+    const checkUserAuth = async () => {
+      console.log('AuthContext useEffect: Initializing authentication...');
+      setAuthState(prevState => ({ ...prevState, loading: true }));
+      const userToken = localStorage.getItem('userToken');
+ if (userToken) {
+ console.log('AuthContext useEffect: User token found.');
+ const user = await fetchUserData();
+ console.log('AuthContext useEffect: Fetched user data:', user);
+ if (user) {
+ setAuthState({
+ isAuthenticated: true,
+ loading: false,
+ user: { ...user, role: 'user' },
+        });
+      } else { // User token exists but fetching user data failed or returned null - invalid token
+ console.log('AuthContext useEffect: User token invalid or user data fetch failed.');
+ setAuthState({
+ isAuthenticated: false,
+ loading: false,
+ user: null,
+        });
+      }
+    } else {
+ console.log('AuthContext useEffect: No user token found. Setting auth state to unauthenticated.');
+ setAuthState({
+ isAuthenticated: false,
+ loading: false,
+ user: null,
+ });
+    }
+    };
+    checkUserAuth();
+  }, []);
 
-      const response = await fetch(`${BASE_URL}/api/users/profile`, {
-        headers: {
-          ...getAuthHeader(),
-        },
+  // Function to handle user login
+  const login = async (username, password) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/users/login`, { // Assuming this is the user login endpoint
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        return data.user;
-      }
-      throw new Error('Failed to fetch user data');
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      return null;
-    }
-  };
+      if (!response.ok) throw new Error('Login failed');
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      const adminToken = localStorage.getItem('adminToken');
-      if (adminToken) {
-        try {
-          const response = await fetch(adminCheckout, {
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-              'Content-Type': 'application/json',
-            },
-          });
+      const data = await response.json();
+      console.log('Backend login response data:', data);
+      localStorage.setItem('userToken', data.token);
+      console.log('Token set in localStorage:', data.token ? data.token.substring(0, 10) + '...' : 'None');
 
-          if (response.ok) {
-            setAuthState({
-              isAuthenticated: true,
-              loading: false,
-              user: { role: 'admin' },
-            });
-          } else {
-            localStorage.removeItem('adminToken');
-            checkUserAuth();
-          }
-        } catch (error) {
-          console.error('Admin auth check failed:', error);
-          localStorage.removeItem('adminToken');
-          checkUserAuth();
-        }
+      const user = await fetchUserData(); // Fetch user data after successful login
+      if (user) {
+        setAuthState({ isAuthenticated: true, loading: false, user: { ...user, role: 'user' } });
       } else {
-        checkUserAuth();
-      }
-    };
-
-    const checkUserAuth = async () => {
-      const userToken = localStorage.getItem('userToken');
-      if (userToken) {
-        const user = await fetchUserData();
-        if (user) {
-          setAuthState({
-            isAuthenticated: true,
-            loading: false,
-            user: { ...user, role: 'user' },
-          });
-        } else {
-          setAuthState({
-            isAuthenticated: false,
-            loading: false,
-            user: null,
-          });
-        }
-      } else {
+        // If fetching user data fails after login, remove the token and set to unauthenticated
+        localStorage.removeItem('userToken');
+        console.error('Failed to fetch user data after successful login. Removing token.');
         setAuthState({
           isAuthenticated: false,
           loading: false,
           user: null,
         });
+        // Consider throwing an error or returning false to indicate a partial failure
       }
-    };
-
-    initializeAuth();
-  }, []);
-
-  const login = async (username, password, isAdmin = false) => {
-    try {
-      let response;
-      if (isAdmin) {
-        response = await fetch(adminCheckout, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-        });
-      } else {
-        response = await fetch(`${BASE_URL}/api/users/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-        });
-      }
-
-      if (!response.ok) throw new Error('Login failed');
-
-      const data = await response.json();
-      const tokenKey = isAdmin ? 'adminToken' : 'userToken';
-      localStorage.setItem(tokenKey, data.token);
-
-      if (!isAdmin) {
-        const user = await fetchUserData();
-        if (user) {
-          setAuthState({
-            isAuthenticated: true,
-            loading: false,
-            user: { ...user, role: 'user' },
-          });
-        } else {
-          localStorage.removeItem(tokenKey);
-          throw new Error('Failed to fetch user data after login');
-        }
-      } else {
-        setAuthState({
-          isAuthenticated: true,
-          loading: false,
-          user: { role: 'admin' },
-        });
-      }
-
       return true;
     } catch (error) {
       console.error('Login error:', error);
@@ -147,7 +119,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('adminToken');
     localStorage.removeItem('userToken');
     setAuthState({ isAuthenticated: false, loading: false, user: null });
   };

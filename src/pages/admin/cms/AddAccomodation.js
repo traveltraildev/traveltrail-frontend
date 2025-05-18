@@ -1,6 +1,5 @@
 // Replace the existing AddAccommodation component with this
-import React, { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   TextField,
@@ -16,7 +15,6 @@ import { getAllAccommodations } from "../../../endpoints";
 const AddAccommodation = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -32,31 +30,6 @@ const AddAccommodation = () => {
     inclusions: [],
     exclusions: [],
   });
-
-  useEffect(() => {
-    const verifyToken = async () => {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        navigate("/admin/login");
-        return;
-      }
-
-      try {
-        const decoded = jwtDecode(token);
-        if (decoded.exp * 1000 < Date.now()) {
-          localStorage.removeItem("adminToken");
-          navigate("/admin/login");
-        }
-      } catch (error) {
-        localStorage.removeItem("adminToken");
-        navigate("/admin/login");
-      } finally {
-        setAuthChecked(true);
-      }
-    };
-
-    verifyToken();
-  }, [navigate]);
 
   const handleChange = (field) => (e) => {
     const value = e.target.value;
@@ -121,10 +94,6 @@ const AddAccommodation = () => {
       setLoading(false);
     }
   };
-
-  if (!authChecked) {
-    return <CircularProgress sx={{ display: "block", margin: "2rem auto" }} />;
-  }
 
   return (
     <Card elevation={3} sx={{ p: 3, mb: 4, mt: 8 }}>

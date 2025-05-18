@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   return (
-    <Box sx={{ p: 4 }}>
+    <Box sx={{ p: 4, backgroundColor: 'red', minHeight: '500px' }}>
       <Typography variant="h4" gutterBottom>
         Admin Dashboard
       </Typography>

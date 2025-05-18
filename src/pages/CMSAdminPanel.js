@@ -11,6 +11,9 @@ const CMSAdminPanel = () => {
     { name: "About Us", key: "about-us", path: "/admin/cms/edit/about-us" },
     { name: "Contact Us", key: "contact-us", path: "/admin/cms/edit/contact-us" },
     { name: "Terms & Conditions", key: "terms-and-conditions", path: "/admin/cms/edit/terms-and-conditions" },
+    { name: "Privacy Policy", key: "privacy-policy", path: "/admin/cms/edit/privacy-policy" },
+    { name: "Cookie Policy", key: "cookie-policy", path: "/admin/cms/edit/cookie-policy" },
+    { name: "Accessibility Statement", key: "accessibility-statement", path: "/admin/cms/edit/accessibility-statement" },
   ];
 
   // Travel Content Management
