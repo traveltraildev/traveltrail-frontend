@@ -24,6 +24,7 @@ import {
   IconButton,
   useMediaQuery,
 } from "@mui/material";
+import { useTheme } from '@mui/material/styles';
 import { Link, useNavigate } from "react-router-dom";
 import { getAllAccommodations } from "../endpoints";
 import { Tune, Close, Search } from "@mui/icons-material";
@@ -46,6 +47,8 @@ const Accommodations = () => {
   const [allThemes, setAllThemes] = useState([]);
   const [allAmenities, setAllAmenities] = useState([]);
   const navigate = useNavigate();
+  const theme = useTheme(); // Add this line
+
   const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
@@ -113,89 +116,195 @@ const Accommodations = () => {
     }
   };
 
+  const gradientText = {
+    background: 'linear-gradient(45deg, #f57f17 30%, #ffca28 90%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    fontWeight: 800,
+    letterSpacing: '-0.5px'
+  };
+
   return (
     <Box sx={{ pt: 8 }}>
       <Navbar />
 
-      {/* Search & Filters Section */}
-      <Box sx={{ 
-        p: { xs: 2, md: 4 },
-        bgcolor: "var(--neutral-50)",
-        borderBottom: "1px solid var(--neutral-200)",
-        position: "sticky",
-        top: 64,
-        zIndex: 1
-      }}>
-        <Box sx={{ 
-          maxWidth: 1200,
-          mx: "auto",
-          display: "flex",
-          flexDirection: "column",
-          gap: 2
-        }}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Search accommodations..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputProps={{
-              startAdornment: <Search sx={{ color: "text.secondary", mr: 1 }}/>,
-              sx: {
-                borderRadius: "8px",
-                bgcolor: "background.default",
-              }
+      {/* Enhanced Search & Filters Section */}
+<Box sx={{ 
+  pt: { xs: 2, md: 4 },
+  bgcolor: "background.paper",
+  borderBottom: "1px solid",
+  borderColor: "divider",
+  textAlign: "center",
+  position: "sticky",
+  top: 0,
+  zIndex: 1200,
+  backdropFilter: "blur(10px)",
+  backgroundColor: "rgba(255, 255, 255, 0.8)"
+}}>
+  {/* Compact Hero Header for Mobile */}
+  <Typography variant="h2" sx={{
+    mb: { xs: 2, md: 4 },
+    ...gradientText,
+    fontSize: { xs: '1.75rem', md: '2.75rem' },
+    px: 2
+  }}>
+    Explore Stays
+  </Typography>
+
+  {/* Sticky Search Bar */}
+  <Box sx={{
+    maxWidth: 800,
+    mx: "auto",
+    position: "relative",
+    mb: { xs: 1, md: 3 },
+    px: 2
+  }}>
+    <TextField
+      fullWidth
+      variant="outlined"
+      placeholder="Search accommodations..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      InputProps={{
+        startAdornment: <Search sx={{ 
+          color: "text.secondary", 
+          mr: 1,
+          fontSize: { xs: '1.2rem', md: '1.5rem' }
+        }} />,
+        endAdornment: (
+          <Button 
+            variant="contained" 
+            color="warning"
+            sx={{ 
+              position: "absolute",
+              right: 0,
+              top: 0,
+              height: "100%",
+              px: { xs: 1.5, md: 3 },
+              minWidth: { xs: 'auto', md: '100px' },
+              borderRadius: "0 8px 8px 0"
             }}
-          />
-          
-          {/* Filter Chips */}
-          <Box sx={{ 
-            display: "flex",
-            gap: 1,
-            overflowX: "auto",
-            py: 1,
-            '&::-webkit-scrollbar': { height: '4px' },
-            '&::-webkit-scrollbar-thumb': { backgroundColor: 'text.secondary', borderRadius: 2 }
-          }}>
-            <Chip
-              label="Filters"
-              onClick={() => setIsFilterModalOpen(true)}
-              icon={<Tune fontSize="small" />}
-              sx={{ flexShrink: 0 }}
-            />
-            {sortBy !== 'name' && (
-              <Chip
-                label={`Sort: ${sortBy === 'price-low' ? 'Low to High' : 'High to Low'}`}
-                onDelete={() => removeFilter('sort')}
-                sx={{ flexShrink: 0 }}
-              />
-            )}
-            {(priceRange[0] !== 0 || priceRange[1] !== 10000) && (
-              <Chip
-                label={`Price: ₹${priceRange[0]} - ₹${priceRange[1]}`}
-                onDelete={() => removeFilter('price')}
-                sx={{ flexShrink: 0 }}
-              />
-            )}
-            {selectedDestinations.map(destination => (
-              <Chip
-                key={destination}
-                label={destination}
-                onDelete={() => removeFilter('destination', destination)}
-                sx={{ flexShrink: 0 }}
-              />
-            ))}
-            {selectedAmenities.map(amenity => (
-              <Chip
-                key={amenity}
-                label={amenity}
-                onDelete={() => removeFilter('amenity', amenity)}
-                sx={{ flexShrink: 0 }}
-              />
-            ))}
-          </Box>
-        </Box>
-      </Box>
+          >
+            {useMediaQuery(theme.breakpoints.up('md')) ? 'Search' : <Search />}
+          </Button>
+        ),
+        sx: {
+          borderRadius: "8px",
+          bgcolor: "background.default",
+          boxShadow: { xs: 1, md: 3 },
+          pr: { xs: 8, md: 10 },
+          height: { xs: '48px', md: '56px' },
+          '& input': {
+            fontSize: { xs: '0.9rem', md: '1rem' }
+          }
+        }
+      }}
+    />
+  </Box>
+
+  {/* Compact Filter Chips for Mobile */}
+  <Box sx={{ 
+    display: "flex",
+    gap: 1,
+    justifyContent: "flex-start",
+    flexWrap: "nowrap",
+    overflowX: "auto",
+    px: 2,
+    pb: 1,
+    mx: { xs: -2, md: 0 },
+    '&::-webkit-scrollbar': {
+      height: '3px',
+      backgroundColor: 'transparent'
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: 'text.secondary',
+      borderRadius: 2
+    }
+  }}>
+    <Chip
+      label="Filters"
+      onClick={() => setIsFilterModalOpen(true)}
+      icon={<Tune fontSize="small" />}
+      variant="outlined"
+      sx={{
+        borderColor: 'grey.300',
+        bgcolor: 'background.paper',
+        '&:hover': { bgcolor: 'warning.light' },
+        flexShrink: 0
+      }}
+    />
+    {sortBy !== 'name' && (
+      <Chip
+        label={`Sort: ${sortBy === 'price-low' ? 'Low' : 'High'}`}
+        onDelete={() => removeFilter('sort')}
+        sx={{
+          bgcolor: 'warning.light',
+          '.MuiChip-deleteIcon': { color: 'warning.dark' },
+          flexShrink: 0
+        }}
+      />
+    )}
+    {(priceRange[0] !== 0 || priceRange[1] !== 10000) && (
+      <Chip
+        label={`₹${priceRange[0]}-${priceRange[1]}`}
+        onDelete={() => removeFilter('price')}
+        sx={{
+          bgcolor: 'warning.light',
+          '.MuiChip-deleteIcon': { color: 'warning.dark' },
+          flexShrink: 0
+        }}
+      />
+    )}
+    {selectedDestinations.map(destination => (
+      <Chip
+        key={destination}
+        label={destination}
+        onDelete={() => removeFilter('destination', destination)}
+        sx={{
+          bgcolor: 'warning.light',
+          '.MuiChip-deleteIcon': { color: 'warning.dark' },
+          flexShrink: 0
+        }}
+      />
+    ))}
+    {selectedAmenities.map(amenity => (
+      <Chip
+        key={amenity}
+        label={amenity}
+        onDelete={() => removeFilter('amenity', amenity)}
+        sx={{
+          bgcolor: 'warning.light',
+          '.MuiChip-deleteIcon': { color: 'warning.dark' },
+          flexShrink: 0
+        }}
+      />
+    ))}
+  </Box>
+</Box>
+
+{/* Results Header */}
+<Box sx={{ 
+  textAlign: "center",
+  py: 2,
+  bgcolor: "background.paper",
+  borderBottom: "1px solid",
+  borderTop: "1px solid",
+  borderColor: "divider",
+  transition: 'all 0.3s ease',
+  mx: { xs: -2, md: 0 },
+  px: 2
+}}>
+  <Typography variant="h5" sx={{ 
+    ...gradientText,
+    fontSize: { xs: '1rem', md: '1.5rem' },
+    fontWeight: 900,
+    letterSpacing: '-0.05rem',
+    lineHeight: 1.3,
+    px: 2
+  }}>
+    {filteredAccommodations.length} {filteredAccommodations.length === 1 ? 'Accommodation' : 'Accommodations'} Found
+  </Typography>
+</Box>
 
       {/* Accommodations Grid */}
       <Box sx={{ 
