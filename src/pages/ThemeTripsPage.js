@@ -58,7 +58,7 @@ const ThemeTripsPage = () => {
             mb: 2,
           }}
         >
-          {themeName} Trips
+          {themeName} Tripss
         </Typography>
         
         <Chip
