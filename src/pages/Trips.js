@@ -40,40 +40,11 @@ import Slide from "@mui/material/Slide";
 import { useScrollTrigger } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { debounce } from "@mui/material/utils";
+import Tune from "@mui/icons-material/Tune";
+
 import { motion } from "framer-motion";
 
-const CollapsibleHeader = styled(AppBar)(({ theme }) => ({
-  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-  backdropFilter: "blur(8px)",
-  backgroundColor: alpha(theme.palette.background.paper, 0.8),
-}));
 
-const MobileHeader = styled("div")(({ theme }) => ({
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  zIndex: 1100,
-  display: "flex",
-  alignItems: "center",
-  gap: theme.spacing(1),
-  padding: theme.spacing(1.5, "7%"),
-  backgroundColor: alpha(theme.palette.background.paper, 0.97),
-  backdropFilter: "blur(8px)",
-  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-  boxShadow: theme.shadows[2],
-}));
-
-const FloatingSearch = styled("div")(({ theme }) => ({
-  position: "fixed",
-  top: 56, // Height of mobile header
-  left: 0,
-  right: 0,
-  zIndex: 1099,
-  padding: theme.spacing(1, "7%"),
-  backgroundColor: theme.palette.background.paper,
-  boxShadow: theme.shadows[2],
-}));
 
 const TripsCard = () => {
   const theme = useTheme();
@@ -111,8 +82,6 @@ const TripsCard = () => {
   });
   const navigate = useNavigate();
 
-  const [isNavbarVisible, setIsNavbarVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   const preSearch = location?.state?.search;
 
@@ -121,7 +90,6 @@ const TripsCard = () => {
       setSearchTerm(preSearch);
     }
   }, [preSearch]);
-
 
 
   // Fetch trips data
@@ -328,8 +296,8 @@ const TripsCard = () => {
                         selectedDestinations: e.target.checked
                           ? [...filterState.selectedDestinations, destination]
                           : filterState.selectedDestinations.filter(
-                              (d) => d !== destination
-                            ),
+                            (d) => d !== destination
+                          ),
                       })
                     }
                   />
@@ -353,8 +321,8 @@ const TripsCard = () => {
                         selectedThemes: e.target.checked
                           ? [...filterState.selectedThemes, theme]
                           : filterState.selectedThemes.filter(
-                              (t) => t !== theme
-                            ),
+                            (t) => t !== theme
+                          ),
                       })
                     }
                   />
@@ -378,8 +346,8 @@ const TripsCard = () => {
                         selectedInclusions: e.target.checked
                           ? [...filterState.selectedInclusions, inclusion]
                           : filterState.selectedInclusions.filter(
-                              (i) => i !== inclusion
-                            ),
+                            (i) => i !== inclusion
+                          ),
                       })
                     }
                   />
@@ -403,8 +371,8 @@ const TripsCard = () => {
                         selectedExclusions: e.target.checked
                           ? [...filterState.selectedExclusions, exclusion]
                           : filterState.selectedExclusions.filter(
-                              (e) => e !== exclusion
-                            ),
+                            (e) => e !== exclusion
+                          ),
                       })
                     }
                   />
@@ -419,154 +387,209 @@ const TripsCard = () => {
     }
   };
 
+  // Gradient text styling
+  const gradientText = {
+    background: 'linear-gradient(45deg, #f57f17 30%, #ffca28 90%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    fontWeight: 800,
+    letterSpacing: '-0.5px'
+  };
+
   return (
-    <Box
-      sx={{
-        padding: "100px 7%",
-        backgroundColor: "#f5f5f5",
-        pt: { xs: headerState.isExpanded ? "160px" : "100px", sm: "100px" },
-        transition: "padding-top 0.3s ease",
-      }}
-    >
-      
-          {/* Header */}
-          <Box sx={{ textAlign: "center", mb: 4, mx: "auto", px: { xs: 2, md: 7 } }}>
+    <Box sx={{
+      padding: { xs: "80px 2%", md: "100px 2%" },
+      backgroundColor: "#f5f5f5",
+    }}>
+      <Box sx={{
+        pt: { xs: 2, md: 4 },
+        bgcolor: "background.paper",
+        borderBottom: "1px solid",
+        borderColor: "divider",
+        textAlign: "center",
+        position: "sticky",
+        top: 0,
+        zIndex: 1200,
+        backdropFilter: "blur(10px)",
+        backgroundColor: "rgba(255, 255, 255, 0.8)"
+      }}>
+        {/* Header Title */}
         <Typography
           variant="h3"
           gutterBottom
-          fontWeight="bold"
           sx={{
-            mb: 4,
-            background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            fontSize: { xs: "1.8rem", md: "2.2rem" },
+            ...gradientText,
+            fontSize: { xs: '1.75rem', md: '2.75rem' },
+            px: 2,
+            mb: { xs: 2, md: 4 }
           }}
         >
           Explore Adventures
         </Typography>
 
-        <Box
-          sx={{
-            position: "relative",
-            maxWidth: { xs: "100%", md: 600 },
-            mx: "auto",
-            mb: 4,
-          }}
-        >
+
+
+        {/* Search Bar */}
+        <Box sx={{
+          maxWidth: 800,
+          mx: "auto",
+          position: "relative",
+          mb: { xs: 1, md: 3 },
+          px: 2
+        }}>
           <TextField
             fullWidth
             variant="outlined"
             placeholder="Search trips by name..."
             value={searchTerm}
             onChange={handleSearch}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 4,
-                boxShadow: 3,
-                pr: 1,
-                backgroundColor: "background.paper",
-              },
-            }}
             InputProps={{
+              startAdornment: <SearchIcon sx={{ color: "text.secondary", mr: 1 }} />,
               endAdornment: (
-                <IconButton
+                <Button
+                  variant="contained"
+                  color="warning"
                   sx={{
-                    bgcolor: "primary.main",
-                    "&:hover": { bgcolor: "primary.dark" },
-                    p: { xs: "6px", md: "8px" },
+                    position: "absolute",
+                    right: 0,
+                    top: 0,
+                    height: "100%",
+                    px: { xs: 1.5, md: 3 },
+                    minWidth: { xs: "auto", md: "100px" },
+                    borderRadius: "0 8px 8px 0"
                   }}
                 >
-                  <SearchIcon sx={{ color: "common.white" }} />
-                </IconButton>
+                  {useMediaQuery(theme.breakpoints.up("md")) ? "Search" : <SearchIcon />}
+                </Button>
               ),
+              sx: {
+                borderRadius: "8px",
+                bgcolor: "background.default",
+                boxShadow: 3,
+                pr: { xs: 8, md: 10 },
+                height: { xs: "48px", md: "56px" }
+              }
             }}
           />
         </Box>
-      </Box>
 
-      {/* Filter Chips */}
-
-     
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1,
-            flexWrap: { xs: "nowrap", sm: "wrap" },
-            overflowX: { xs: "auto", sm: "visible" },
-            pb: 1,
-            mx: { xs: "-7%", sm: 0 },
-            px: { xs: "7%", sm: 0 },
-            "&::-webkit-scrollbar": {
-              display: "none",
-            },
-          }}
-        >
+        {/* Filter Chips */}
+        <Box sx={{
+          display: "flex",
+          gap: 1,
+          justifyContent: "flex-start",
+          flexWrap: "nowrap",
+          overflowX: "auto",
+          px: 2,
+          pb: 1,
+          mx: { xs: -2, md: 0 },
+          '&::-webkit-scrollbar': {
+            height: '3px',
+            backgroundColor: 'transparent'
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'text.secondary',
+            borderRadius: 2
+          }
+        }}>
           <Chip
             label="Filters"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("sort");
-            }}
+            onClick={toggleFilterModal}
+            icon={<Tune fontSize="small" />}
             variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Sort"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("sort");
+            sx={{
+              borderColor: 'grey.300',
+              bgcolor: 'background.paper',
+              '&:hover': { bgcolor: 'warning.light' },
+              flexShrink: 0
             }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
           />
-          <Chip
-            label="Price"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("price");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Destinations"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("destinations");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Themes"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("themes");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Inclusions"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("inclusions");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Exclusions"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveFilterCategory("exclusions");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
+          {filterState.sortBy !== "name" && (
+            <Chip
+              label={`Sort: ${filterState.sortBy === "price-low" ? "Low" : "High"}`}
+              onDelete={() => handleFilterChange({ sortBy: "name" })}
+              sx={{
+                bgcolor: 'warning.light',
+                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                flexShrink: 0
+              }}
+            />
+          )}
+          {(filterState.priceRange[0] !== 0 || filterState.priceRange[1] !== 1000000) && (
+            <Chip
+              label={`₹${filterState.priceRange[0]}-${filterState.priceRange[1]}`}
+              onDelete={() => handleFilterChange({ priceRange: [0, 1000000] })}
+              sx={{
+                bgcolor: 'warning.light',
+                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                flexShrink: 0
+              }}
+            />
+          )}
+          {filterState.selectedDestinations.map(destination => (
+            <Chip
+              key={destination}
+              label={destination}
+              onDelete={() => handleFilterChange({
+                selectedDestinations: filterState.selectedDestinations.filter(d => d !== destination)
+              })}
+              sx={{
+                bgcolor: 'warning.light',
+                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                flexShrink: 0
+              }}
+            />
+          ))}
+          {filterState.selectedThemes.map(theme => (
+            <Chip
+              key={theme}
+              label={theme}
+              onDelete={() => handleFilterChange({
+                selectedThemes: filterState.selectedThemes.filter(t => t !== theme)
+              })}
+              sx={{
+                bgcolor: 'warning.light',
+                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                flexShrink: 0
+              }}
+            />
+          ))}
+          {filterState.selectedInclusions.map(inclusion => (
+            <Chip
+              key={inclusion}
+              label={inclusion}
+              onDelete={() => handleFilterChange({
+                selectedInclusions: filterState.selectedInclusions.filter(i => i !== inclusion)
+              })}
+              sx={{
+                bgcolor: 'warning.light',
+                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                flexShrink: 0
+              }}
+            />
+          ))}
+          {filterState.selectedExclusions.map(exclusion => (
+            <Chip
+              key={exclusion}
+              label={exclusion}
+              onDelete={() => handleFilterChange({
+                selectedExclusions: filterState.selectedExclusions.filter(e => e !== exclusion)
+              })}
+              sx={{
+                bgcolor: 'warning.light',
+                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                flexShrink: 0
+              }}
+            />
+          ))}
         </Box>
-      
+
+
+
+
+
+      </Box>
+
 
       {/* Filter Modal */}
       <Dialog
@@ -576,106 +599,146 @@ const TripsCard = () => {
         maxWidth="md"
         PaperProps={{
           sx: {
-            borderRadius: "20px",
+            borderRadius: "16px",
             overflow: "hidden",
-            boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
-          },
+            boxShadow: "0 12px 24px rgba(0,0,0,0.15)",
+            border: "1px solid",
+            borderColor: "divider"
+          }
         }}
         TransitionComponent={Fade}
       >
         <DialogTitle
           sx={{
-            backgroundColor: "#f5f5f5",
+            bgcolor: "warning.main",
+            color: "common.white",
             py: 2,
             px: 3,
-            borderRadius: "10px 10px 0 0",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
           }}
         >
-          Filter Options
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            Filter Options
+          </Typography>
+          <IconButton onClick={toggleFilterModal} sx={{ color: "common.white" }}>
+            <Close />
+          </IconButton>
         </DialogTitle>
+
         <DialogContent sx={{ p: 3 }}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={3}>
-              {/* Left Pane with Filter Categories */}
-              <List>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    selected={activeFilterCategory === "sort"}
-                    onClick={() => setActiveFilterCategory("sort")}
-                  >
-                    <ListItemText primary="Sort By" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    selected={activeFilterCategory === "price"}
-                    onClick={() => setActiveFilterCategory("price")}
-                  >
-                    <ListItemText primary="Price Range" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    selected={activeFilterCategory === "destinations"}
-                    onClick={() => setActiveFilterCategory("destinations")}
-                  >
-                    <ListItemText primary="Destinations" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    selected={activeFilterCategory === "themes"}
-                    onClick={() => setActiveFilterCategory("themes")}
-                  >
-                    <ListItemText primary="Themes" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    selected={activeFilterCategory === "inclusions"}
-                    onClick={() => setActiveFilterCategory("inclusions")}
-                  >
-                    <ListItemText primary="Inclusions" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    selected={activeFilterCategory === "exclusions"}
-                    onClick={() => setActiveFilterCategory("exclusions")}
-                  >
-                    <ListItemText primary="Exclusions" />
-                  </ListItemButton>
-                </ListItem>
+              <List sx={{ '& .MuiListItemButton-root': { borderRadius: 2 } }}>
+                {['sort', 'price', 'destinations', 'themes', 'inclusions', 'exclusions'].map((category) => (
+                  <ListItem key={category} disablePadding sx={{ mb: 0.5 }}>
+                    <ListItemButton
+                      selected={activeFilterCategory === category}
+                      onClick={() => setActiveFilterCategory(category)}
+                      sx={{
+                        bgcolor: activeFilterCategory === category ? 'warning.light' : 'transparent',
+                        '&:hover': { bgcolor: 'action.hover' },
+                        borderLeft: `4px solid ${activeFilterCategory === category ? 'warning.main' : 'transparent'}`
+                      }}
+                    >
+                      <ListItemText
+                        primary={category.charAt(0).toUpperCase() + category.slice(1)}
+                        primaryTypographyProps={{
+                          fontWeight: 500,
+                          color: activeFilterCategory === category ? 'warning.dark' : 'text.primary'
+                        }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
               </List>
             </Grid>
+
             <Grid item xs={12} md={9}>
-              {renderFilterContent()}
+              <Box sx={{
+                maxHeight: '60vh',
+                overflowY: 'auto',
+                pr: 2,
+                '&::-webkit-scrollbar': { width: '6px' },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor: 'text.secondary',
+                  borderRadius: '4px'
+                }
+              }}>
+                {renderFilterContent()}
+              </Box>
             </Grid>
           </Grid>
         </DialogContent>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            px: 3,
-            py: 2,
-            borderTop: "1px solid #e0e0e0",
-          }}
-        >
-          <Button onClick={toggleFilterModal} sx={{ color: "#f57f17", mr: 1 }}>
+
+        <Box sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: 3,
+          py: 2,
+          borderTop: "1px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper"
+        }}>
+          <Button
+            onClick={toggleFilterModal}
+            variant="outlined"
+            sx={{
+              color: "text.secondary",
+              borderColor: "divider",
+              '&:hover': { borderColor: "text.secondary" }
+            }}
+          >
             Cancel
           </Button>
           <Button
-            sx={{
-              bgcolor: "#f57f17",
-            }}
             variant="contained"
+            color="warning"
             onClick={applyFilters}
+            sx={{
+              px: 4,
+              fontWeight: 600,
+              boxShadow: 1,
+              '&:hover': { boxShadow: 2 }
+            }}
           >
-            Apply Filters
+            Show Results
           </Button>
         </Box>
       </Dialog>
+
+      {/* Results Header */}
+      <Box sx={{
+        textAlign: "center",
+        py: 3,
+        mb: 4,
+        bgcolor: "background.paper",
+        borderBottom: "2px solid",
+        borderTop: "2px solid",
+        borderColor: "divider",
+        mx: { xs: -2, md: 0 },
+        px: 2,
+        position: "sticky",
+        top: { xs: 56, md: 64 },
+        zIndex: 1100,
+        backdropFilter: "blur(8px)"
+      }}>
+        <Typography variant="h5" sx={{
+          ...gradientText,
+          fontSize: { xs: '1.25rem', md: '1.5rem' },
+          fontWeight: 600,
+          letterSpacing: '-0.03rem',
+          lineHeight: 1.25,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 1.5
+        }}>
+          {filteredTrips.length} {filteredTrips.length === 1 ? 'Trip' : 'Trips'} Found
+        </Typography>
+      </Box>
 
       {/* Trips Grid */}
       <Grid container spacing={2} justifyContent="center">
