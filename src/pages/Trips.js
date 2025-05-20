@@ -75,13 +75,6 @@ const FloatingSearch = styled("div")(({ theme }) => ({
   boxShadow: theme.shadows[2],
 }));
 
-const Logo = styled(Box)(({ theme }) => ({
-  width: "120px", // Adjust the width as needed
-  height: "40px", // Adjust the height as needed
-  marginRight: "10px", // Add some spacing
-  objectFit: "contain", // Maintain aspect ratio
-}));
-
 const TripsCard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -91,20 +84,6 @@ const TripsCard = () => {
     isExpanded: true,
     scrollPosition: 0,
   });
-
-  // Debounced scroll handler
-  const handleScroll = debounce(() => {
-    const currentScroll = window.scrollY;
-    const isTop = currentScroll < 10;
-    const isScrollingUp = currentScroll < headerState.scrollPosition;
-    const pastThreshold = currentScroll > 100;
-
-    setHeaderState((prev) => ({
-      scrollPosition: currentScroll,
-      isScrolledTop: isTop,
-      isExpanded: isTop || (isScrollingUp && pastThreshold),
-    }));
-  }, 50);
 
   const [trips, setTrips] = useState([]);
   const [filteredTrips, setFilteredTrips] = useState([]);
@@ -143,29 +122,7 @@ const TripsCard = () => {
     }
   }, [preSearch]);
 
-  useEffect(() => {
-    if (!isMobile) return;
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isMobile]);
-
-  useEffect(() => {
-    if (!isMobile) return;
-
-    let lastScroll = 0;
-    const handleScroll = () => {
-      const currentScroll = window.scrollY;
-      const isScrollingUp = currentScroll < lastScroll;
-
-      setShowMobileSearch(isScrollingUp && currentScroll > 100);
-      setIsNavbarVisible(currentScroll < 50 || isScrollingUp);
-      lastScroll = currentScroll;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isMobile]);
 
   // Fetch trips data
   useEffect(() => {
@@ -471,125 +428,66 @@ const TripsCard = () => {
         transition: "padding-top 0.3s ease",
       }}
     >
-      {/* Mobile Header */}
-      {isMobile && (
-        <MobileHeader
+      
+          {/* Header */}
+          <Box sx={{ textAlign: "center", mb: 4, mx: "auto", px: { xs: 2, md: 7 } }}>
+        <Typography
+          variant="h3"
+          gutterBottom
+          fontWeight="bold"
           sx={{
-            transform: `translateY(${headerState.isExpanded ? 0 : "-100%"})`,
-            height: headerState.isScrolledTop ? 88 : 56,
+            mb: 4,
+            background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            fontSize: { xs: "1.8rem", md: "2.2rem" },
           }}
         >
-          {/* Logo with scale animation */}
-          <motion.div
-            animate={{ scale: headerState.isScrolledTop ? 1 : 0.9 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Logo>
-              <img
-                src="/images/mainLogo.svg"
-                alt="Travel Trail"
-                style={{ width: "100%", height: "100%", objectFit: "contain" }}
-              />
-            </Logo>
-          </motion.div>
+          Explore Adventures
+        </Typography>
 
-          {/* Search Bar with width animation */}
-          <motion.div
-            style={{ flexGrow: 1 }}
-            animate={{
-              opacity: headerState.isExpanded ? 1 : 0,
-              width: headerState.isExpanded ? "auto" : 0,
-            }}
-          >
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Search trips..."
-              value={searchTerm}
-              onChange={handleSearch}
-              InputProps={{
-                sx: {
-                  borderRadius: 28,
-                  backgroundColor: alpha(theme.palette.common.white, 0.9),
-                  height: 40,
-                },
-                startAdornment: <SearchIcon sx={{ mr: 1 }} />,
-              }}
-            />
-          </motion.div>
-
-          {/* Menu Button with fade animation */}
-          <Fade in={!headerState.isScrolledTop}>
-            <IconButton sx={{ flexShrink: 0 }}>
-              <MenuIcon />
-            </IconButton>
-          </Fade>
-        </MobileHeader>
-      )}
-      {/* Desktop Header */}
-      {!isMobile && (
-        <Box sx={{ textAlign: "center", mb: 4 }}>
-          <Typography
-            variant="h3"
-            gutterBottom
-            fontWeight="bold"
+        <Box
+          sx={{
+            position: "relative",
+            maxWidth: { xs: "100%", md: 600 },
+            mx: "auto",
+            mb: 4,
+          }}
+        >
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search trips by name..."
+            value={searchTerm}
+            onChange={handleSearch}
             sx={{
-              mb: 4,
-              background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 4,
+                boxShadow: 3,
+                pr: 1,
+                backgroundColor: "background.paper",
+              },
             }}
-          >
-            Explore Adventures
-          </Typography>
-
-          <Box
-            sx={{
-              position: "relative",
-              maxWidth: 600,
-              mx: "auto",
-              mb: 4,
+            InputProps={{
+              endAdornment: (
+                <IconButton
+                  sx={{
+                    bgcolor: "primary.main",
+                    "&:hover": { bgcolor: "primary.dark" },
+                    p: { xs: "6px", md: "8px" },
+                  }}
+                >
+                  <SearchIcon sx={{ color: "common.white" }} />
+                </IconButton>
+              ),
             }}
-          >
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Search trips by name..."
-              value={searchTerm}
-              onChange={handleSearch}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 4,
-                  boxShadow: 3,
-                  pr: 1,
-                  backgroundColor: "background.paper",
-                },
-              }}
-              InputProps={{
-                endAdornment: (
-                  <IconButton
-                    sx={{
-                      bgcolor: "primary.main",
-                      "&:hover": { bgcolor: "primary.dark" },
-                    }}
-                  >
-                    <SearchIcon sx={{ color: "common.white" }} />
-                  </IconButton>
-                ),
-              }}
-            />
-          </Box>
+          />
         </Box>
-      )}
+      </Box>
 
       {/* Filter Chips */}
 
-      <Slide
-        in={headerState.isExpanded}
-        direction="down"
-        mountOnEnter
-        unmountOnExit
-      >
+     
         <Box
           sx={{
             display: "flex",
@@ -668,7 +566,7 @@ const TripsCard = () => {
             sx={{ cursor: "pointer" }}
           />
         </Box>
-      </Slide>
+      
 
       {/* Filter Modal */}
       <Dialog

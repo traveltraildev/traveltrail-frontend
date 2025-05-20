@@ -3,6 +3,7 @@ import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 import { Link as RouterLink } from 'react-router-dom';
 import HamburgerMenu from './HamburgerMenu';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -15,8 +16,8 @@ import Button from '@mui/material/Button';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'light' 
-    ? 'rgba(253, 216, 53, 0.7)' // #f9a825 with 90% opacity for light mode
-    : 'rgba(0, 0, 0, 0.75)', // Keep dark mode as original
+    ? 'rgba(253, 216, 53, 0.7)' 
+    : 'rgba(0, 0, 0, 0.75)',
   backdropFilter: 'blur(8px)',
   borderBottom: `1px solid ${theme.palette.divider}`,
   color: theme.palette.getContrastText('#fdd835b3'),
@@ -119,7 +120,8 @@ export default function Navbar() {
                 (tripTheme) => (
                   <MenuItem 
                     key={tripTheme} 
-                    onClick={handleTripMenuClose}
+                    component={RouterLink}
+                    to={`/theme/${encodeURIComponent(tripTheme)}`}
                     sx={{
                       '&:hover': {
                         backgroundColor: theme.palette.action?.selected
