@@ -16,7 +16,6 @@ import {
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import Navbar from "../components/common/Navbar";
 import Hero from "../components/Home/Hero";
 import { getAllTrips, getAllAccommodations } from "../endpoints";
 
@@ -114,7 +113,6 @@ const Home = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Navbar />
       <Container
         maxWidth="xl"
         sx={{ py: { xs: 4, md: 8 }, px: { xs: 2, md: 4 } }}
@@ -491,12 +489,12 @@ const valueProps = [
 const testimonials = [
   {
     text: "The trip was perfectly organized from start to finish. The accommodations were amazing and the local guides were knowledgeable and friendly.",
-    author: "Sarah Johnson",
+    author: "Atul Khatri",
     location: "Rishikesh Adventure Trip",
   },
   {
     text: "Stayed at the Platinum Beachfront Resort and it exceeded all expectations. The service was impeccable and the location was perfect.",
-    author: "Michael Chen",
+    author: "Shivangi Verma",
     location: "Goa Beach Vacation",
   },
 ];
