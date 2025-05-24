@@ -29,6 +29,7 @@ const AddAccommodation = () => {
     amenities: [],
     inclusions: [],
     exclusions: [],
+    destination: "",
   });
 
   const handleChange = (field) => (e) => {
@@ -64,6 +65,8 @@ const AddAccommodation = () => {
         ),
         inclusions: formData.inclusions.filter((incl) => incl.trim() !== ""),
         exclusions: formData.exclusions.filter((excl) => excl.trim() !== ""),
+        destination: formData.destination, // Include destination in payload
+
       };
 
       const response = await fetch(getAllAccommodations, {
@@ -109,6 +112,16 @@ const AddAccommodation = () => {
               label="Accommodation Name"
               value={formData.name}
               onChange={handleChange("name")}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Destination"
+              value={formData.destination}
+              onChange={handleChange("destination")}
               required
             />
           </Grid>

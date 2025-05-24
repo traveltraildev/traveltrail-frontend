@@ -57,6 +57,7 @@ const EditAccomodation = () => {
     amenities: accommodation?.amenities || [],
     inclusions: accommodation?.inclusions || [],
     exclusions: accommodation?.exclusions || [],
+    destination: accommodation?.destination || "",
   });
 
   useEffect(() => {
@@ -74,6 +75,7 @@ const EditAccomodation = () => {
         amenities: accommodation?.amenities || [],
         inclusions: accommodation?.inclusions || [],
         exclusions: accommodation?.exclusions || [],
+        destination: accommodation?.destination || "",
       });
     }
   }, [accommodation]);
@@ -137,6 +139,7 @@ const EditAccomodation = () => {
         ),
         inclusions: formData.inclusions.filter((incl) => incl.trim() !== ""),
         exclusions: formData.exclusions.filter((excl) => excl.trim() !== ""),
+        destination: formData.destination, // Added destination to payload
       };
 
       const response = await fetch(`${getAllAccommodations}/${id}`, {
@@ -186,6 +189,16 @@ const EditAccomodation = () => {
               label="Accommodation Name"
               value={formData.name}
               onChange={handleChange("name")}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Destination"
+              value={formData.destination}
+              onChange={handleChange("destination")}
               required
             />
           </Grid>

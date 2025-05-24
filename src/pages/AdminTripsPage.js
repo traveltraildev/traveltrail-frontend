@@ -1,4 +1,3 @@
-// Replace the existing AdminTripsPage component with this
 import React, { useEffect, useState } from "react";
 import { DataGrid, GridToolbar, GridActionsCellItem } from "@mui/x-data-grid";
 import {
@@ -11,12 +10,10 @@ import {
   Container,
   useTheme,
   Button,
+  styled,
+  Paper,
 } from "@mui/material";
-import {
-  Delete as DeleteIcon,
-  Edit as EditIcon,
-  Visibility as ViewIcon,
-} from "@mui/icons-material";
+import { Delete as DeleteIcon, Edit as EditIcon, Visibility as ViewIcon } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
@@ -32,48 +29,52 @@ const AdminTripsPage = () => {
   const columns = [
     {
       field: "sno",
-      headerName: "S.No",
+      headerName: "#",
       width: 80,
-      valueGetter: (params) => params?.api?.getRowIndex(params.row.id) + 1,
+      sortable: false,
+      headerAlign: "center",
+      align: "center",
     },
-    { field: "name", headerName: "Name", flex: 1 },
-    { field: "price", headerName: "Price", type: "number", width: 120 },
+    { field: "name", headerName: "Trip Name", flex: 2 },
+    { field: "price", headerName: "Price (INR)", type: "number", width: 150 },
     { field: "daysCount", headerName: "Days", type: "number", width: 100 },
     { field: "nightsCount", headerName: "Nights", type: "number", width: 100 },
     {
       field: "actions",
       headerName: "Actions",
-      type: "actions",
-      width: 150,
-      getActions: (params) => [
-        <GridActionsCellItem
-          icon={
+      width: 180,
+      sortable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
+          <IconButton
+            color="info"
+            size="small"
+            onClick={() => navigate(`/trips/${params.row.id}`)}
+          >
             <Tooltip title="View Details">
-              <ViewIcon color="info" />
+              <ViewIcon />
             </Tooltip>
-          }
-          onClick={() => navigate(`/trips/${params.row.id}`)}
-          label="View"
-        />,
-        <GridActionsCellItem
-          icon={
+          </IconButton>
+          <IconButton
+            color="primary"
+            size="small"
+            onClick={() => navigate(`/admin/edit-trip/${params.row.id}`)}
+          >
             <Tooltip title="Edit Trip">
-              <EditIcon color="primary" />
+              <EditIcon />
             </Tooltip>
-          }
-          onClick={() => navigate(`/admin/edit-trip/${params.row.id}`)}
-          label="Edit"
-        />,
-        <GridActionsCellItem
-          icon={
+          </IconButton>
+          <IconButton
+            color="error"
+            size="small"
+            onClick={() => handleDelete(params.row.id)}
+          >
             <Tooltip title="Delete Trip">
-              <DeleteIcon color="error" />
+              <DeleteIcon />
             </Tooltip>
-          }
-          onClick={() => handleDelete(params.row.id)}
-          label="Delete"
-        />,
-      ],
+          </IconButton>
+        </Box>
+      ),
     },
   ];
 
@@ -82,19 +83,15 @@ const AdminTripsPage = () => {
       try {
         const token = localStorage.getItem("adminToken");
         const response = await fetch(`${getAllTrips}/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
           method: "DELETE",
         });
 
-        if (!response.ok) {
-          throw new Error("Delete failed");
-        }
-
-        setData(data.filter((item) => item.id !== id));
+        if (!response.ok) throw new Error("Delete failed");
+        
+        setData(prev => prev.filter(item => item.id !== id));
       } catch (error) {
-        console.error("Error deleting trip:", error);
+        console.error("Error:", error);
         alert("Failed to delete trip");
       }
     }
@@ -113,9 +110,7 @@ const AdminTripsPage = () => {
       }
 
       const response = await fetch(getAllTrips, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.status === 401) {
@@ -126,9 +121,10 @@ const AdminTripsPage = () => {
 
       const result = await response.json();
       setData(
-        result.map((item) => ({
+        result.map((item, index) => ({
           ...item,
           id: item._id,
+          sno: index + 1,
         }))
       );
     } catch (error) {
@@ -138,52 +134,88 @@ const AdminTripsPage = () => {
     }
   };
 
+  const LoadingContainer = styled(Box)(({ theme }) => ({
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "60vh",
+  }));
+
   if (error) {
     return <Alert severity="error">{error}</Alert>;
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "20px",
-        }}
-      >
-        <Typography variant="h4" gutterBottom>
-          Trip Management
-        </Typography>
-        <Link to={"/admin/cms/add-trip"}>
-          <Button variant="contained">Add New Trip</Button>
-        </Link>
-      </Box>
-      {loading ? (
-        <CircularProgress />
-      ) : (
-        <Box sx={{ height: 600, width: "100%" }}>
-          <DataGrid
-            rows={data}
-            columns={columns}
-            pageSize={10}
-            rowsPerPageOptions={[10]}
-            checkboxSelection
-            disableSelectionOnClick
-            components={{ Toolbar: GridToolbar }}
+    <>
+      <Navbar />
+      <Container maxWidth="lg" sx={{ mt: 6, mb: 4 }}>
+        <Paper
+          variant="outlined"
+          sx={{ 
+            p: 3, 
+            borderRadius: 2,
+            backgroundColor: theme.palette.background.paper 
+          }}
+        >
+          <Box
             sx={{
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "#f5f5f5",
-                fontWeight: "bold",
-              },
-              "& .MuiDataGrid-cell": {
-                borderBottom: "1px solid #e0e0e0",
-              },
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 3,
             }}
-          />
-        </Box>
-      )}
-    </Container>
+          >
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
+              Trip Management
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<EditIcon />}
+              component={Link}
+              to="/admin/cms/add-trip"
+              sx={{ px: 3, height: "40px" }}
+            >
+              Add New Trip
+            </Button>
+          </Box>
+
+          {loading ? (
+            <LoadingContainer>
+              <CircularProgress />
+            </LoadingContainer>
+          ) : (
+            <Box sx={{ height: 550, width: "100%" }}>
+              <DataGrid
+                rows={data}
+                columns={columns}
+                pageSize={10}
+                rowsPerPageOptions={[10]}
+                checkboxSelection
+                disableSelectionOnClick
+                components={{ Toolbar: GridToolbar }}
+                sx={{
+                  '& .MuiDataGrid-columnHeaders': {
+                    backgroundColor: theme.palette.action.hover,
+                    color: theme.palette.text.primary,
+                  },
+                  '& .MuiDataGrid-cell': {
+                    borderBottom: `1px solid ${theme.palette.divider}`,
+                  },
+                  '& .MuiDataGrid-row': {
+                    '&:hover': {
+                      backgroundColor: theme.palette.action.hover,
+                      cursor: 'pointer',
+                    },
+                  },
+                }}
+              />
+            </Box>
+          )}
+        </Paper>
+      </Container>
+      <Footer />
+    </>
   );
 };
 
