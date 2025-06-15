@@ -12,6 +12,7 @@ import {
   CardContent,
   Chip,
   Autocomplete,
+  Checkbox,
 } from "@mui/material";
 import ItineraryDayForm from "./ItineraryDayForm";
 import { getAllTrips } from "../../../endpoints";
@@ -73,6 +74,14 @@ const EditTripPage = () => {
     setTripData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setTripData((prev) => ({
+      ...prev,
+      [name]: checked,
     }));
   };
 
@@ -373,6 +382,19 @@ const EditTripPage = () => {
               <Button variant="outlined" onClick={handleAddDay} sx={{ mt: 2 }}>
                 Add Another Day
               </Button>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              sx={{ display: "flex", gap: "8px", alignItems: "center" }}
+            >
+              <Checkbox
+                name="isInternational"
+                checked={tripData.isInternational}
+                onChange={handleCheckboxChange}
+              />{" "}
+              <Typography>Is this is an international trip</Typography>
             </Grid>
 
             {/* Form Actions */}

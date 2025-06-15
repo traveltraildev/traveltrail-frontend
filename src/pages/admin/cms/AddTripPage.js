@@ -10,6 +10,7 @@ import {
   CircularProgress,
   Autocomplete,
   Grid,
+  Checkbox,
 } from "@mui/material";
 import Navbar from "../../../components/common/Navbar";
 import Navbar2 from "../../../components/common/Navbar2";
@@ -68,7 +69,9 @@ const AddTripPage = ({ isMobile }) => {
     images: [],
     itineraries: [{ highlights: [] }],
     availability: true,
+    isInternational: false,
   });
+
   const [loading, setLoading] = useState(false);
   const [itenaryDays, setItenaryDays] = useState([0]);
   const navigate = useNavigate();
@@ -211,7 +214,6 @@ const AddTripPage = ({ isMobile }) => {
                 sx={{ mb: 2 }}
               />
             </Grid>
-
             <Grid item xs={12} md={6}>
               <TextField
                 label="Destination"
@@ -222,7 +224,6 @@ const AddTripPage = ({ isMobile }) => {
                 sx={{ mb: 2 }}
               />
             </Grid>
-
             <Grid item xs={12}>
               <TextField
                 label="Description"
@@ -235,7 +236,6 @@ const AddTripPage = ({ isMobile }) => {
                 sx={{ mb: 2 }}
               />
             </Grid>
-
             <Grid item xs={12} md={4}>
               <TextField
                 label="Price"
@@ -247,7 +247,6 @@ const AddTripPage = ({ isMobile }) => {
                 sx={{ mb: 2 }}
               />
             </Grid>
-
             <Grid item xs={12} md={4}>
               <TextField
                 label="Days Count"
@@ -259,7 +258,6 @@ const AddTripPage = ({ isMobile }) => {
                 sx={{ mb: 2 }}
               />
             </Grid>
-
             <Grid item xs={12} md={4}>
               <TextField
                 label="Nights Count"
@@ -271,7 +269,6 @@ const AddTripPage = ({ isMobile }) => {
                 sx={{ mb: 2 }}
               />
             </Grid>
-
             <Grid item xs={12}>
               <Autocomplete
                 multiple
@@ -299,7 +296,6 @@ const AddTripPage = ({ isMobile }) => {
                 sx={{ mb: 2 }}
               />
             </Grid>
-
             <Grid item xs={12}>
               <Autocomplete
                 multiple
@@ -329,7 +325,6 @@ const AddTripPage = ({ isMobile }) => {
                 sx={{ mb: 2 }}
               />
             </Grid>
-
             <Grid item xs={12}>
               <Autocomplete
                 multiple
@@ -359,7 +354,6 @@ const AddTripPage = ({ isMobile }) => {
                 sx={{ mb: 2 }}
               />
             </Grid>
-
             <Grid item xs={12}>
               <TextField
                 label="Image URLs (comma-separated)"
@@ -377,7 +371,6 @@ const AddTripPage = ({ isMobile }) => {
                 sx={{ mb: 2 }}
               />
             </Grid>
-
             <Grid item xs={12}>
               <Typography variant="h6" sx={{ mb: 2 }}>
                 Itinerary
@@ -391,7 +384,19 @@ const AddTripPage = ({ isMobile }) => {
                 Add Another Day
               </Button>
             </Grid>
-
+            <Grid
+              item
+              xs={12}
+              sx={{ display: "flex", gap: "8px", alignItems: "center" }}
+            >
+              <Checkbox
+                checked={formData.isInternational}
+                onChange={(e) =>
+                  handleChange("isInternational", e.target.checked)
+                }
+              />{" "}
+              <Typography>Is this is an international trip</Typography>
+            </Grid>
             <Grid item xs={12}>
               <Button
                 type="submit"
