@@ -41,6 +41,7 @@ import { useScrollTrigger } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { debounce } from "@mui/material/utils";
 import Tune from "@mui/icons-material/Tune";
+import { TripListSkeleton } from "../components/common/TripCardSkeleton"; // Added import
 
 import { motion } from "framer-motion";
 
@@ -57,6 +58,7 @@ const TripsCard = () => {
   });
 
   const [trips, setTrips] = useState([]);
+  const [loading, setLoading] = useState(true); // Added loading state
   const [filteredTrips, setFilteredTrips] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -95,20 +97,25 @@ const TripsCard = () => {
   // Fetch trips data
   useEffect(() => {
     const fetchTrips = async () => {
+      setLoading(true); // Set loading true at the start
       try {
         const response = await fetch(getAllTrips);
         if (!response.ok) throw new Error("Failed to fetch trips");
         const data = await response.json();
         setTrips(data);
-        setFilteredTrips(data);
+        setFilteredTrips(data); // Assuming initial display shows all trips
       } catch (error) {
         console.error("Error fetching trips:", error);
         alert("Error loading trips. Check console.");
+        setTrips([]); // Clear trips on error
+        setFilteredTrips([]); // Clear filtered trips on error
+      } finally {
+        setLoading(false); // Stop loading in both success and error cases
       }
     };
 
     fetchTrips();
-  }, [navigate]);
+  }, [navigate]); // navigate dependency might be removable if not used in fetchTrips
 
   useEffect(() => {
     if (preSearchData?.search?.length > 0) {
@@ -398,8 +405,8 @@ const TripsCard = () => {
 
   return (
     <Box sx={{
-      padding: { xs: "80px 2%", md: "100px 2%" },
-      backgroundColor: "#f5f5f5",
+      padding: (theme) => ({ xs: `${theme.spacing(10)} ${theme.spacing(2)}`, md: `${theme.spacing(12.5)} ${theme.spacing(4)}` }),
+      backgroundColor: (theme) => theme.palette.background.default,
     }}>
       <Box sx={{
         pt: { xs: 2, md: 4 },
@@ -448,7 +455,8 @@ const TripsCard = () => {
               endAdornment: (
                 <Button
                   variant="contained"
-                  color="warning"
+                  color="secondary" // Changed from warning
+                  aria-label={useMediaQuery(theme.breakpoints.up("md")) ? undefined : "Search trips"}
                   sx={{
                     position: "absolute",
                     right: 0,
@@ -498,9 +506,9 @@ const TripsCard = () => {
             icon={<Tune fontSize="small" />}
             variant="outlined"
             sx={{
-              borderColor: 'grey.300',
+              borderColor: theme.palette.divider, // Changed from grey.300
               bgcolor: 'background.paper',
-              '&:hover': { bgcolor: 'warning.light' },
+              '&:hover': { bgcolor: alpha(theme.palette.secondary.main, 0.1) }, // Changed from warning.light
               flexShrink: 0
             }}
           />
@@ -509,8 +517,8 @@ const TripsCard = () => {
               label={`Sort: ${filterState.sortBy === "price-low" ? "Low" : "High"}`}
               onDelete={() => handleFilterChange({ sortBy: "name" })}
               sx={{
-                bgcolor: 'warning.light',
-                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                bgcolor: theme.palette.secondary.light, // Changed from warning.light
+                '.MuiChip-deleteIcon': { color: theme.palette.secondary.dark }, // Changed from warning.dark
                 flexShrink: 0
               }}
             />
@@ -520,8 +528,8 @@ const TripsCard = () => {
               label={`₹${filterState.priceRange[0]}-${filterState.priceRange[1]}`}
               onDelete={() => handleFilterChange({ priceRange: [0, 1000000] })}
               sx={{
-                bgcolor: 'warning.light',
-                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                bgcolor: theme.palette.secondary.light, // Changed from warning.light
+                '.MuiChip-deleteIcon': { color: theme.palette.secondary.dark }, // Changed from warning.dark
                 flexShrink: 0
               }}
             />
@@ -534,13 +542,13 @@ const TripsCard = () => {
                 selectedDestinations: filterState.selectedDestinations.filter(d => d !== destination)
               })}
               sx={{
-                bgcolor: 'warning.light',
-                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                bgcolor: theme.palette.secondary.light, // Changed from warning.light
+                '.MuiChip-deleteIcon': { color: theme.palette.secondary.dark }, // Changed from warning.dark
                 flexShrink: 0
               }}
             />
           ))}
-          {filterState.selectedThemes.map(theme => (
+          {filterState.selectedThemes.map(theme => ( // Corrected: iterator name is 'theme' in the original code
             <Chip
               key={theme}
               label={theme}
@@ -548,8 +556,8 @@ const TripsCard = () => {
                 selectedThemes: filterState.selectedThemes.filter(t => t !== theme)
               })}
               sx={{
-                bgcolor: 'warning.light',
-                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                bgcolor: theme.palette.secondary.light, // Changed from warning.light
+                '.MuiChip-deleteIcon': { color: theme.palette.secondary.dark }, // Changed from warning.dark
                 flexShrink: 0
               }}
             />
@@ -562,8 +570,8 @@ const TripsCard = () => {
                 selectedInclusions: filterState.selectedInclusions.filter(i => i !== inclusion)
               })}
               sx={{
-                bgcolor: 'warning.light',
-                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                bgcolor: theme.palette.secondary.light, // Changed from warning.light
+                '.MuiChip-deleteIcon': { color: theme.palette.secondary.dark }, // Changed from warning.dark
                 flexShrink: 0
               }}
             />
@@ -576,8 +584,8 @@ const TripsCard = () => {
                 selectedExclusions: filterState.selectedExclusions.filter(e => e !== exclusion)
               })}
               sx={{
-                bgcolor: 'warning.light',
-                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                bgcolor: theme.palette.secondary.light, // Changed from warning.light
+                '.MuiChip-deleteIcon': { color: theme.palette.secondary.dark }, // Changed from warning.dark
                 flexShrink: 0
               }}
             />
@@ -610,8 +618,8 @@ const TripsCard = () => {
       >
         <DialogTitle
           sx={{
-            bgcolor: "warning.main",
-            color: "common.white",
+            bgcolor: theme.palette.secondary.main, // Changed from warning.main
+            color: theme.palette.secondary.contrastText, // Changed from common.white
             py: 2,
             px: 3,
             display: "flex",
@@ -622,7 +630,7 @@ const TripsCard = () => {
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Filter Options
           </Typography>
-          <IconButton onClick={toggleFilterModal} sx={{ color: "common.white" }}>
+          <IconButton onClick={toggleFilterModal} sx={{ color: theme.palette.secondary.contrastText }} aria-label="Close filter options dialog"> {/* Changed color */}
             <Close />
           </IconButton>
         </DialogTitle>
@@ -637,16 +645,16 @@ const TripsCard = () => {
                       selected={activeFilterCategory === category}
                       onClick={() => setActiveFilterCategory(category)}
                       sx={{
-                        bgcolor: activeFilterCategory === category ? 'warning.light' : 'transparent',
+                        bgcolor: activeFilterCategory === category ? theme.palette.secondary.light : 'transparent', // Changed from warning.light
                         '&:hover': { bgcolor: 'action.hover' },
-                        borderLeft: `4px solid ${activeFilterCategory === category ? 'warning.main' : 'transparent'}`
+                        borderLeft: `4px solid ${activeFilterCategory === category ? theme.palette.secondary.main : 'transparent'}` // Changed from warning.main
                       }}
                     >
                       <ListItemText
                         primary={category.charAt(0).toUpperCase() + category.slice(1)}
                         primaryTypographyProps={{
                           fontWeight: 500,
-                          color: activeFilterCategory === category ? 'warning.dark' : 'text.primary'
+                          color: activeFilterCategory === category ? theme.palette.secondary.dark : theme.palette.text.primary // Changed from warning.dark
                         }}
                       />
                     </ListItemButton>
@@ -695,7 +703,7 @@ const TripsCard = () => {
           </Button>
           <Button
             variant="contained"
-            color="warning"
+            color="secondary" // Changed from warning
             onClick={applyFilters}
             sx={{
               px: 4,
@@ -741,10 +749,13 @@ const TripsCard = () => {
       </Box>
 
       {/* Trips Grid */}
-      <Grid container spacing={2} justifyContent="center">
-        {filteredTrips?.map((trip) => (
-          <Grid
-            item
+      {loading ? (
+        <TripListSkeleton count={6} /> // Display 6 skeletons while loading
+      ) : filteredTrips && filteredTrips.length > 0 ? (
+        <Grid container spacing={2} justifyContent="center">
+          {filteredTrips.map((trip) => (
+            <Grid
+              item
             key={trip._id}
             xs={12}
             sm={6}
@@ -759,13 +770,13 @@ const TripsCard = () => {
                 flexDirection: "column",
                 borderRadius: "12px",
                 overflow: "hidden",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                boxShadow: theme.shadows[2], // Changed shadow
                 bgcolor: "background.paper",
                 "&:hover": {
-                  boxShadow: { sm: "0 8px 16px rgba(0, 0, 0, 0.1)" },
+                  boxShadow: { sm: theme.shadows[4] }, // Changed hover shadow
                   transform: { sm: "translateY(-3px)" },
                 },
-                transition: { sm: "transform 0.3s ease" },
+                transition: { sm: "transform 0.3s ease, box-shadow 0.3s ease" }, // Added box-shadow to transition
               }}
             >
               {/* Image Section */}
@@ -857,7 +868,7 @@ const TripsCard = () => {
                     display: "flex",
                     alignItems: "center",
                     gap: 0.5,
-                    color: "#f57f17",
+                    color: theme.palette.primary.main, // Changed color
                     mb: { xs: 0.5, sm: 1 },
                   }}
                 >
@@ -907,13 +918,13 @@ const TripsCard = () => {
                     sx={{
                       borderRadius: "8px",
                       textTransform: "none",
-                      bgcolor: "#f57f17",
-                      color: "#fff",
+                      bgcolor: theme.palette.primary.main, // Changed bgcolor
+                      color: theme.palette.primary.contrastText, // Changed color
                       fontSize: { xs: "0.75rem", sm: "0.875rem" },
                       py: { xs: 0.5, sm: 0.75 },
                       "&:hover": {
-                        bgcolor: "#ff6f00",
-                        boxShadow: 1,
+                        bgcolor: theme.palette.primary.dark, // Changed hover bgcolor
+                        boxShadow: theme.shadows[1], // Use theme shadow
                       },
                     }}
                   >
@@ -928,14 +939,14 @@ const TripsCard = () => {
                     sx={{
                       borderRadius: "6px",
                       textTransform: "none",
-                      borderColor: "#ffc107",
-                      color: "#ffc107",
+                      borderColor: theme.palette.secondary.main, // Changed borderColor
+                      color: theme.palette.secondary.main, // Changed color
                       fontSize: { xs: "0.75rem", sm: "0.875rem" },
                       py: { xs: 0.5, sm: 0.75 },
                       "&:hover": {
-                        borderColor: "#ffa000",
-                        color: "#ffa000",
-                        bgcolor: "#fff8e1",
+                        borderColor: theme.palette.secondary.dark, // Changed hover borderColor
+                        color: theme.palette.secondary.dark, // Changed hover color
+                        bgcolor: alpha(theme.palette.secondary.main, 0.08), // Changed hover bgcolor
                       },
                     }}
                   >
@@ -945,8 +956,11 @@ const TripsCard = () => {
               </CardContent>
             </Card>
           </Grid>
-        ))}
-      </Grid>
+          ))}
+        </Grid>
+      ) : (
+        !loading && <Typography variant="h6" sx={{ textAlign: 'center', mt: 4, color: 'text.secondary' }}>No trips found matching your criteria.</Typography>
+      )}
       <Dialog
         open={!!selectedTrip}
         onClose={() => setSelectedTrip(null)}
@@ -956,14 +970,15 @@ const TripsCard = () => {
           sx: {
             borderRadius: "16px",
             overflow: "visible",
-            backgroundColor: "#fff8e1",
+            backgroundColor: theme.palette.background.paper, // Changed background color
           },
         }}
       >
         <Box sx={{ position: "absolute", right: 16, top: 16 }}>
           <IconButton
             onClick={() => setSelectedTrip(null)}
-            sx={{ color: "#f57f17" }}
+            sx={{ color: theme.palette.primary.main }} // Changed color
+            aria-label="Close booking dialog"
           >
             <Close />
           </IconButton>

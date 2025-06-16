@@ -90,10 +90,35 @@ export default function Navbar() {
             <Button
               variant="text"
               color="inherit"
-              sx={{ 
+              id="trips-button" // Added id
+              aria-haspopup="true" // Added aria-haspopup
+              aria-expanded={Boolean(tripMenuAnchorEl)} // Added aria-expanded
+              aria-controls={Boolean(tripMenuAnchorEl) ? 'trips-menu' : undefined} // Added aria-controls
+              sx={{
                 fontWeight: 600,
+                position: 'relative', // Required for the pseudo-element
+                paddingBottom: '4px', // Space for the underline
+                overflow: 'hidden', // Prevent issues with scaling if any text overflows
                 '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.1)'
+                  backgroundColor: 'transparent', // Assuming no background color change on hover for these links
+                  transform: 'none', // Override the global button theme's hover scale effect
+                  color: (theme) => theme.palette.text.primary, // Ensure text color remains consistent or as desired
+                  '&::after': {
+                    transform: 'scaleX(1)', // Show underline on hover
+                    transformOrigin: 'bottom left',
+                  }
+                },
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  left: '8px', // Adjust to align with button padding
+                  right: '8px', // Adjust to align with button padding
+                  bottom: '2px', // Adjust vertical position of underline
+                  height: '2px', // Thickness of the underline
+                  backgroundColor: (theme) => theme.palette.accent.main, // Use accent color from theme
+                  transform: 'scaleX(0)', // Initially hidden
+                  transformOrigin: 'bottom left',
+                  transition: 'transform 0.25s ease-out', // Animation for the underline
                 }
               }}
               onClick={handleTripMenuOpen}
@@ -101,6 +126,8 @@ export default function Navbar() {
               Trips
             </Button>
             <Menu
+              id="trips-menu" // Added id
+              aria-labelledby="trips-button" // Added aria-labelledby
               anchorEl={tripMenuAnchorEl}
               open={Boolean(tripMenuAnchorEl)}
               onClose={handleTripMenuClose}
@@ -138,10 +165,31 @@ export default function Navbar() {
               <Button 
                 variant="text" 
                 color="inherit" 
-                sx={{ 
+                sx={{
                   fontWeight: 600,
+                  position: 'relative', // Required for the pseudo-element
+                  paddingBottom: '4px', // Space for the underline
+                  overflow: 'hidden', // Prevent issues with scaling if any text overflows
                   '&:hover': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.1)'
+                    backgroundColor: 'transparent', // Assuming no background color change on hover for these links
+                    transform: 'none', // Override the global button theme's hover scale effect
+                    color: (theme) => theme.palette.text.primary, // Ensure text color remains consistent or as desired
+                    '&::after': {
+                      transform: 'scaleX(1)', // Show underline on hover
+                      transformOrigin: 'bottom left',
+                    }
+                  },
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    left: '8px', // Adjust to align with button padding
+                    right: '8px', // Adjust to align with button padding
+                    bottom: '2px', // Adjust vertical position of underline
+                    height: '2px', // Thickness of the underline
+                    backgroundColor: (theme) => theme.palette.accent.main, // Use accent color from theme
+                    transform: 'scaleX(0)', // Initially hidden
+                    transformOrigin: 'bottom left',
+                    transition: 'transform 0.25s ease-out', // Animation for the underline
                   }
                 }}
               >
@@ -153,10 +201,31 @@ export default function Navbar() {
                 <Button 
                   variant="text" 
                   color="inherit" 
-                  sx={{ 
+                  sx={{
                     fontWeight: 600,
+                    position: 'relative', // Required for the pseudo-element
+                    paddingBottom: '4px', // Space for the underline
+                    overflow: 'hidden', // Prevent issues with scaling if any text overflows
                     '&:hover': {
-                      backgroundColor: 'rgba(0, 0, 0, 0.1)'
+                      backgroundColor: 'transparent', // Assuming no background color change on hover for these links
+                      transform: 'none', // Override the global button theme's hover scale effect
+                      color: (theme) => theme.palette.text.primary, // Ensure text color remains consistent or as desired
+                      '&::after': {
+                        transform: 'scaleX(1)', // Show underline on hover
+                        transformOrigin: 'bottom left',
+                      }
+                    },
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      left: '8px', // Adjust to align with button padding
+                      right: '8px', // Adjust to align with button padding
+                      bottom: '2px', // Adjust vertical position of underline
+                      height: '2px', // Thickness of the underline
+                      backgroundColor: (theme) => theme.palette.accent.main, // Use accent color from theme
+                      transform: 'scaleX(0)', // Initially hidden
+                      transformOrigin: 'bottom left',
+                      transition: 'transform 0.25s ease-out', // Animation for the underline
                     }
                   }}
                 >
@@ -170,16 +239,9 @@ export default function Navbar() {
             {(isUserAuthenticated || isAdminAuthenticated) ? (
               <RouterLink to="/logout" style={{ textDecoration: 'none' }}>
                 <Button 
-                  variant="contained"
-                  sx={{ 
-                    backgroundColor: '#f9a825',
-                    color: theme.palette.getContrastText('#f9a825'),
-                    borderRadius: '20px',
-                    '&:hover': {
-                      backgroundColor: '#d18c1f',
-                      boxShadow: theme.shadows[2]
-                    }
-                  }}
+                  variant="contained" // Changed
+                  color="primary" // Changed
+                  // Removed sx props
                 >
                   Logout
                 </Button>
@@ -187,16 +249,9 @@ export default function Navbar() {
             ) : (
               <RouterLink to="/login" style={{ textDecoration: 'none' }}>
                 <Button 
-                  variant="outlined" 
-                  sx={{ 
-                    borderRadius: '20px',
-                    borderColor: 'inherit',
-                    color: 'inherit',
-                    '&:hover': {
-                      borderColor: '#d18c1f',
-                      backgroundColor: 'rgba(249, 168, 37, 0.1)'
-                    }
-                  }}
+                  variant="outlined" // Changed
+                  color="primary" // Changed
+                  // Removed sx props
                 >
                   Login
                 </Button>
