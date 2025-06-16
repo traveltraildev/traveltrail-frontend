@@ -28,6 +28,13 @@ const palette = {
     primary: '#222222',
     secondary: '#555555', // A slightly lighter shade for secondary text
   },
+  action: { // Added this action object
+    hover: 'rgba(0, 0, 0, 0.04)', // A common default MUI hover opacity
+    selected: 'rgba(0, 0, 0, 0.08)', // A common default MUI selected opacity
+    disabled: 'rgba(0, 0, 0, 0.26)',
+    disabledBackground: 'rgba(0, 0, 0, 0.12)',
+    focus: 'rgba(0, 0, 0, 0.12)'
+  }
 };
 
 // Define typography
