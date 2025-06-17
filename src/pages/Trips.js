@@ -45,8 +45,6 @@ import { TripListSkeleton } from "../components/common/TripCardSkeleton"; // Add
 
 import { motion } from "framer-motion";
 
-
-
 const TripsCard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -84,7 +82,6 @@ const TripsCard = () => {
   });
   const navigate = useNavigate();
 
-
   const preSearch = location?.state?.search;
 
   useEffect(() => {
@@ -92,7 +89,6 @@ const TripsCard = () => {
       setSearchTerm(preSearch);
     }
   }, [preSearch]);
-
 
   // Fetch trips data
   useEffect(() => {
@@ -303,8 +299,8 @@ const TripsCard = () => {
                         selectedDestinations: e.target.checked
                           ? [...filterState.selectedDestinations, destination]
                           : filterState.selectedDestinations.filter(
-                            (d) => d !== destination
-                          ),
+                              (d) => d !== destination
+                            ),
                       })
                     }
                   />
@@ -328,8 +324,8 @@ const TripsCard = () => {
                         selectedThemes: e.target.checked
                           ? [...filterState.selectedThemes, theme]
                           : filterState.selectedThemes.filter(
-                            (t) => t !== theme
-                          ),
+                              (t) => t !== theme
+                            ),
                       })
                     }
                   />
@@ -353,8 +349,8 @@ const TripsCard = () => {
                         selectedInclusions: e.target.checked
                           ? [...filterState.selectedInclusions, inclusion]
                           : filterState.selectedInclusions.filter(
-                            (i) => i !== inclusion
-                          ),
+                              (i) => i !== inclusion
+                            ),
                       })
                     }
                   />
@@ -378,8 +374,8 @@ const TripsCard = () => {
                         selectedExclusions: e.target.checked
                           ? [...filterState.selectedExclusions, exclusion]
                           : filterState.selectedExclusions.filter(
-                            (e) => e !== exclusion
-                          ),
+                              (e) => e !== exclusion
+                            ),
                       })
                     }
                   />
@@ -396,54 +392,61 @@ const TripsCard = () => {
 
   // Gradient text styling
   const gradientText = {
-    background: 'linear-gradient(45deg, #f57f17 30%, #ffca28 90%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
+    background: "linear-gradient(45deg, #f57f17 30%, #ffca28 90%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
     fontWeight: 800,
-    letterSpacing: '-0.5px'
+    letterSpacing: "-0.5px",
   };
 
   return (
-    <Box sx={{
-      padding: (theme) => ({ xs: `${theme.spacing(10)} ${theme.spacing(2)}`, md: `${theme.spacing(12.5)} ${theme.spacing(4)}` }),
-      backgroundColor: (theme) => theme.palette.background.default,
-    }}>
-      <Box sx={{
-        pt: { xs: 2, md: 4 },
-        bgcolor: "background.paper",
-        borderBottom: "1px solid",
-        borderColor: "divider",
-        textAlign: "center",
-        position: "sticky",
-        top: 0,
-        zIndex: 1200,
-        backdropFilter: "blur(10px)",
-        backgroundColor: "rgba(255, 255, 255, 0.8)"
-      }}>
+    <Box
+      sx={{
+        padding: (theme) => ({
+          xs: `${theme.spacing(10)} ${theme.spacing(2)}`,
+          md: `${theme.spacing(12.5)} ${theme.spacing(4)}`,
+        }),
+        backgroundColor: (theme) => theme.palette.background.default,
+      }}
+    >
+      <Box
+        sx={{
+          pt: { xs: 2, md: 4 },
+          bgcolor: "background.paper",
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          textAlign: "center",
+          position: "sticky",
+          top: 0,
+          zIndex: 1200,
+          backdropFilter: "blur(10px)",
+          backgroundColor: "rgba(255, 255, 255, 0.8)",
+        }}
+      >
         {/* Header Title */}
         <Typography
           variant="h3"
           gutterBottom
           sx={{
             ...gradientText,
-            fontSize: { xs: '1.75rem', md: '2.75rem' },
+            fontSize: { xs: "1.75rem", md: "2.75rem" },
             px: 2,
-            mb: { xs: 2, md: 4 }
+            mb: { xs: 2, md: 4 },
           }}
         >
           Explore Adventures
         </Typography>
 
-
-
         {/* Search Bar */}
-        <Box sx={{
-          maxWidth: 800,
-          mx: "auto",
-          position: "relative",
-          mb: { xs: 1, md: 3 },
-          px: 2
-        }}>
+        <Box
+          sx={{
+            maxWidth: 800,
+            mx: "auto",
+            position: "relative",
+            mb: { xs: 1, md: 3 },
+            px: 2,
+          }}
+        >
           <TextField
             fullWidth
             variant="outlined"
@@ -451,12 +454,18 @@ const TripsCard = () => {
             value={searchTerm}
             onChange={handleSearch}
             InputProps={{
-              startAdornment: <SearchIcon sx={{ color: "text.secondary", mr: 1 }} />,
+              startAdornment: (
+                <SearchIcon sx={{ color: "text.secondary", mr: 1 }} />
+              ),
               endAdornment: (
                 <Button
                   variant="contained"
                   color="secondary" // Changed from warning
-                  aria-label={useMediaQuery(theme.breakpoints.up("md")) ? undefined : "Search trips"}
+                  aria-label={
+                    useMediaQuery(theme.breakpoints.up("md"))
+                      ? undefined
+                      : "Search trips"
+                  }
                   sx={{
                     position: "absolute",
                     right: 0,
@@ -464,10 +473,14 @@ const TripsCard = () => {
                     height: "100%",
                     px: { xs: 1.5, md: 3 },
                     minWidth: { xs: "auto", md: "100px" },
-                    borderRadius: "0 8px 8px 0"
+                    borderRadius: "0 8px 8px 0",
                   }}
                 >
-                  {useMediaQuery(theme.breakpoints.up("md")) ? "Search" : <SearchIcon />}
+                  {useMediaQuery(theme.breakpoints.up("md")) ? (
+                    "Search"
+                  ) : (
+                    <SearchIcon />
+                  )}
                 </Button>
               ),
               sx: {
@@ -475,31 +488,33 @@ const TripsCard = () => {
                 bgcolor: "background.default",
                 boxShadow: 3,
                 pr: { xs: 8, md: 10 },
-                height: { xs: "48px", md: "56px" }
-              }
+                height: { xs: "48px", md: "56px" },
+              },
             }}
           />
         </Box>
 
         {/* Filter Chips */}
-        <Box sx={{
-          display: "flex",
-          gap: 1,
-          justifyContent: "flex-start",
-          flexWrap: "nowrap",
-          overflowX: "auto",
-          px: 2,
-          pb: 1,
-          mx: { xs: -2, md: 0 },
-          '&::-webkit-scrollbar': {
-            height: '3px',
-            backgroundColor: 'transparent'
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'text.secondary',
-            borderRadius: 2
-          }
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            justifyContent: "flex-start",
+            flexWrap: "nowrap",
+            overflowX: "auto",
+            px: 2,
+            pb: 1,
+            mx: { xs: -2, md: 0 },
+            "&::-webkit-scrollbar": {
+              height: "3px",
+              backgroundColor: "transparent",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "text.secondary",
+              borderRadius: 2,
+            },
+          }}
+        >
           <Chip
             label="Filters"
             onClick={toggleFilterModal}
@@ -507,97 +522,116 @@ const TripsCard = () => {
             variant="outlined"
             sx={{
               borderColor: theme.palette.divider, // Changed from grey.300
-              bgcolor: 'background.paper',
-              '&:hover': { bgcolor: alpha(theme.palette.secondary.main, 0.1) }, // Changed from warning.light
-              flexShrink: 0
+              bgcolor: "background.paper",
+              "&:hover": { bgcolor: alpha(theme.palette.secondary.main, 0.1) }, // Changed from warning.light
+              flexShrink: 0,
             }}
           />
           {filterState.sortBy !== "name" && (
             <Chip
-              label={`Sort: ${filterState.sortBy === "price-low" ? "Low" : "High"}`}
+              label={`Sort: ${
+                filterState.sortBy === "price-low" ? "Low" : "High"
+              }`}
               onDelete={() => handleFilterChange({ sortBy: "name" })}
               sx={{
                 bgcolor: theme.palette.secondary.light, // Changed from warning.light
-                '.MuiChip-deleteIcon': { color: theme.palette.secondary.dark }, // Changed from warning.dark
-                flexShrink: 0
+                ".MuiChip-deleteIcon": { color: theme.palette.secondary.dark }, // Changed from warning.dark
+                flexShrink: 0,
               }}
             />
           )}
-          {(filterState.priceRange[0] !== 0 || filterState.priceRange[1] !== 1000000) && (
+          {(filterState.priceRange[0] !== 0 ||
+            filterState.priceRange[1] !== 1000000) && (
             <Chip
               label={`₹${filterState.priceRange[0]}-${filterState.priceRange[1]}`}
               onDelete={() => handleFilterChange({ priceRange: [0, 1000000] })}
               sx={{
                 bgcolor: theme.palette.secondary.light, // Changed from warning.light
-                '.MuiChip-deleteIcon': { color: theme.palette.secondary.dark }, // Changed from warning.dark
-                flexShrink: 0
+                ".MuiChip-deleteIcon": { color: theme.palette.secondary.dark }, // Changed from warning.dark
+                flexShrink: 0,
               }}
             />
           )}
-          {filterState.selectedDestinations.map(destination => (
+          {filterState.selectedDestinations.map((destination) => (
             <Chip
               key={destination}
               label={destination}
-              onDelete={() => handleFilterChange({
-                selectedDestinations: filterState.selectedDestinations.filter(d => d !== destination)
-              })}
+              onDelete={() =>
+                handleFilterChange({
+                  selectedDestinations: filterState.selectedDestinations.filter(
+                    (d) => d !== destination
+                  ),
+                })
+              }
               sx={{
                 bgcolor: theme.palette.secondary.light, // Changed from warning.light
-                '.MuiChip-deleteIcon': { color: theme.palette.secondary.dark }, // Changed from warning.dark
-                flexShrink: 0
+                ".MuiChip-deleteIcon": { color: theme.palette.secondary.dark }, // Changed from warning.dark
+                flexShrink: 0,
               }}
             />
           ))}
-          {filterState.selectedThemes.map(theme => ( // Corrected: iterator name is 'theme' in the original code
-            <Chip
-              key={theme}
-              label={theme}
-              onDelete={() => handleFilterChange({
-                selectedThemes: filterState.selectedThemes.filter(t => t !== theme)
-              })}
-              sx={{
-                bgcolor: theme.palette.secondary.light, // Changed from warning.light
-                '.MuiChip-deleteIcon': { color: theme.palette.secondary.dark }, // Changed from warning.dark
-                flexShrink: 0
-              }}
-            />
-          ))}
-          {filterState.selectedInclusions.map(inclusion => (
+          {filterState.selectedThemes.map(
+            (
+              theme // Corrected: iterator name is 'theme' in the original code
+            ) => (
+              <Chip
+                key={theme}
+                label={theme}
+                onDelete={() =>
+                  handleFilterChange({
+                    selectedThemes: filterState.selectedThemes.filter(
+                      (t) => t !== theme
+                    ),
+                  })
+                }
+                sx={{
+                  bgcolor: theme.palette.secondary.light, // Changed from warning.light
+                  ".MuiChip-deleteIcon": {
+                    color: theme.palette.secondary.dark,
+                  }, // Changed from warning.dark
+                  flexShrink: 0,
+                }}
+              />
+            )
+          )}
+          {filterState.selectedInclusions.map((inclusion) => (
             <Chip
               key={inclusion}
               label={inclusion}
-              onDelete={() => handleFilterChange({
-                selectedInclusions: filterState.selectedInclusions.filter(i => i !== inclusion)
-              })}
+              onDelete={() =>
+                handleFilterChange({
+                  selectedInclusions: filterState.selectedInclusions.filter(
+                    (i) => i !== inclusion
+                  ),
+                })
+              }
               sx={{
                 bgcolor: theme.palette.secondary.light, // Changed from warning.light
-                '.MuiChip-deleteIcon': { color: theme.palette.secondary.dark }, // Changed from warning.dark
-                flexShrink: 0
+                ".MuiChip-deleteIcon": { color: theme.palette.secondary.dark }, // Changed from warning.dark
+                flexShrink: 0,
               }}
             />
           ))}
-          {filterState.selectedExclusions.map(exclusion => (
+          {filterState.selectedExclusions.map((exclusion) => (
             <Chip
               key={exclusion}
               label={exclusion}
-              onDelete={() => handleFilterChange({
-                selectedExclusions: filterState.selectedExclusions.filter(e => e !== exclusion)
-              })}
+              onDelete={() =>
+                handleFilterChange({
+                  selectedExclusions: filterState.selectedExclusions.filter(
+                    (e) => e !== exclusion
+                  ),
+                })
+              }
               sx={{
                 bgcolor: theme.palette.secondary.light, // Changed from warning.light
-                '.MuiChip-deleteIcon': { color: theme.palette.secondary.dark }, // Changed from warning.dark
-                flexShrink: 0
+                ".MuiChip-deleteIcon": { color: theme.palette.secondary.dark }, // Changed from warning.dark
+                flexShrink: 0,
               }}
             />
           ))}
         </Box>
-
-
-
-
-
       </Box>
-
 
       {/* Filter Modal */}
       <Dialog
@@ -611,8 +645,8 @@ const TripsCard = () => {
             overflow: "hidden",
             boxShadow: "0 12px 24px rgba(0,0,0,0.15)",
             border: "1px solid",
-            borderColor: "divider"
-          }
+            borderColor: "divider",
+          },
         }}
         TransitionComponent={Fade}
       >
@@ -624,13 +658,19 @@ const TripsCard = () => {
             px: 3,
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center"
+            alignItems: "center",
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Filter Options
           </Typography>
-          <IconButton onClick={toggleFilterModal} sx={{ color: theme.palette.secondary.contrastText }} aria-label="Close filter options dialog"> {/* Changed color */}
+          <IconButton
+            onClick={toggleFilterModal}
+            sx={{ color: theme.palette.secondary.contrastText }}
+            aria-label="Close filter options dialog"
+          >
+            {" "}
+            {/* Changed color */}
             <Close />
           </IconButton>
         </DialogTitle>
@@ -638,23 +678,42 @@ const TripsCard = () => {
         <DialogContent sx={{ p: 3 }}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={3}>
-              <List sx={{ '& .MuiListItemButton-root': { borderRadius: 2 } }}>
-                {['sort', 'price', 'destinations', 'themes', 'inclusions', 'exclusions'].map((category) => (
+              <List sx={{ "& .MuiListItemButton-root": { borderRadius: 2 } }}>
+                {[
+                  "sort",
+                  "price",
+                  "destinations",
+                  "themes",
+                  "inclusions",
+                  "exclusions",
+                ].map((category) => (
                   <ListItem key={category} disablePadding sx={{ mb: 0.5 }}>
                     <ListItemButton
                       selected={activeFilterCategory === category}
                       onClick={() => setActiveFilterCategory(category)}
                       sx={{
-                        bgcolor: activeFilterCategory === category ? theme.palette.secondary.light : 'transparent', // Changed from warning.light
-                        '&:hover': { bgcolor: 'action.hover' },
-                        borderLeft: `4px solid ${activeFilterCategory === category ? theme.palette.secondary.main : 'transparent'}` // Changed from warning.main
+                        bgcolor:
+                          activeFilterCategory === category
+                            ? theme.palette.secondary.light
+                            : "transparent", // Changed from warning.light
+                        "&:hover": { bgcolor: "action.hover" },
+                        borderLeft: `4px solid ${
+                          activeFilterCategory === category
+                            ? theme.palette.secondary.main
+                            : "transparent"
+                        }`, // Changed from warning.main
                       }}
                     >
                       <ListItemText
-                        primary={category.charAt(0).toUpperCase() + category.slice(1)}
+                        primary={
+                          category.charAt(0).toUpperCase() + category.slice(1)
+                        }
                         primaryTypographyProps={{
                           fontWeight: 500,
-                          color: activeFilterCategory === category ? theme.palette.secondary.dark : theme.palette.text.primary // Changed from warning.dark
+                          color:
+                            activeFilterCategory === category
+                              ? theme.palette.secondary.dark
+                              : theme.palette.text.primary, // Changed from warning.dark
                         }}
                       />
                     </ListItemButton>
@@ -664,39 +723,43 @@ const TripsCard = () => {
             </Grid>
 
             <Grid item xs={12} md={9}>
-              <Box sx={{
-                maxHeight: '60vh',
-                overflowY: 'auto',
-                pr: 2,
-                '&::-webkit-scrollbar': { width: '6px' },
-                '&::-webkit-scrollbar-thumb': {
-                  backgroundColor: 'text.secondary',
-                  borderRadius: '4px'
-                }
-              }}>
+              <Box
+                sx={{
+                  maxHeight: "60vh",
+                  overflowY: "auto",
+                  pr: 2,
+                  "&::-webkit-scrollbar": { width: "6px" },
+                  "&::-webkit-scrollbar-thumb": {
+                    backgroundColor: "text.secondary",
+                    borderRadius: "4px",
+                  },
+                }}
+              >
                 {renderFilterContent()}
               </Box>
             </Grid>
           </Grid>
         </DialogContent>
 
-        <Box sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          px: 3,
-          py: 2,
-          borderTop: "1px solid",
-          borderColor: "divider",
-          bgcolor: "background.paper"
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            px: 3,
+            py: 2,
+            borderTop: "1px solid",
+            borderColor: "divider",
+            bgcolor: "background.paper",
+          }}
+        >
           <Button
             onClick={toggleFilterModal}
             variant="outlined"
             sx={{
               color: "text.secondary",
               borderColor: "divider",
-              '&:hover': { borderColor: "text.secondary" }
+              "&:hover": { borderColor: "text.secondary" },
             }}
           >
             Cancel
@@ -709,7 +772,7 @@ const TripsCard = () => {
               px: 4,
               fontWeight: 600,
               boxShadow: 1,
-              '&:hover': { boxShadow: 2 }
+              "&:hover": { boxShadow: 2 },
             }}
           >
             Show Results
@@ -718,33 +781,39 @@ const TripsCard = () => {
       </Dialog>
 
       {/* Results Header */}
-      <Box sx={{
-        textAlign: "center",
-        py: 3,
-        mb: 4,
-        bgcolor: "background.paper",
-        borderBottom: "2px solid",
-        borderTop: "2px solid",
-        borderColor: "divider",
-        mx: { xs: -2, md: 0 },
-        px: 2,
-        position: "sticky",
-        top: { xs: 56, md: 64 },
-        zIndex: 1100,
-        backdropFilter: "blur(8px)"
-      }}>
-        <Typography variant="h5" sx={{
-          ...gradientText,
-          fontSize: { xs: '1.25rem', md: '1.5rem' },
-          fontWeight: 600,
-          letterSpacing: '-0.03rem',
-          lineHeight: 1.25,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 1.5
-        }}>
-          {filteredTrips.length} {filteredTrips.length === 1 ? 'Trip' : 'Trips'} Found
+      <Box
+        sx={{
+          textAlign: "center",
+          py: 3,
+          mb: 4,
+          bgcolor: "background.paper",
+          borderBottom: "2px solid",
+          borderTop: "2px solid",
+          borderColor: "divider",
+          mx: { xs: -2, md: 0 },
+          px: 2,
+          position: "sticky",
+          top: { xs: 56, md: 64 },
+          zIndex: 1100,
+          backdropFilter: "blur(8px)",
+        }}
+      >
+        <Typography
+          variant="h5"
+          sx={{
+            ...gradientText,
+            fontSize: { xs: "1.25rem", md: "1.5rem" },
+            fontWeight: 600,
+            letterSpacing: "-0.03rem",
+            lineHeight: 1.25,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 1.5,
+          }}
+        >
+          {filteredTrips.length} {filteredTrips.length === 1 ? "Trip" : "Trips"}{" "}
+          Found
         </Typography>
       </Box>
 
@@ -756,210 +825,219 @@ const TripsCard = () => {
           {filteredTrips.map((trip) => (
             <Grid
               item
-            key={trip._id}
-            xs={12}
-            sm={6}
-            md={4}
-            sx={{ display: "flex" }}
-          >
-            <Card
-              sx={{
-                width: "100%",
-                height: { xs: "100%" },
-                display: "flex",
-                flexDirection: "column",
-                borderRadius: "12px",
-                overflow: "hidden",
-                boxShadow: theme.shadows[2], // Changed shadow
-                bgcolor: "background.paper",
-                "&:hover": {
-                  boxShadow: { sm: theme.shadows[4] }, // Changed hover shadow
-                  transform: { sm: "translateY(-3px)" },
-                },
-                transition: { sm: "transform 0.3s ease, box-shadow 0.3s ease" }, // Added box-shadow to transition
-              }}
+              key={trip._id}
+              xs={12}
+              sm={6}
+              md={4}
+              sx={{ display: "flex" }}
             >
-              {/* Image Section */}
-              <Box
+              <Card
                 sx={{
-                  position: "relative",
                   width: "100%",
-                  pt: { xs: "50%", sm: "56.25%" }, // Adjusted aspect ratio
-                  overflow: "hidden",
-                  bgcolor: "grey.100",
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  image={trip?.images[0] || "./images/defaultImg.png"}
-                  alt={trip?.name || ""}
-                  sx={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
-                <Chip
-                  label={`${trip?.daysCount} days`}
-                  size="small"
-                  sx={{
-                    position: "absolute",
-                    top: 8,
-                    left: 8,
-                    bgcolor: "rgba(0,0,0,0.7)",
-                    color: "#fff8e1",
-                    fontWeight: 600,
-                    fontSize: { xs: "0.7rem", sm: "0.8rem" },
-                  }}
-                />
-              </Box>
-
-              <CardContent
-                sx={{
-                  p: { xs: 1.5, sm: 2 },
-                  flex: 1,
+                  height: { xs: "100%" },
                   display: "flex",
                   flexDirection: "column",
-                  gap: { xs: 0.5, sm: 1 },
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  boxShadow: theme.shadows[2], // Changed shadow
+                  bgcolor: "background.paper",
+                  "&:hover": {
+                    boxShadow: { sm: theme.shadows[4] }, // Changed hover shadow
+                    transform: { sm: "translateY(-3px)" },
+                  },
+                  transition: {
+                    sm: "transform 0.3s ease, box-shadow 0.3s ease",
+                  }, // Added box-shadow to transition
                 }}
               >
-                {/* Trip Info */}
+                {/* Image Section */}
                 <Box
                   sx={{
+                    position: "relative",
+                    width: "100%",
+                    pt: { xs: "50%", sm: "56.25%" }, // Adjusted aspect ratio
+                    overflow: "hidden",
+                    bgcolor: "grey.100",
+                  }}
+                >
+                  <CardMedia
+                    component="img"
+                    image={trip?.images[0] || "./images/defaultImg.png"}
+                    alt={trip?.name || ""}
+                    sx={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <Chip
+                    label={`${trip?.daysCount} days`}
+                    size="small"
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      left: 8,
+                      bgcolor: "rgba(0,0,0,0.7)",
+                      color: "#fff8e1",
+                      fontWeight: 600,
+                      fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                    }}
+                  />
+                </Box>
+
+                <CardContent
+                  sx={{
+                    p: { xs: 1.5, sm: 2 },
                     flex: 1,
-                    mb: { xs: 0.5, sm: 1 },
-                  }}
-                >
-                  <Typography
-                    variant="body1"
-                    fontWeight="600"
-                    sx={{
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      color: "#212121",
-                      fontSize: { xs: "0.9rem", sm: "1rem" },
-                    }}
-                  >
-                    {trip?.name || ""}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      display: "-webkit-box",
-                      WebkitLineClamp: 1,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      color: "#616161",
-                      fontSize: { xs: "0.8rem", sm: "0.875rem" },
-                    }}
-                  >
-                    {trip?.destination}
-                  </Typography>
-                </Box>
-
-                {/* Price Section */}
-                <Box
-                  sx={{
                     display: "flex",
-                    alignItems: "center",
-                    gap: 0.5,
-                    color: theme.palette.primary.main, // Changed color
-                    mb: { xs: 0.5, sm: 1 },
+                    flexDirection: "column",
+                    gap: { xs: 0.5, sm: 1 },
                   }}
                 >
-                  <Typography
-                    variant="caption"
+                  {/* Trip Info */}
+                  <Box
                     sx={{
-                      fontWeight: 500,
-                      fontSize: { xs: "0.7rem", sm: "0.75rem" },
+                      flex: 1,
+                      mb: { xs: 0.5, sm: 1 },
                     }}
                   >
-                    Starts from
-                  </Typography>
-                  <Typography
-                    variant="subtitle1"
-                    fontWeight="600"
-                    sx={{
-                      fontSize: { xs: "0.9rem", sm: "1rem" },
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    ₹{trip?.price?.toLocaleString()}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontSize: { xs: "0.7rem", sm: "0.75rem" },
-                      opacity: 0.8,
-                    }}
-                  >
-                    /person
-                  </Typography>
-                </Box>
+                    <Typography
+                      variant="body1"
+                      fontWeight="600"
+                      sx={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        color: "#212121",
+                        fontSize: { xs: "0.9rem", sm: "1rem" },
+                      }}
+                    >
+                      {trip?.name || ""}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 1,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        color: "#616161",
+                        fontSize: { xs: "0.8rem", sm: "0.875rem" },
+                      }}
+                    >
+                      {trip?.destination}
+                    </Typography>
+                  </Box>
 
-                {/* Action Buttons */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: 1,
-                    mt: "auto",
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    size="small"
-                    fullWidth
-                    onClick={() => setSelectedTrip(trip)}
+                  {/* Price Section */}
+                  <Box
                     sx={{
-                      borderRadius: "8px",
-                      textTransform: "none",
-                      bgcolor: theme.palette.primary.main, // Changed bgcolor
-                      color: theme.palette.primary.contrastText, // Changed color
-                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                      py: { xs: 0.5, sm: 0.75 },
-                      "&:hover": {
-                        bgcolor: theme.palette.primary.dark, // Changed hover bgcolor
-                        boxShadow: theme.shadows[1], // Use theme shadow
-                      },
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                      color: theme.palette.primary.main, // Changed color
+                      mb: { xs: 0.5, sm: 1 },
                     }}
                   >
-                    Book Now
-                  </Button>
-                  <Button
-                    component={Link}
-                    to={`/trips/${trip?._id}`}
-                    variant="outlined"
-                    size="small"
-                    fullWidth
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 500,
+                        fontSize: { xs: "0.7rem", sm: "0.75rem" },
+                      }}
+                    >
+                      Starts from
+                    </Typography>
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight="600"
+                      sx={{
+                        fontSize: { xs: "0.9rem", sm: "1rem" },
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      ₹{trip?.price?.toLocaleString()}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontSize: { xs: "0.7rem", sm: "0.75rem" },
+                        opacity: 0.8,
+                      }}
+                    >
+                      /person
+                    </Typography>
+                  </Box>
+
+                  {/* Action Buttons */}
+                  <Box
                     sx={{
-                      borderRadius: "6px",
-                      textTransform: "none",
-                      borderColor: theme.palette.secondary.main, // Changed borderColor
-                      color: theme.palette.secondary.main, // Changed color
-                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                      py: { xs: 0.5, sm: 0.75 },
-                      "&:hover": {
-                        borderColor: theme.palette.secondary.dark, // Changed hover borderColor
-                        color: theme.palette.secondary.dark, // Changed hover color
-                        bgcolor: alpha(theme.palette.secondary.main, 0.08), // Changed hover bgcolor
-                      },
+                      display: "flex",
+                      gap: 1,
+                      mt: "auto",
                     }}
                   >
-                    View
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      fullWidth
+                      onClick={() => setSelectedTrip(trip)}
+                      sx={{
+                        borderRadius: "8px",
+                        textTransform: "none",
+                        bgcolor: theme.palette.primary.main, // Changed bgcolor
+                        color: "#fff", // Changed color
+                        fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                        py: { xs: 0.5, sm: 0.75 },
+                        "&:hover": {
+                          bgcolor: theme.palette.primary.dark, // Changed hover bgcolor
+                          boxShadow: theme.shadows[1], // Use theme shadow
+                        },
+                      }}
+                    >
+                      Book Now
+                    </Button>
+                    <Button
+                      component={Link}
+                      to={`/trips/${trip?._id}`}
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      sx={{
+                        borderRadius: "6px",
+                        textTransform: "none",
+                        borderColor: theme.palette.secondary.main, // Changed borderColor
+                        color: theme.palette.secondary.main, // Changed color
+                        fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                        py: { xs: 0.5, sm: 0.75 },
+                        "&:hover": {
+                          borderColor: theme.palette.secondary.dark, // Changed hover borderColor
+                          color: theme.palette.secondary.dark, // Changed hover color
+                          bgcolor: alpha(theme.palette.secondary.main, 0.08), // Changed hover bgcolor
+                        },
+                      }}
+                    >
+                      View
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
           ))}
         </Grid>
       ) : (
-        !loading && <Typography variant="h6" sx={{ textAlign: 'center', mt: 4, color: 'text.secondary' }}>No trips found matching your criteria.</Typography>
+        !loading && (
+          <Typography
+            variant="h6"
+            sx={{ textAlign: "center", mt: 4, color: "text.secondary" }}
+          >
+            No trips found matching your criteria.
+          </Typography>
+        )
       )}
       <Dialog
         open={!!selectedTrip}
