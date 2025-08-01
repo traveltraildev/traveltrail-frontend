@@ -1,71 +1,263 @@
-import * as React from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import { Link } from "react-router-dom";
-import HamburgerMenu from "./HamburgerMenu";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { styled } from "@mui/material/styles";
+// src/components/common/Navbar.js
+import * as React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import { Link as RouterLink } from 'react-router-dom';
+import HamburgerMenu from './HamburgerMenu';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { styled, useTheme } from '@mui/material/styles';
+import { useAuth } from '../../context/AuthContext';
+import { useAdminAuth } from '../../context/AdminAuthContext';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
 
-// Custom styled components
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundImage: "linear-gradient(to right, var(--primary-100), var(--primary-100))",
-  backgroundColor: "transparent",
-  boxShadow: "none",
+  backgroundColor: theme.palette.mode === 'light' 
+    ? 'rgba(253, 216, 53, 0.7)' 
+    : 'rgba(0, 0, 0, 0.75)',
+  backdropFilter: 'blur(8px)',
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  color: theme.palette.getContrastText('#fdd835b3'),
+  boxShadow: 'none',
+  transition: 'all 0.3s ease',
 }));
 
 const Logo = styled(Box)(({ theme }) => ({
-  width: '120px', // Adjust the width as needed
-  height: '40px', // Adjust the height as needed
-  marginRight: '10px', // Add some spacing
-  objectFit: 'contain', // Maintain aspect ratio
+  width: '140px',
+  height: '44px',
+  marginRight: theme.spacing(2),
+  transition: 'transform 0.3s ease',
+  '&:hover': {
+    transform: 'scale(1.02)'
+  }
 }));
 
 export default function Navbar() {
-  const isSmallScreen = useMediaQuery("(max-width:768px)");
+  const isSmallScreen = useMediaQuery('(max-width:768px)');
+  const { isAuthenticated: isUserAuthenticated } = useAuth();
+  const { isAdminAuthenticated } = useAdminAuth();
+  const theme = useTheme();
+  const [tripMenuAnchorEl, setTripMenuAnchorEl] = React.useState(null);
+
+  const handleTripMenuOpen = (event) => {
+    setTripMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleTripMenuClose = () => {
+    setTripMenuAnchorEl(null);
+  };
 
   return (
     <Box
-      sx={{ 
-        flexGrow: 1, 
-        position: "fixed", 
-        zIndex: 1, 
-        width: "100%", 
+      sx={{
+        flexGrow: 1,
+        position: 'fixed',
+        zIndex: (theme) => theme.zIndex.drawer + 2,
+        width: '100%',
         top: 0,
       }}
     >
       <StyledAppBar position="static">
-        <Toolbar sx={{ px: { xs: 1, md: 3 } }}>
-          {/* Logo */}
-          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+        <Toolbar sx={{ 
+          px: { xs: 2, md: 4 },
+          minHeight: '68px'
+        }}>
+          <RouterLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
             <Logo>
               <img
-                src="/images/logo.svg"
+                src="/images/mainLogo.svg"
                 alt="Travel Trail"
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  objectFit: 'contain',
+                  filter: theme.palette.mode === 'dark' ? 'invert(1)' : 'none'
+                }}
               />
             </Logo>
-          </Link>
+          </RouterLink>
 
           <Box sx={{ flexGrow: 1 }} />
 
-          {/* Primary Menu Items */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
-            <Link to="/trips" style={{ textDecoration: "none", color: "#333" }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                Trips
-              </Typography>
-            </Link>
-            <Link to="/accommodations" style={{ textDecoration: "none", color: "#333" }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+          <Box sx={{ 
+            display: { xs: 'none', md: 'flex' }, 
+            gap: theme.spacing(3),
+            alignItems: 'center'
+          }}>
+            <Button
+              variant="text"
+              color="inherit"
+              id="trips-button" // Added id
+              aria-haspopup="true" // Added aria-haspopup
+              aria-expanded={Boolean(tripMenuAnchorEl)} // Added aria-expanded
+              aria-controls={Boolean(tripMenuAnchorEl) ? 'trips-menu' : undefined} // Added aria-controls
+              sx={{
+                fontWeight: 600,
+                position: 'relative', // Required for the pseudo-element
+                paddingBottom: '4px', // Space for the underline
+                overflow: 'hidden', // Prevent issues with scaling if any text overflows
+                '&:hover': {
+                  backgroundColor: 'transparent', // Assuming no background color change on hover for these links
+                  transform: 'none', // Override the global button theme's hover scale effect
+                  color: (theme) => theme.palette.text.primary, // Ensure text color remains consistent or as desired
+                  '&::after': {
+                    transform: 'scaleX(1)', // Show underline on hover
+                    transformOrigin: 'bottom left',
+                  }
+                },
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  left: '8px', // Adjust to align with button padding
+                  right: '8px', // Adjust to align with button padding
+                  bottom: '2px', // Adjust vertical position of underline
+                  height: '2px', // Thickness of the underline
+                  backgroundColor: (theme) => theme.palette.accent.main, // Use accent color from theme
+                  transform: 'scaleX(0)', // Initially hidden
+                  transformOrigin: 'bottom left',
+                  transition: 'transform 0.25s ease-out', // Animation for the underline
+                }
+              }}
+              onClick={handleTripMenuOpen}
+            >
+              Trips
+            </Button>
+            <Menu
+              id="trips-menu" // Added id
+              aria-labelledby="trips-button" // Added aria-labelledby
+              anchorEl={tripMenuAnchorEl}
+              open={Boolean(tripMenuAnchorEl)}
+              onClose={handleTripMenuClose}
+              PaperProps={{
+                sx: {
+                  maxHeight: 480,
+                  width: '200px',
+                  backgroundColor: theme.palette.mode === 'light'
+                    ? 'rgba(249, 168, 37, 0.95)'
+                    : 'rgba(0, 0, 0, 0.9)',
+                  backdropFilter: 'blur(12px)',
+                  border: `1px solid ${theme.palette.divider}`,
+                },
+              }}
+            >
+              {["Adventure", "Beach", "City Break", "Cultural", "Family", "Hiking", "Luxury", "Nature", "Romantic", "Wildlife", "Honeymoon", "Spiritual"].map(
+                (tripTheme) => (
+                  <MenuItem 
+                    key={tripTheme} 
+                    component={RouterLink}
+                    to={`/theme/${encodeURIComponent(tripTheme)}`}
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: theme.palette.action?.selected
+                      }
+                    }}
+                  >
+                    {tripTheme}
+                  </MenuItem>
+                )
+              )}
+            </Menu>
+
+            <RouterLink to="/accommodations" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Button 
+                variant="text" 
+                color="inherit" 
+                sx={{
+                  fontWeight: 600,
+                  position: 'relative', // Required for the pseudo-element
+                  paddingBottom: '4px', // Space for the underline
+                  overflow: 'hidden', // Prevent issues with scaling if any text overflows
+                  '&:hover': {
+                    backgroundColor: 'transparent', // Assuming no background color change on hover for these links
+                    transform: 'none', // Override the global button theme's hover scale effect
+                    color: (theme) => theme.palette.text.primary, // Ensure text color remains consistent or as desired
+                    '&::after': {
+                      transform: 'scaleX(1)', // Show underline on hover
+                      transformOrigin: 'bottom left',
+                    }
+                  },
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    left: '8px', // Adjust to align with button padding
+                    right: '8px', // Adjust to align with button padding
+                    bottom: '2px', // Adjust vertical position of underline
+                    height: '2px', // Thickness of the underline
+                    backgroundColor: (theme) => theme.palette.accent.main, // Use accent color from theme
+                    transform: 'scaleX(0)', // Initially hidden
+                    transformOrigin: 'bottom left',
+                    transition: 'transform 0.25s ease-out', // Animation for the underline
+                  }
+                }}
+              >
                 Accommodations
-              </Typography>
-            </Link>
+              </Button>
+            </RouterLink>
+            {isUserAuthenticated && (
+              <RouterLink to="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Button 
+                  variant="text" 
+                  color="inherit" 
+                  sx={{
+                    fontWeight: 600,
+                    position: 'relative', // Required for the pseudo-element
+                    paddingBottom: '4px', // Space for the underline
+                    overflow: 'hidden', // Prevent issues with scaling if any text overflows
+                    '&:hover': {
+                      backgroundColor: 'transparent', // Assuming no background color change on hover for these links
+                      transform: 'none', // Override the global button theme's hover scale effect
+                      color: (theme) => theme.palette.text.primary, // Ensure text color remains consistent or as desired
+                      '&::after': {
+                        transform: 'scaleX(1)', // Show underline on hover
+                        transformOrigin: 'bottom left',
+                      }
+                    },
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      left: '8px', // Adjust to align with button padding
+                      right: '8px', // Adjust to align with button padding
+                      bottom: '2px', // Adjust vertical position of underline
+                      height: '2px', // Thickness of the underline
+                      backgroundColor: (theme) => theme.palette.accent.main, // Use accent color from theme
+                      transform: 'scaleX(0)', // Initially hidden
+                      transformOrigin: 'bottom left',
+                      transition: 'transform 0.25s ease-out', // Animation for the underline
+                    }
+                  }}
+                >
+                  Profile
+                </Button>
+              </RouterLink>
+            )}
           </Box>
 
-          {/* Hamburger Menu */}
-          <HamburgerMenu />
+          <Box sx={{ ml: 2 }}>
+            {(isUserAuthenticated || isAdminAuthenticated) ? (
+              <RouterLink to="/logout" style={{ textDecoration: 'none' }}>
+                <Button 
+                  variant="contained" // Changed
+                  color="primary" // Changed
+                  // Removed sx props
+                >
+                  Logout
+                </Button>
+              </RouterLink>
+            ) : (
+              <RouterLink to="/login" style={{ textDecoration: 'none' }}>
+                <Button 
+                  variant="outlined" // Changed
+                  color="primary" // Changed
+                  // Removed sx props
+                >
+                  Login
+                </Button>
+              </RouterLink>
+            )}
+          </Box>
         </Toolbar>
       </StyledAppBar>
     </Box>

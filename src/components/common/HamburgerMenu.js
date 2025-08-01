@@ -1,14 +1,17 @@
-// --- START OF FILE HamburgerMenu.js ---
+// src/components/common/HamburgerMenu.js
 import React from 'react';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 
-const HamburgerMenu = () => {
+export default function HamburgerMenu() {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
+  const { isAuthenticated: isUserAuthenticated } = useAuth();
+  const { isAdminAuthenticated } = useAdminAuth();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -22,36 +25,41 @@ const HamburgerMenu = () => {
     <div>
       <IconButton
         size="large"
-        edge="end"
-        color="black"
+        edge="start"
+        color="inherit"
+        aria-label="menu"
         onClick={handleMenuOpen}
       >
         <MenuIcon />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
-        open={open}
+        open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={handleMenuClose} component={Link} to="/">
-          Home
+        <MenuItem onClick={handleMenuClose}>
+          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            Home
+          </Link>
         </MenuItem>
-        <MenuItem onClick={handleMenuClose} component={Link} to="/about-us">
-          About Us
+        <MenuItem onClick={handleMenuClose}>
+          <Link to="/trips" style={{ textDecoration: 'none', color: 'inherit' }}>
+            Trips
+          </Link>
         </MenuItem>
-        <MenuItem onClick={handleMenuClose} component={Link} to="/contact-us">
-          Contact Us
+        <MenuItem onClick={handleMenuClose}>
+          <Link to="/accommodations" style={{ textDecoration: 'none', color: 'inherit' }}>
+            Accommodations
+          </Link>
         </MenuItem>
-        <MenuItem onClick={handleMenuClose} component={Link} to="/terms-and-conditions">
-          Terms & Conditions
-        </MenuItem>
-        <MenuItem onClick={handleMenuClose} component={Link} to="/admin/login">
-          Login
-        </MenuItem>
+        {isUserAuthenticated && (
+          <MenuItem onClick={handleMenuClose}>
+            <Link to="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>
+              Profile
+            </Link>
+          </MenuItem>
+        )}
       </Menu>
     </div>
   );
-};
-
-export default HamburgerMenu;
-// --- END OF FILE ---
+}

@@ -2,23 +2,24 @@
 import React, { useEffect, useState } from "react";
 import { Container, Typography, Box, Card, CardContent } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { contactUsPage } from "../endpoints";
 
 const ContactUsPage = () => {
   const [pageContent, setPageContent] = useState(null);
   const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
-    fetch('/api/cms/pages/contact-us')
-      .then(response => {
+    fetch(contactUsPage)
+      .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         setPageContent(data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching Contact Us content:", error);
         alert("Error loading content from API. Check console.");
       });
@@ -31,14 +32,25 @@ const ContactUsPage = () => {
 
   return (
     <Container maxWidth="md" sx={{ mt: 8, mb: 4 }}>
-      <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
+      <Typography
+        variant="h4"
+        component="h1"
+        align="center"
+        gutterBottom
+        sx={{ fontWeight: "bold" }}
+      >
         {pageContent.title}
       </Typography>
 
-      <Card elevation={3} sx={{ borderRadius: '12px', p: 4 }}>
+      <Card elevation={3} sx={{ borderRadius: "12px", p: 4 }}>
         <Box
           sx={{
-            "& p": { mb: 2, color: 'text.secondary', fontSize: '1rem', lineHeight: 1.6 },
+            "& p": {
+              mb: 2,
+              color: "text.secondary",
+              fontSize: "1rem",
+              lineHeight: 1.6,
+            },
             "& a": { color: "primary.main", textDecoration: "none" },
           }}
           dangerouslySetInnerHTML={{ __html: pageContent.content }}

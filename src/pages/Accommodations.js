@@ -10,30 +10,33 @@ import {
   Box,
   TextField,
   Chip,
-  Slider,
-  FormControlLabel,
-  Checkbox,
   Dialog,
   DialogTitle,
   DialogContent,
   List,
-  ListItem,
   ListItemButton,
   ListItemText,
   Radio,
   RadioGroup,
+  FormControlLabel,
+  Checkbox,
+  Slider,
+  IconButton,
   useMediaQuery,
-  Fade,
-  Autocomplete,
 } from "@mui/material";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTheme } from '@mui/material/styles';
+import { Link, useNavigate } from "react-router-dom";
+import { getAllAccommodations } from "../endpoints";
+import { Tune, Close, Search } from "@mui/icons-material";
+import { motion } from "framer-motion";
+import Navbar from "../components/common/Navbar";
 
 const Accommodations = () => {
   const [accommodations, setAccommodations] = useState([]);
   const [filteredAccommodations, setFilteredAccommodations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [activeFilterCategory, setActiveFilterCategory] = useState(null);
+  const [activeFilterCategory, setActiveFilterCategory] = useState("sort");
   const [sortBy, setSortBy] = useState("name");
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [selectedDestinations, setSelectedDestinations] = useState([]);
@@ -44,625 +47,566 @@ const Accommodations = () => {
   const [allThemes, setAllThemes] = useState([]);
   const [allAmenities, setAllAmenities] = useState([]);
   const navigate = useNavigate();
+  const theme = useTheme(); // Add this line
 
-  const location = useLocation();
-  const preSearch = location?.state?.search;
-
-  useEffect(() => {
-    if (preSearch?.length > 0) {
-      setSearchTerm(preSearch);
-    }
-  }, [preSearch]);
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
-    filterAccommodations();
-  }, [
-    searchTerm,
-    accommodations,
-    priceRange,
-    selectedDestinations,
-    selectedThemes,
-    maxOccupancy,
-    selectedAmenities,
-    sortBy,
-  ]);
-
-  useEffect(() => {
-    const fetchAccommodations = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("/api/accommodations");
-        if (!response.ok) throw new Error("Failed to fetch accommodations");
-        const data = await response.json();
-        setAccommodations(data.data || []); // Handle null case
-        setFilteredAccommodations(data.data || []);
+        const [accResponse, destinations, themes, amenities] = await Promise.all([
+          fetch(getAllAccommodations),
+          fetch(`${getAllAccommodations}/filters/destinations`),
+          fetch(`${getAllAccommodations}/filters/themes`),
+          fetch(`${getAllAccommodations}/filters/amenities`)
+        ]);
+
+        const accData = await accResponse.json();
+        setAccommodations(accData.data || []);
+        setFilteredAccommodations(accData.data || []);
+
+        setAllDestinations(await destinations.json());
+        setAllThemes(await themes.json());
+        setAllAmenities(await amenities.json());
       } catch (error) {
-        console.error("Error fetching accommodations:", error);
-        alert("Error loading accommodations. Check console.");
+        console.error("Error fetching data:", error);
       }
     };
-
-    fetchAccommodations();
+    fetchData();
   }, [navigate]);
 
   useEffect(() => {
-    const fetchFilterOptions = async () => {
-      try {
-        // Fetch destinations
-        const destinationsResponse = await fetch(
-          "/api/accommodations/filters/destinations"
-        );
-        const destinations = await destinationsResponse.json();
-        setAllDestinations(destinations);
-
-        // Fetch themes
-        const themesResponse = await fetch(
-          "/api/accommodations/filters/themes"
-        );
-        const themes = await themesResponse.json();
-        setAllThemes(themes);
-
-        // Fetch amenities
-        const amenitiesResponse = await fetch(
-          "/api/accommodations/filters/amenities"
-        );
-        const amenities = await amenitiesResponse.json();
-        setAllAmenities(amenities);
-      } catch (error) {
-        console.error("Error fetching filter options:", error);
-      }
-    };
-
-    fetchFilterOptions();
-  }, []);
-
-  const handleSearch = (event) => {
-    // const value = event.target.value;
-    // setSearchTerm(value);
-
-    // if (value.trim() === "") {
-    //   setFilteredAccommodations(accommodations);
-    // } else {
-    //   filterAccommodations();
-    // }
-
-    setSearchTerm(event.target.value);
-  };
-
-  const handleSortChange = (event) => {
-    setSortBy(event.target.value);
     filterAccommodations();
-  };
-
-  const handlePriceChange = (event, newValue) => {
-    setPriceRange(newValue);
-    filterAccommodations();
-  };
-
-  const handleDestinationChange = (event) => {
-    setSelectedDestinations((prev) =>
-      event.target.checked
-        ? [...prev, event.target.value]
-        : prev.filter((dest) => dest !== event.target.value)
-    );
-    filterAccommodations();
-  };
-
-  const handleThemeChange = (event) => {
-    const newThemes = event.target.checked
-      ? [...selectedThemes, event.target.value]
-      : selectedThemes.filter((theme) => theme !== event.target.value);
-    setSelectedThemes(newThemes);
-    filterAccommodations();
-  };
-
-  const handleOccupancyChange = (event) => {
-    setMaxOccupancy(event.target.value);
-    filterAccommodations();
-  };
-
-  const handleAmenitiesChange = (event) => {
-    const newAmenities = event.target.checked
-      ? [...selectedAmenities, event.target.value]
-      : selectedAmenities.filter((amenity) => amenity !== event.target.value);
-    setSelectedAmenities(newAmenities);
-    filterAccommodations();
-  };
-
-  const toggleFilterModal = () => {
-    setIsFilterModalOpen(!isFilterModalOpen);
-  };
-
-  const setActiveCategory = (category) => {
-    setActiveFilterCategory(category);
-  };
+  }, [searchTerm, sortBy, priceRange, selectedDestinations, selectedThemes, maxOccupancy, selectedAmenities]);
 
   const filterAccommodations = () => {
-    let filtered = [...accommodations];
-
-    // Search filter
-    if (searchTerm.trim() !== "") {
-      filtered = filtered.filter((accommodation) =>
-        accommodation.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Price filter
-    filtered = filtered.filter(
-      (accommodation) =>
-        accommodation.price >= priceRange[0] &&
-        accommodation.price <= priceRange[1]
+    let filtered = accommodations.filter(acc =>
+      acc.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      acc.price >= priceRange[0] &&
+      acc.price <= priceRange[1] &&
+      (selectedDestinations.length === 0 || selectedDestinations.includes(acc.destination)) &&
+      (selectedThemes.length === 0 || selectedThemes.some(theme => acc.themes?.includes(theme))) &&
+      (maxOccupancy === 0 || acc.maxOccupancy >= maxOccupancy) &&
+      (selectedAmenities.length === 0 || selectedAmenities.every(a => acc.amenities?.includes(a)))
     );
 
-    // Destination filter
-    if (selectedDestinations.length > 0) {
-      filtered = filtered.filter((accommodation) =>
-        selectedDestinations.includes(accommodation.destination)
-      );
-    }
-
-    // Theme filter
-    if (selectedThemes.length > 0) {
-      filtered = filtered.filter((accommodation) =>
-        selectedThemes.some(
-          (theme) => (accommodation.themes || []).includes(theme) // Handle undefined
-        )
-      );
-    }
-
-    // Occupancy filter
-    if (maxOccupancy > 0) {
-      filtered = filtered.filter(
-        (accommodation) => (accommodation.maxOccupancy || 0) >= maxOccupancy
-      );
-    }
-
-    // Amenities filter
-    if (selectedAmenities.length > 0) {
-      filtered = filtered.filter((accommodation) =>
-        selectedAmenities.every(
-          (amenity) => (accommodation.amenities || []).includes(amenity) // Handle undefined
-        )
-      );
-    }
-
-    // Sort
-    filtered.sort((a, b) => {
-      if (sortBy === "price-low") {
-        return a.price - b.price;
-      } else if (sortBy === "price-high") {
-        return b.price - a.price;
-      }
-      return a.name.localeCompare(b.name);
-    });
+    filtered.sort((a, b) => sortBy === "price-low" ? a.price - b.price :
+      sortBy === "price-high" ? b.price - a.price :
+        a.name.localeCompare(b.name));
 
     setFilteredAccommodations(filtered);
   };
 
-  // Filter content components
-  const renderFilterContent = () => {
-    switch (activeFilterCategory) {
-      case "sort":
-        return (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Sort By
-            </Typography>
-            <RadioGroup value={sortBy} onChange={handleSortChange} row>
-              <FormControlLabel value="name" control={<Radio />} label="Name" />
-              <FormControlLabel
-                value="price-low"
-                control={<Radio />}
-                label="Price: Low to High"
-              />
-              <FormControlLabel
-                value="price-high"
-                control={<Radio />}
-                label="Price: High to Low"
-              />
-            </RadioGroup>
-          </Box>
-        );
-      case "price":
-        return (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBelow>
-              Price Range
-            </Typography>
-            <Slider
-              value={priceRange}
-              onChange={handlePriceChange}
-              valueLabelDisplay="auto"
-              min={0}
-              max={10000}
-              step={100}
-              marks={[
-                { value: 0, label: "₹0" },
-                { value: 2000, label: "₹2000" },
-                { value: 4000, label: "₹4000" },
-                { value: 6000, label: "₹6000" },
-                { value: 8000, label: "₹8000" },
-                { value: 10000, label: "₹10000+" },
-              ]}
-              sx={{ width: "100%" }}
-            />
-          </Box>
-        );
-      case "destinations":
-        return (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBelow>
-              Destinations
-            </Typography>
-            {allDestinations.map((destination) => (
-              <FormControlLabel
-                key={destination}
-                control={
-                  <Checkbox
-                    checked={selectedDestinations.includes(destination)}
-                    onChange={(e) => handleDestinationChange(e)}
-                    value={destination}
-                  />
-                }
-                label={destination}
-              />
-            ))}
-          </Box>
-        );
-      case "themes":
-        return (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBelow>
-              Themes
-            </Typography>
-            {allThemes.map((theme) => (
-              <FormControlLabel
-                key={theme}
-                control={
-                  <Checkbox
-                    checked={selectedThemes.includes(theme)}
-                    onChange={(e) => handleThemeChange(e)}
-                    value={theme}
-                  />
-                }
-                label={theme}
-              />
-            ))}
-          </Box>
-        );
-      case "occupancy":
-        return (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBelow>
-              Occupancy
-            </Typography>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={maxOccupancy > 0}
-                  onChange={(e) => setMaxOccupancy(e.target.checked ? 2 : 0)}
-                />
-              }
-              label="Family-Friendly (2+ guests)"
-            />
-            {maxOccupancy > 0 && (
-              <Autocomplete
-                options={[2, 3, 4, 5, 6]}
-                value={maxOccupancy}
-                onChange={(e, value) => setMaxOccupancy(value)}
-                renderInput={(params) => (
-                  <TextField {...params} label="Minimum Occupancy" />
-                )}
-                sx={{ mt: 1 }}
-              />
-            )}
-          </Box>
-        );
-      case "amenities":
-        return (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBelow>
-              Amenities
-            </Typography>
-            {allAmenities.map((amenity) => (
-              <FormControlLabel
-                key={amenity}
-                control={
-                  <Checkbox
-                    checked={selectedAmenities.includes(amenity)}
-                    onChange={(e) => handleAmenitiesChange(e)}
-                    value={amenity}
-                  />
-                }
-                label={amenity}
-              />
-            ))}
-          </Box>
-        );
+  const removeFilter = (type, value) => {
+    switch (type) {
+      case 'destination':
+        setSelectedDestinations(prev => prev.filter(d => d !== value));
+        break;
+      case 'amenity':
+        setSelectedAmenities(prev => prev.filter(a => a !== value));
+        break;
+      case 'sort':
+        setSortBy('name');
+        break;
+      case 'price':
+        setPriceRange([0, 10000]);
+        break;
       default:
-        return null;
+        break;
     }
   };
 
+  const gradientText = {
+    background: 'linear-gradient(45deg, #f57f17 30%, #ffca28 90%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    fontWeight: 800,
+    letterSpacing: '-0.5px'
+  };
+
   return (
-    <Box sx={{ padding: "100px 7%", backgroundColor: "#f5f5f5" }}>
-      <Typography
-        variant="h4"
-        textAlign="center"
-        gutterBottom
-        fontWeight="bold"
-        color="#000"
-        marginBottom={"30px"}
-      >
-        Explore Your Accommodations
-      </Typography>
+    <Box sx={{ pt: 8 }}>
 
-      {/* Search Bar */}
-      <Box sx={{ mb: 4 }}>
-        <TextField
-          label="Search by name"
-          value={searchTerm}
-          onChange={handleSearch}
-          fullWidth
-          sx={{
-            mb: 2,
-            borderRadius: "50px", // Rounded edges
-            overflow: "hidden",
-          }}
-          InputProps={{
-            style: {
-              borderRadius: "50px", // Rounded input field
-            },
-          }}
-        />
+      {/* Enhanced Search & Filters Section */}
+      <Box sx={{
+        pt: { xs: 2, md: 4 },
+        bgcolor: "background.paper",
+        borderBottom: "1px solid",
+        borderColor: "divider",
+        textAlign: "center",
+        position: "sticky",
+        top: 0,
+        zIndex: 1200,
+        backdropFilter: "blur(10px)",
+        backgroundColor: "rgba(255, 255, 255, 0.8)"
+      }}>
+        {/* Compact Hero Header for Mobile */}
+        <Typography variant="h2" sx={{
+          mb: { xs: 2, md: 4 },
+          ...gradientText,
+          fontSize: { xs: '1.75rem', md: '2.75rem' },
+          px: 2
+        }}>
+          Explore Stays
+        </Typography>
 
-        {/* Filter Chips */}
-
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-          <Chip
-            label="Filters"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveCategory("sort"); // Default to sort when "Filters" is clicked
-            }}
+        {/* Sticky Search Bar */}
+        <Box sx={{
+          maxWidth: 800,
+          mx: "auto",
+          position: "relative",
+          mb: { xs: 1, md: 3 },
+          px: 2
+        }}>
+          <TextField
+            fullWidth
             variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Sort"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveCategory("sort");
+            placeholder="Search accommodations..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: <Search sx={{
+                color: "text.secondary",
+                mr: 1,
+                fontSize: { xs: '1.2rem', md: '1.5rem' }
+              }} />,
+              endAdornment: (
+                <Button
+                  variant="contained"
+                  color="warning"
+                  sx={{
+                    position: "absolute",
+                    right: 0,
+                    top: 0,
+                    height: "100%",
+                    px: { xs: 1.5, md: 3 },
+                    minWidth: { xs: 'auto', md: '100px' },
+                    borderRadius: "0 8px 8px 0"
+                  }}
+                >
+                  {useMediaQuery(theme.breakpoints.up('md')) ? 'Search' : <Search />}
+                </Button>
+              ),
+              sx: {
+                borderRadius: "8px",
+                bgcolor: "background.default",
+                boxShadow: { xs: 1, md: 3 },
+                pr: { xs: 8, md: 10 },
+                height: { xs: '48px', md: '56px' },
+                '& input': {
+                  fontSize: { xs: '0.9rem', md: '1rem' }
+                }
+              }
             }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Price"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveCategory("price");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Destinations"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveCategory("destinations");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Themes"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveCategory("themes");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Occupancy"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveCategory("occupancy");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
-          />
-          <Chip
-            label="Amenities"
-            onClick={() => {
-              toggleFilterModal();
-              setActiveCategory("amenities");
-            }}
-            variant="outlined"
-            sx={{ cursor: "pointer" }}
           />
         </Box>
+
+        {/* Compact Filter Chips for Mobile */}
+        <Box sx={{
+          display: "flex",
+          gap: 1,
+          justifyContent: "flex-start",
+          flexWrap: "nowrap",
+          overflowX: "auto",
+          px: 2,
+          pb: 1,
+          mx: { xs: -2, md: 0 },
+          '&::-webkit-scrollbar': {
+            height: '3px',
+            backgroundColor: 'transparent'
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'text.secondary',
+            borderRadius: 2
+          }
+        }}>
+          <Chip
+            label="Filters"
+            onClick={() => setIsFilterModalOpen(true)}
+            icon={<Tune fontSize="small" />}
+            variant="outlined"
+            sx={{
+              borderColor: 'grey.300',
+              bgcolor: 'background.paper',
+              '&:hover': { bgcolor: 'warning.light' },
+              flexShrink: 0
+            }}
+          />
+          {sortBy !== 'name' && (
+            <Chip
+              label={`Sort: ${sortBy === 'price-low' ? 'Low' : 'High'}`}
+              onDelete={() => removeFilter('sort')}
+              sx={{
+                bgcolor: 'warning.light',
+                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                flexShrink: 0
+              }}
+            />
+          )}
+          {(priceRange[0] !== 0 || priceRange[1] !== 10000) && (
+            <Chip
+              label={`₹${priceRange[0]}-${priceRange[1]}`}
+              onDelete={() => removeFilter('price')}
+              sx={{
+                bgcolor: 'warning.light',
+                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                flexShrink: 0
+              }}
+            />
+          )}
+          {selectedDestinations.map(destination => (
+            <Chip
+              key={destination}
+              label={destination}
+              onDelete={() => removeFilter('destination', destination)}
+              sx={{
+                bgcolor: 'warning.light',
+                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                flexShrink: 0
+              }}
+            />
+          ))}
+          {selectedAmenities.map(amenity => (
+            <Chip
+              key={amenity}
+              label={amenity}
+              onDelete={() => removeFilter('amenity', amenity)}
+              sx={{
+                bgcolor: 'warning.light',
+                '.MuiChip-deleteIcon': { color: 'warning.dark' },
+                flexShrink: 0
+              }}
+            />
+          ))}
+        </Box>
+      </Box>
+
+      {/* Results Header */}
+      <Box sx={{
+        textAlign: "center",
+        py: 2,
+        bgcolor: "background.paper",
+        borderBottom: "1px solid",
+        borderTop: "1px solid",
+        borderColor: "divider",
+        transition: 'all 0.3s ease',
+        mx: { xs: -2, md: 0 },
+        px: 2
+      }}>
+        <Typography variant="h5" sx={{
+          ...gradientText,
+          fontSize: { xs: '1rem', md: '1.5rem' },
+          fontWeight: 900,
+          letterSpacing: '-0.05rem',
+          lineHeight: 1.3,
+          px: 2
+        }}>
+          {filteredAccommodations.length} {filteredAccommodations.length === 1 ? 'Accommodation' : 'Accommodations'} Found
+        </Typography>
+      </Box>
+
+      {/* Accommodations Grid */}
+      <Box sx={{
+        p: { xs: 2, md: 4 },
+        maxWidth: 1400,
+        mx: "auto"
+      }}>
+        <Grid container spacing={3}>
+          {filteredAccommodations.map(acc => (
+            <Grid item key={acc._id} xs={12} sm={6} md={4} lg={3}>
+              <Card
+                component={motion.div}
+                whileHover={{ y: -4 }}
+                sx={{
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                  transition: "all 0.2s ease",
+                  '&:hover': {
+                    boxShadow: "0 4px 6px rgba(0,0,0,0.16)"
+                  }
+                }}
+              >
+                <Box sx={{
+                  position: "relative",
+                  pt: "56.25%",
+                  overflow: "hidden"
+                }}>
+                  <CardMedia
+                    component="img"
+                    image={acc.images?.[0] || "/images/placeholder-accom.png"}
+                    alt={acc.name}
+                    sx={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
+                  />
+                  <Chip
+                    label={`₹${acc.price}/night`}
+                    size="small"
+                    sx={{
+                      position: "absolute",
+                      bottom: 16,
+                      left: 16,
+                      bgcolor: "#e8f5e9",
+                      color: "#2e7d32",
+                      fontWeight: 600
+                    }}
+                  />
+                </Box>
+
+                <CardContent sx={{
+                  flexGrow: 1,
+                  p: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1
+                }}>
+                  <Typography variant="h6" sx={{
+                    fontWeight: 600,
+                    color: "#212121",
+                    lineHeight: 1.2
+                  }}>
+                    {acc.name}
+                  </Typography>
+
+                  <Typography variant="body2" sx={{
+                    color: "#616161",
+                    mb: 1
+                  }}>
+                    {acc.destination}
+                  </Typography>
+
+                  <Box sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 0.5,
+                    mt: "auto"
+                  }}>
+                    <Chip
+                      label={`🛏️ ${acc.roomType}`}
+                      size="small"
+                      sx={{ bgcolor: "#f5f5f5", color: "#616161" }}
+                    />
+                    <Chip
+                      label={`👥 ${acc.maxOccupancy} guests`}
+                      size="small"
+                      sx={{ bgcolor: "#f5f5f5", color: "#616161" }}
+                    />
+                  </Box>
+                </CardContent>
+
+                <Button
+                  fullWidth
+                  component={Link}
+                  to={`/accommodations/${acc._id}`}
+                  sx={{
+                    bgcolor: "#e8f5e9",
+                    color: "#2e7d32",
+                    borderRadius: 0,
+                    py: 1,
+                    '&:hover': {
+                      bgcolor: "#c8e6c9"
+                    }
+                  }}
+                >
+                  View Details
+                </Button>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        {filteredAccommodations.length === 0 && (
+          <Box sx={{
+            textAlign: "center",
+            py: 8,
+            color: "#9e9e9e"
+          }}>
+            <Search sx={{ fontSize: 64, mb: 2 }} />
+            <Typography variant="h6" gutterBottom>
+              No accommodations found
+            </Typography>
+            <Typography variant="body1">
+              Try adjusting your search or filters
+            </Typography>
+          </Box>
+        )}
       </Box>
 
       {/* Filter Modal */}
       <Dialog
+        fullScreen={isMobile}
         open={isFilterModalOpen}
-        onClose={toggleFilterModal}
-        fullWidth
-        maxWidth="md"
-        PaperProps={{
-          sx: {
-            borderRadius: "20px", // Rounded modal
-            overflow: "hidden",
-            boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
-          },
-        }}
-        TransitionComponent={Fade}
+        onClose={() => setIsFilterModalOpen(false)}
+        PaperProps={{ sx: { borderRadius: isMobile ? 0 : '12px' } }}
       >
-        <DialogTitle
-          sx={{
-            backgroundColor: "#f5f5f5",
-            py: 2,
-            px: 3,
-            borderRadius: "10px 10px 0 0",
-          }}
-        >
+        <DialogTitle sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          borderBottom: "1px solid #e0e0e0",
+          position: "sticky",
+          top: 0,
+          bgcolor: "background.paper",
+          zIndex: 1
+        }}>
           Filter Options
+          <IconButton onClick={() => setIsFilterModalOpen(false)}>
+            <Close />
+          </IconButton>
         </DialogTitle>
-        <DialogContent sx={{ p: 3 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={3}>
-              {/* Left Pane with Filter Categories */}
-              <List>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    selected={activeFilterCategory === "sort"}
-                    onClick={() => setActiveCategory("sort")}
-                  >
-                    <ListItemText primary="Sort By" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    selected={activeFilterCategory === "price"}
-                    onClick={() => setActiveCategory("price")}
-                  >
-                    <ListItemText primary="Price Range" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    selected={activeFilterCategory === "destinations"}
-                    onClick={() => setActiveCategory("destinations")}
-                  >
-                    <ListItemText primary="Destinations" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    selected={activeFilterCategory === "themes"}
-                    onClick={() => setActiveCategory("themes")}
-                  >
-                    <ListItemText primary="Themes" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    selected={activeFilterCategory === "occupancy"}
-                    onClick={() => setActiveCategory("occupancy")}
-                  >
-                    <ListItemText primary="Occupancy" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    selected={activeFilterCategory === "amenities"}
-                    onClick={() => setActiveCategory("amenities")}
-                  >
-                    <ListItemText primary="Amenities" />
-                  </ListItemButton>
-                </ListItem>
-              </List>
-            </Grid>
-            <Grid item xs={12} md={9}>
-              {renderFilterContent()}
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            px: 3,
-            py: 2,
-            borderTop: "1px solid #e0e0e0",
-          }}
-        >
-          <Button onClick={toggleFilterModal} sx={{ mr: 1 }}>
-            Cancel
-          </Button>
-          <Button variant="contained" onClick={filterAccommodations}>
-            Apply Filters
-          </Button>
-        </Box>
-      </Dialog>
 
-      <Grid container spacing={4} justifyContent="center">
-        {filteredAccommodations.map((accommodation) => (
-          <Grid item key={accommodation.id} xs={12} sm={6} md={4}>
-            <Card
-              sx={{
-                borderRadius: "12px",
-                overflow: "hidden",
-                transition: "transform 0.3s ease",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                "&:hover": {
-                  boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
-                  transform: "translateY(-3px)",
-                },
-                bgcolor: "background.paper",
-                p: 1,
-                height: "100%",
-              }}
-            >
-              <CardMedia
-                component="img"
-                height="140" // Reduced image height
-                image={accommodation?.images?.[0] || "./images/defaultImg.png"}
-                alt={accommodation?.name || ""}
+        <DialogContent sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          p: 0
+        }}>
+          {/* Filter Categories */}
+          <List sx={{
+            width: { md: 240 },
+            borderRight: { md: "1px solid #e0e0e0" }
+          }}>
+            {['Sort', 'Price', 'Destinations', 'Amenities'].map((category) => (
+              <ListItemButton
+                key={category}
+                selected={activeFilterCategory === category.toLowerCase()}
+                onClick={() => setActiveFilterCategory(category.toLowerCase())}
                 sx={{
-                  objectFit: "cover",
-                  width: "100%",
+                  borderLeft: "4px solid",
+                  borderColor: activeFilterCategory === category.toLowerCase() ?
+                    "#4caf50" : "transparent",
+                  bgcolor: activeFilterCategory === category.toLowerCase() ?
+                    "#e8f5e9" : "transparent"
                 }}
-              />
-              <CardContent sx={{ p: 2 }}>
-                <Box sx={{ mb: 0.5 }}>
-                  <Typography variant="h6" fontWeight="600" gutterBottom noWrap>
-                    {accommodation?.name}
-                  </Typography>
-                </Box>
-                <Box sx={{ mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {accommodation?.destination}
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    mt: "auto",
+              >
+                <ListItemText
+                  primary={category}
+                  primaryTypographyProps={{
+                    fontWeight: activeFilterCategory === category.toLowerCase() ? 600 : 400
                   }}
-                >
-                  <Chip
-                    label={`${accommodation?.price} ₹`}
-                    color="primary"
-                    size="small"
-                    sx={{ fontWeight: "bold", fontSize: "0.9rem" }}
+                />
+              </ListItemButton>
+            ))}
+          </List>
+
+          {/* Filter Content */}
+          <Box sx={{
+            flex: 1,
+            p: 3,
+            overflowY: "auto",
+            maxHeight: { md: "60vh" }
+          }}>
+            {activeFilterCategory === "sort" && (
+              <RadioGroup value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <FormControlLabel
+                  value="name"
+                  control={<Radio color="success" />}
+                  label="Alphabetical (A-Z)"
+                />
+                <FormControlLabel
+                  value="price-low"
+                  control={<Radio color="success" />}
+                  label="Price: Low to High"
+                />
+                <FormControlLabel
+                  value="price-high"
+                  control={<Radio color="success" />}
+                  label="Price: High to Low"
+                />
+              </RadioGroup>
+            )}
+
+            {activeFilterCategory === "price" && (
+              <Box sx={{ px: 2 }}>
+                <Typography variant="body1" sx={{ mb: 3 }}>
+                  Price Range: ₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}
+                </Typography>
+                <Slider
+                  value={priceRange}
+                  onChange={(_, newValue) => setPriceRange(newValue)}
+                  min={0}
+                  max={10000}
+                  step={500}
+                  valueLabelDisplay="auto"
+                  valueLabelFormat={(value) => `₹${value.toLocaleString()}`}
+                  color="success"
+                />
+              </Box>
+            )}
+
+            {activeFilterCategory === "destinations" && (
+              <Box sx={{ columnCount: { md: 2 }, columnGap: 4 }}>
+                {allDestinations.map((destination) => (
+                  <FormControlLabel
+                    key={destination}
+                    control={
+                      <Checkbox
+                        checked={selectedDestinations.includes(destination)}
+                        onChange={(e) => setSelectedDestinations(
+                          e.target.checked ? [...selectedDestinations, destination] :
+                            selectedDestinations.filter(d => d !== destination)
+                        )}
+                        color="success"
+                      />
+                    }
+                    label={destination}
+                    sx={{ display: "block", mb: 1 }}
                   />
-                  <Button
-                    component={Link}
-                    to={`/accommodations/${accommodation?._id}`}
-                    variant="contained"
-                    sx={{
-                      px: 2,
-                      py: 0.5,
-                      fontSize: "0.875rem",
-                      bgcolor: "#2196f3",
-                      color: "white",
-                      "&:hover": { bgcolor: "#0d8bf2" },
-                      borderRadius: "25px",
-                      textTransform: "none",
-                    }}
-                  >
-                    View Details
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                ))}
+              </Box>
+            )}
+
+            {activeFilterCategory === "amenities" && (
+              <Box sx={{ columnCount: { md: 2 }, columnGap: 4 }}>
+                {allAmenities.map((amenity) => (
+                  <FormControlLabel
+                    key={amenity}
+                    control={
+                      <Checkbox
+                        checked={selectedAmenities.includes(amenity)}
+                        onChange={(e) => setSelectedAmenities(
+                          e.target.checked ? [...selectedAmenities, amenity] :
+                            selectedAmenities.filter(a => a !== amenity)
+                        )}
+                        color="success"
+                      />
+                    }
+                    label={amenity}
+                    sx={{ display: "block", mb: 1 }}
+                  />
+                ))}
+              </Box>
+            )}
+
+            <Box sx={{
+              position: "sticky",
+              bottom: 0,
+              bgcolor: "background.paper",
+              pt: 2,
+              borderTop: "1px solid #e0e0e0",
+              mt: 3
+            }}>
+              <Button
+                fullWidth
+                variant="contained"
+                color="success"
+                onClick={() => setIsFilterModalOpen(false)}
+                sx={{ py: 1.5, fontWeight: 600 }}
+              >
+                Apply Filters
+              </Button>
+            </Box>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

@@ -1,59 +1,64 @@
-// Replace the existing AccommodationCard component with this
 import React from "react";
-import { Box, Typography, Card, CardContent } from "@mui/material";
+import { Box, Typography, Card, CardContent, useTheme } from "@mui/material";
 
 const AccommodationCard = ({ trip }) => {
+  const theme = useTheme(); // Hook to access the theme
+
   return (
     <Card
       elevation={2}
       sx={{
-        borderRadius: "15px",
+        // borderRadius: "15px", // Removed to allow theme's 12px to apply
         mb: 2,
-        transition: "transform 0.3s ease",
+        transition: "transform 0.3s ease, box-shadow 0.3s ease", // Added box-shadow to transition
         "&:hover": {
           transform: "translateY(-5px)",
-          boxShadow: "0 8px 16px rgba(0,0,0,0.1)"
+          boxShadow: theme.shadows[4], // Using theme shadow for consistency
         }
       }}
     >
-      <CardContent sx={{ padding: "16px" }}>
-        <Box sx={{ padding: "16px" }}>
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: "bold", mb: 1, fontSize: "1.1rem" }}
-          >
-            Accommodation
-          </Typography>
-          <Box
-            sx={{
-              display: "flex",
-              gap: "12px",
-              mb: 2,
-              alignItems: "center",
-            }}
-          >
-            <Box>
-              <img
-                src={trip?.images[0]}
-                alt={trip?.name}
-                style={{ height: "60px", borderRadius: "8px" }}
-              />
-            </Box>
-            <Box>
-              <Typography
-                sx={{ fontWeight: "bold", fontSize: "0.95rem" }}
-              >
-                {`${trip?.name} ( ${trip?.daysCount} Days, ${trip?.nightsCount} Nights )`}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "text.secondary", fontSize: "0.85rem" }}
-              >
-                ₹{trip?.price}/night
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
+      <Box sx={{
+        position: 'relative',
+        width: '100%',
+        paddingTop: '56.25%', // 16:9 Aspect Ratio
+        overflow: 'hidden',
+        // Removed borderRadius from here, card itself will clip if needed, or theme.shape.borderRadius can be used if image container needs specific rounding
+      }}>
+        <img
+          src={trip?.images[0] || '/images/defaultImg.png'} // Fallback image
+          alt={trip?.name}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+      </Box>
+      <CardContent sx={{ padding: theme.spacing(2) }}> {/* Use theme spacing */}
+        {/* Removed redundant outer Box with padding:"16px" */}
+        <Typography
+          variant="h6" // Uses theme typography for size and base weight
+          component="div" // Good practice for semantic HTML if it's the main title of the card content
+          sx={{ fontWeight: "bold", mb: 1 }} // Keep bold, mb for spacing below title
+        >
+          {trip?.name} {/* Display trip name as title */}
+        </Typography>
+        <Typography
+          variant="body1" // Appropriate for descriptive text
+          sx={{ mb: 1 }} // Spacing for details
+        >
+          {`${trip?.daysCount} Days, ${trip?.nightsCount} Nights`}
+        </Typography>
+        <Typography
+          variant="h5" // Using a larger variant for price makes it prominent
+          color="primary" // Use theme's primary color for emphasis
+          sx={{ fontWeight: "bold" }}
+        >
+          ₹{trip?.price}/night
+        </Typography>
       </CardContent>
     </Card>
   );

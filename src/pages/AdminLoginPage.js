@@ -1,82 +1,95 @@
-// Replace the existing AdminLoginPage component with this
-import React, { useState, useEffect } from "react";
-import { Container, TextField, Button, Typography, Box } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import React, { useState } from 'react';
+import { Container, Typography, Box, TextField, Button, Link } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useAdminAuth } from '../context/AdminAuthContext';
 
 const AdminLoginPage = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const { login } = useAuth();
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+  });
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    localStorage.removeItem("adminToken");
-  }, []);
+  const { adminLogin } = useAdminAuth(); // Access adminLogin via useAdminAuth
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Executing AdminLoginPage handleSubmit'); // Add this
+    setError(null);
+
     try {
-      const response = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.message || "Authentication failed");
-        return;
+      const success = await adminLogin(formData.username, formData.password);
+      if (success) {
+        navigate('/admin/dashboard');
+      } else {
+        setError('Invalid credentials or login failed');
       }
-
-      const data = await response.json();
-      localStorage.setItem("adminToken", data.adminToken);
-      await login(username, password);
-      navigate("/admin/dashboard");
     } catch (error) {
-      console.error("Login error:", error);
-      setError("Server connection failed");
+      setError('Login failed. Please try again.');
+      console.error('Login error:', error);
     }
   };
 
   return (
-    <Container maxWidth="xs" sx={{ mt: 8 }}>
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
+    <Container maxWidth="sm" sx={{ mt: 8 }}>
+      <Box
+        sx={{
+          backgroundColor: 'var(--neutral-50)',
+          p: 4,
+          borderRadius: '12px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
+        }}
+      >
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'var(--primary-500)' }}>
           Admin Login
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%", mt: 3 }}>
-          <TextField
-            fullWidth
-            label="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            margin="normal"
-            required
-          />
-          <TextField
-            fullWidth
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            margin="normal"
-            required
-          />
-          {error && (
-            <Typography color="error" sx={{ mt: 2 }}>
-              {error}
-            </Typography>
-          )}
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{ mt: 2, width: "100%", bgcolor: "#1976d2", "&:hover": { bgcolor: "#115293" } }}
-          >
-            Sign In
-          </Button>
-        </Box>
+
+        {error && (
+          <Typography color="error" sx={{ mt: 2 }}>
+            {error}
+          </Typography>
+        )}
+
+        <TextField
+          fullWidth
+          label="Username"
+          value={formData.username}
+          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+          required
+        />
+
+        <TextField
+          fullWidth
+          label="Password"
+          type="password"
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          required
+        />
+
+        <Button
+          type="submit"
+          variant="contained"
+          onClick={handleSubmit}
+          sx={{
+            bgcolor: 'var(--primary-500)',
+            '&:hover': { bgcolor: 'var(--primary-600)' },
+            py: 1.5,
+          }}
+        >
+          Login
+        </Button>
+
+        <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
+          Need to login as a user?{' '}
+          <Link href="/login" sx={{ color: 'var(--primary-500)' }}>
+            User Login
+          </Link>
+        </Typography>
       </Box>
     </Container>
   );

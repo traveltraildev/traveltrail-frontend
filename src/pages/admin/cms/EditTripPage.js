@@ -12,8 +12,10 @@ import {
   CardContent,
   Chip,
   Autocomplete,
+  Checkbox,
 } from "@mui/material";
 import ItineraryDayForm from "./ItineraryDayForm";
+import { getAllTrips } from "../../../endpoints";
 
 // Options for Autocomplete components
 const themeOptions = [
@@ -49,7 +51,7 @@ const EditTripPage = () => {
   useEffect(() => {
     const fetchTripData = async () => {
       try {
-        const response = await fetch(`/api/trips/${tripId}`);
+        const response = await fetch(`${getAllTrips}/${tripId}`);
         if (!response.ok) throw new Error("Failed to fetch trip");
         const data = await response.json();
         setTripData({
@@ -72,6 +74,14 @@ const EditTripPage = () => {
     setTripData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setTripData((prev) => ({
+      ...prev,
+      [name]: checked,
     }));
   };
 
@@ -101,6 +111,17 @@ const EditTripPage = () => {
       ...prev,
       itineraries: updatedItineraries,
     }));
+  };
+
+  const handleRemoveHighlight = (dayIndex, highlightIndex) => {
+    setTripData((prev) => {
+      const updatedItineraries = [...prev.itineraries];
+      const day = updatedItineraries[dayIndex];
+      if (day && day.highlights) {
+        day.highlights.splice(highlightIndex, 1); // Remove the highlight by index
+      }
+      return { ...prev, itineraries: updatedItineraries };
+    });
   };
 
   const handleAddDay = () => {
@@ -143,7 +164,7 @@ const EditTripPage = () => {
       // Remove MongoDB _id from the update data
       delete tripToUpdate._id;
 
-      const response = await fetch(`/api/trips/${tripId}`, {
+      const response = await fetch(`${getAllTrips}/${tripId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -354,12 +375,26 @@ const EditTripPage = () => {
                   dayData={day}
                   onChangeDayData={handleItineraryChange}
                   onAddHighlight={handleAddHighlight}
+                  onRemoveHighlight={handleRemoveHighlight}
                   onDeleteDay={handleDeleteDay}
                 />
               ))}
               <Button variant="outlined" onClick={handleAddDay} sx={{ mt: 2 }}>
                 Add Another Day
               </Button>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              sx={{ display: "flex", gap: "8px", alignItems: "center" }}
+            >
+              <Checkbox
+                name="isInternational"
+                checked={tripData.isInternational}
+                onChange={handleCheckboxChange}
+              />{" "}
+              <Typography>Is this is an international trip</Typography>
             </Grid>
 
             {/* Form Actions */}

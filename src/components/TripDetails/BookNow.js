@@ -1,4 +1,4 @@
-// Replace the existing BookNow component with this
+// src/components/TripDetails/BookNow.js
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -15,8 +15,9 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import { BASE_URL } from '../../endpoints';
 import { getAuthHeader } from "../../utils";
+import { sheetProxy } from "../../endpoints";
 
 const BookNow = ({ trip }) => {
   const navigate = useNavigate();
@@ -52,9 +53,30 @@ const BookNow = ({ trip }) => {
     }
 
     try {
-      const response = await fetch("/api/sheets-proxy", {
+      // Send booking data to your backend API
+      const apiResponse = await fetch(`${BASE_URL}/api/bookings`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...getAuthHeader() },
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader()
+        },
+        body: JSON.stringify({
+          tripId: trip._id,
+          startDate: dayjs(formData.startDate).format("YYYY-MM-DD"),
+          endDate: dayjs(formData.endDate).format("YYYY-MM-DD"),
+          attendees: {
+            adults: formData.adultAttendees || 0,
+            children: formData.childAttendees || 0
+          }
+        })
+      });
+
+      if (!apiResponse.ok) throw new Error("Failed to save booking to database");
+
+      // Send booking data to Google Sheets
+      const sheetsResponse = await fetch(sheetProxy, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           secret: process.env.REACT_APP_GAS_SECRET,
@@ -66,7 +88,7 @@ const BookNow = ({ trip }) => {
         }),
       });
 
-      if (!response.ok) throw new Error("Submission failed");
+      if (!sheetsResponse.ok) throw new Error("Failed to save booking to Google Sheets");
 
       // Redirect to confirmation page with booking data
       navigate("/booking-confirmation", {
@@ -83,6 +105,7 @@ const BookNow = ({ trip }) => {
         },
       });
     } catch (error) {
+      console.error('Error submitting booking:', error);
       navigate("/booking-confirmation", { state: { success: false } });
     } finally {
       setLoading(false);
@@ -183,9 +206,7 @@ const BookNow = ({ trip }) => {
               label="Adults"
               type="number"
               value={formData.adultAttendees}
-              onChange={(e) =>
-                handleChange("adultAttendees", e.target.value)
-              }
+              onChange={(e) => handleChange("adultAttendees", e.target.value)}
               fullWidth
               size="small"
               inputProps={{ min: 1 }}
@@ -196,9 +217,7 @@ const BookNow = ({ trip }) => {
               label="Children"
               type="number"
               value={formData.childAttendees}
-              onChange={(e) =>
-                handleChange("childAttendees", e.target.value)
-              }
+              onChange={(e) => handleChange("childAttendees", e.target.value)}
               fullWidth
               size="small"
               inputProps={{ min: 0 }}
@@ -209,7 +228,9 @@ const BookNow = ({ trip }) => {
         <Button
           type="submit"
           variant="contained"
-          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+          startIcon={
+            loading ? <CircularProgress size={20} color="inherit" /> : null
+          }
           disabled={loading}
           sx={{
             mt: 3,

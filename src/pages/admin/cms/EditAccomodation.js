@@ -10,6 +10,7 @@ import {
   CircularProgress,
   InputAdornment,
 } from "@mui/material";
+import { getAllAccommodations } from "../../../endpoints";
 
 const EditAccomodation = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const EditAccomodation = () => {
   }, [id]);
 
   useEffect(() => {
-    fetch(`/api/accommodations/${id}`)
+    fetch(`${getAllAccommodations}/${id}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -56,6 +57,7 @@ const EditAccomodation = () => {
     amenities: accommodation?.amenities || [],
     inclusions: accommodation?.inclusions || [],
     exclusions: accommodation?.exclusions || [],
+    destination: accommodation?.destination || "",
   });
 
   useEffect(() => {
@@ -73,6 +75,7 @@ const EditAccomodation = () => {
         amenities: accommodation?.amenities || [],
         inclusions: accommodation?.inclusions || [],
         exclusions: accommodation?.exclusions || [],
+        destination: accommodation?.destination || "",
       });
     }
   }, [accommodation]);
@@ -136,9 +139,10 @@ const EditAccomodation = () => {
         ),
         inclusions: formData.inclusions.filter((incl) => incl.trim() !== ""),
         exclusions: formData.exclusions.filter((excl) => excl.trim() !== ""),
+        destination: formData.destination, // Added destination to payload
       };
 
-      const response = await fetch(`/api/accommodations/${id}`, {
+      const response = await fetch(`${getAllAccommodations}/${id}`, {
         method: "Put",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -185,6 +189,16 @@ const EditAccomodation = () => {
               label="Accommodation Name"
               value={formData.name}
               onChange={handleChange("name")}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Destination"
+              value={formData.destination}
+              onChange={handleChange("destination")}
               required
             />
           </Grid>
