@@ -119,7 +119,7 @@ const Home = () => {
       >
         {/* Hero Section */}
         <Box sx={{ mb: { xs: 6, md: 8 }, borderRadius: 4, overflow: "hidden" }}>
-          <Hero backgroundImage="/images/hero.webp" />
+          <Hero backgroundImage="/images/hero.jpg" />
         </Box>
 
         {/* Featured Trips Section */}
