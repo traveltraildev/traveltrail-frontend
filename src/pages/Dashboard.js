@@ -112,6 +112,48 @@ const Dashboard = () => {
         Admin Dashboard
       </Typography>
 
+      {/* Actions Panel - moved to top */}
+      <Box sx={{ mb: 4 }}>
+        <Card sx={{ display: 'flex', gap: 2, p: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <Button
+            variant="contained"
+            color="primary"
+            component={Link}
+            to="/admin/cms/add-trip"
+            sx={{ flex: 1, minWidth: 180 }}
+          >
+            Add New Trip
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            component={Link}
+            to="/admin/add-accommodation"
+            sx={{ flex: 1, minWidth: 180 }}
+          >
+            Add New Accommodation
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            component={Link}
+            to="/admin/manage-bookings"
+            sx={{ flex: 1, minWidth: 180 }}
+          >
+            Manage Bookings
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            component={Link}
+            to="/admin/cms"
+            sx={{ flex: 1, minWidth: 180 }}
+          >
+            Manage CMS Content
+          </Button>
+        </Card>
+      </Box>
+
       {/* Search Bar with Suggestions */}
       <Box sx={{ position: 'relative', mb: 4 }}>
         <Paper
@@ -380,38 +422,7 @@ const Dashboard = () => {
             </Card>
           </Grid>
 
-          {/* Actions Panel */}
-          <Grid item xs={12}>
-            <Card sx={{ display: 'flex', gap: 2, p: 3 }}>
-              <Button
-                variant="contained"
-                color="primary"
-                component={Link}
-                to="/admin/cms/add-trip"
-                sx={{ flex: 1 }}
-              >
-                Add New Trip
-              </Button>
-              <Button
-                variant="outlined"
-                color="primary"
-                component={Link}
-                to="/admin/accommodations/add"
-                sx={{ flex: 1 }}
-              >
-                Add New Accommodation
-              </Button>
-              <Button
-                variant="outlined"
-                color="primary"
-                component={Link}
-                to="/admin/cms"
-                sx={{ flex: 1 }}
-              >
-                Manage CMS Content
-              </Button>
-            </Card>
-          </Grid>
+          // ...existing code...
         </Grid>
       )}
     </Container>

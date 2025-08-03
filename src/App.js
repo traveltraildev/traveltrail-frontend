@@ -40,6 +40,7 @@ import ChangePasswordPage from './pages/ChangePasswordPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import Logout from './pages/Logout';
+import ManageBookingsPage from './pages/ManageBookingsPage';
 
 
 // Components
@@ -96,11 +97,13 @@ function App() {
                   <Route path="/profile" element={<UserProfilePage />} />
                   <Route path="/edit-profile" element={<EditProfilePage />} />
                   <Route path="/change-password" element={<ChangePasswordPage />} />
+                 
                 </Route>
 
                 {/* Admin Protected Routes */}
                 <Route element={<RequireAuth isAdmin />}>
                   <Route path="/admin/dashboard" element={<Dashboard />} />
+                   <Route path="/admin/manage-bookings" element={<ManageBookingsPage />} />
                   <Route path="/admin/cms" element={<CMSAdminPanel />} />
                   <Route path="/admin/cms/trips-list" element={<AdminTripsPage />} />
                   <Route path="/admin/cms/edit/about-us" element={<EditAboutUsPage />} />
