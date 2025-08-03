@@ -1,13 +1,16 @@
 // src/api/userAPI.js
 import { BASE_URL } from '../endpoints';
-import { getAuthHeader } from '../utils';
+import {  getUserAuthHeader } from '../utils';
 
 export const getUserProfile = async () => {
   try {
+
+
+
     const response = await fetch(`${BASE_URL}/api/users/profile`, {
       headers: {
         'Content-Type': 'application/json',
-        ...getAuthHeader()
+        ...getUserAuthHeader()
       }
     });
     if (!response.ok) throw new Error('Failed to fetch user profile');
@@ -24,7 +27,7 @@ export const updateUserProfile = async (userId, data) => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        ...getAuthHeader()
+        ...getUserAuthHeader()
       },
       body: JSON.stringify(data)
     });
@@ -45,7 +48,7 @@ export const changeUserPassword = async (userId, data) => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        ...getAuthHeader()
+        ...getUserAuthHeader()
       },
       body: JSON.stringify(data)
     });

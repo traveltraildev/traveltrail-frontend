@@ -3,7 +3,7 @@ import { Container, Typography, TextField, Button, Box, CircularProgress, Snackb
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { getAuthHeader } from "../../../utils"; // Assuming getAuthHeader is in utils
+import { getAdminAuthHeader } from "../../../utils"; // Assuming getAdminAuthHeader is in utils
 import { BASE_URL } from "../../../endpoints"; // Assuming BASE_URL is in endpoints
 
 const EditAccessibilityStatementPage = () => {
@@ -66,7 +66,7 @@ const EditAccessibilityStatementPage = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...getAuthHeader(), // Use the same getAuthHeader as working pages
+          ...getAdminAuthHeader(), // Use the same getAdminAuthHeader as working pages
         },
         body: JSON.stringify(pageContent),
       });

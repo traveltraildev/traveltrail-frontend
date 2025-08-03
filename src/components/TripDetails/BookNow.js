@@ -16,7 +16,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import { BASE_URL } from '../../endpoints';
-import { getAuthHeader } from "../../utils";
+import { getUserAuthHeader } from "../../utils";
 import { sheetProxy } from "../../endpoints";
 
 const BookNow = ({ trip }) => {
@@ -58,7 +58,7 @@ const BookNow = ({ trip }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...getAuthHeader()
+          ...getUserAuthHeader()
         },
         body: JSON.stringify({
           tripId: trip._id,

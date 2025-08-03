@@ -1,17 +1,9 @@
 import React from 'react';
 import { createContext, useContext, useState, useEffect } from 'react';
 import { BASE_URL } from '../endpoints';
+import { getUserAuthHeader } from '../utils';
 
-// Basic implementation of getAuthHeader - retrieves user token from localStorage
-const getAuthHeader = () => {
-  const token = localStorage.getItem('userToken');
-  if (token) {
-    return {
-      'Authorization': `Bearer ${token}`
-    };
-  }
-  return {};
-};
+
 // Function to fetch user data based on token
 // Moved outside the component to avoid redefining on each render
 const fetchUserData = async () => {
@@ -19,9 +11,10 @@ const fetchUserData = async () => {
     const token = localStorage.getItem('userToken');
     if (!token) return null;
 
+
     const response = await fetch(`${BASE_URL}/api/users/profile`, { // Assuming this endpoint exists
       headers: {
-        ...getAuthHeader(),
+        ...getUserAuthHeader(),
       },
     });
 

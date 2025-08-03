@@ -11,7 +11,7 @@
 
 // src/utils/endpoints.js
 export const BASE_URL =
-  process.env.REACT_APP_API_URL || "https://backend-alpha-topaz.vercel.app";
+  process.env.REACT_APP_API_BASE;
 
 export const getAllTrips = BASE_URL + "/api/trips";
 export const getAllAccommodations = BASE_URL + "/api/accommodations";
