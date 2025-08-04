@@ -53,6 +53,11 @@ const BookNow = ({ trip }) => {
     }
 
     try {
+
+      if(getUserAuthHeader()){
+
+      
+
       // Send booking data to your backend API
       const apiResponse = await fetch(`${BASE_URL}/api/bookings`, {
         method: "POST",
@@ -67,11 +72,15 @@ const BookNow = ({ trip }) => {
           attendees: {
             adults: formData.adultAttendees || 0,
             children: formData.childAttendees || 0
-          }
+          },
+          firstName: formData?.firstName,
+          lastName: formData?.lastName
         })
       });
 
-      if (!apiResponse.ok) throw new Error("Failed to save booking to database");
+      }
+
+      // if (!apiResponse.ok) throw new Error("Failed to save booking to database");
 
       // Send booking data to Google Sheets
       const sheetsResponse = await fetch(sheetProxy, {
