@@ -6,7 +6,7 @@ import Footer from "../../../components/common/Footer";
 import ReactQuill from "react-quill"; // Import ReactQuill
 import "react-quill/dist/quill.snow.css"; // Import Quill styles
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { getAuthHeader } from "../../../utils";
+import { getAdminAuthHeader } from "../../../utils";
 import { tacPage } from "../../../endpoints";
 
 const EditTermsAndConditionsPage = () => {
@@ -46,7 +46,7 @@ const EditTermsAndConditionsPage = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...getAuthHeader(),
+        ...getAdminAuthHeader(),
         },
         body: JSON.stringify(pageContent),
       });
