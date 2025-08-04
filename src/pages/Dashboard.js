@@ -30,6 +30,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { Link } from 'react-router-dom';
+import { BASE_URL } from '../endpoints';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -71,7 +72,7 @@ const Dashboard = () => {
         setTrips(tripsData);
 
         // Fetch accommodations
-        const accommodationsResponse = await fetch('/api/accommodations');
+        const accommodationsResponse = await fetch(`${BASE_URL}/api/accommodations`);
         if (!accommodationsResponse.ok) throw new Error('Failed to fetch accommodations');
         const accommodationsData = await accommodationsResponse.json();
         setAccommodations(accommodationsData.data);
