@@ -1,228 +1,154 @@
 import React, { useEffect, useState } from "react";
-import ImageGallery from "../components/TripDetails/ImageGallery";
 import { useParams } from "react-router-dom";
 import {
   Box,
-  Typography,
   Container,
   Grid,
-  Card,
-  CardContent,
-  Chip,
+  Typography,
   Skeleton,
-  useTheme,
-  Divider,
+  AppBar,
+  Toolbar,
+  Button,
+  Slide,
+  useScrollTrigger,
   Stack,
+  Paper,
+  Chip,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText
 } from "@mui/material";
+import ImageGallery from "../components/TripDetails/ImageGallery";
 import BookNow from "../components/TripDetails/BookNow";
-import StickyAccommodationTitle from "../components/TripDetails/StickyAccommodationTitle";
 import { getAllAccommodations } from "../endpoints";
-import {
-  LocalOffer as OfferIcon,
-  CheckCircle as InclusionIcon,
-  Cancel as ExclusionIcon,
-  Info as OverviewIcon,
-  Category as ThemeIcon,
-  Star as RatingIcon,
-  BusinessCenter,
-} from "@mui/icons-material";
-// Add at top with other imports
-import PlaceIcon from '@mui/icons-material/Place';
-import CheckCircle from '@mui/icons-material/CheckCircle'; 
-import Cancel from '@mui/icons-material/Cancel';
+import { Bed, People, CheckCircleOutline } from '@mui/icons-material';
 
+// Sticky header that appears on scroll
+const StickyHeader = ({ accommodation }) => {
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 400,
+  });
 
+  return (
+    <Slide appear={false} direction="down" in={trigger}>
+      <AppBar component="div" elevation={2} sx={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(8px)' }}>
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <Box>
+            <Typography variant="h6" color="text.primary" fontWeight="600">{accommodation.name}</Typography>
+            <Typography variant="body2" color="text.secondary">{accommodation.destination}</Typography>
+          </Box>
+          <Button variant="contained" href="#booking-section">Book Now</Button>
+        </Toolbar>
+      </AppBar>
+    </Slide>
+  );
+};
 
-const AccommodationDetailsPage = ({ isMobile }) => {
-  const { id } = useParams();
+// Section component for styling
+const Section = ({ title, children }) => (
+  <Paper elevation={0} sx={{ p: 3, mb: 3, borderRadius: 2, border: '1px solid', borderColor: 'neutral.200' }}>
+    <Typography variant="h5" component="h2" fontWeight="600" sx={{ mb: 2 }}>
+      {title}
+    </Typography>
+    {children}
+  </Paper>
+);
+
+// Main info component for the accommodation
+const AccommodationInfo = ({ accommodation }) => (
+  <Stack spacing={3}>
+    <Section title="Overview">
+      <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+        {accommodation.overview}
+      </Typography>
+    </Section>
+
+    <Section title="Details">
+        <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap">
+            <Chip icon={<Bed />} label={`Bed: ${accommodation.bedType}`} />
+            <Chip icon={<People />} label={`Sleeps: ${accommodation.maxOccupancy}`} />
+            <Chip label={`Size: ${accommodation.size}`} />
+        </Stack>
+    </Section>
+
+    {accommodation.amenities?.length > 0 && (
+      <Section title="Amenities">
+        <List dense>
+            <Grid container spacing={1}>
+                {accommodation.amenities.map((item) => (
+                    <Grid item xs={12} sm={6} key={item}>
+                        <ListItem disableGutters>
+                            <ListItemIcon sx={{minWidth: 32}}><CheckCircleOutline color="success" fontSize="small" /></ListItemIcon>
+                            <ListItemText primary={item} />
+                        </ListItem>
+                    </Grid>
+                ))}
+            </Grid>
+        </List>
+      </Section>
+    )}
+  </Stack>
+);
+
+const AccommodationDetailsPage = () => {
   const [accommodation, setAccommodation] = useState(null);
-  const theme = useTheme();
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
 
   useEffect(() => {
-    fetch(`${getAllAccommodations}/${id}`)
-      .then((response) => {
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        return response.json();
-      })
-      .then((data) => setAccommodation(data))
-      .catch((error) => {
-        console.error("Error fetching accommodation details:", error);
-        alert("Error loading accommodation details. Check console.");
-      });
+    setLoading(true);
     window.scrollTo(0, 0);
+    fetch(`${getAllAccommodations}/${id}`)
+      .then((res) => res.ok ? res.json() : Promise.reject(res))
+      .then((data) => setAccommodation(data))
+      .catch((error) => console.error("Error fetching accommodation details:", error))
+      .finally(() => setLoading(false));
   }, [id]);
 
-  if (!accommodation) return <Skeleton variant="rectangular" height="100vh" />;
+  if (loading) {
+    return (
+      <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
+        <Skeleton variant="rectangular" width="100%" height={500} sx={{ borderRadius: 2, mb: 3 }} />
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={8}>
+            <Skeleton variant="text" height={60} />
+            <Skeleton variant="text" />
+            <Skeleton variant="text" width="80%" />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 2 }} />
+          </Grid>
+        </Grid>
+      </Container>
+    );
+  }
+
+  if (!accommodation) {
+    return (
+      <Container sx={{ textAlign: 'center', py: 12 }}>
+        <Typography variant="h4">Accommodation not found</Typography>
+      </Container>
+    );
+  }
 
   return (
     <>
-      <StickyAccommodationTitle accommodation={accommodation} />
-      
-      <Container
-        maxWidth="xl"
-        sx={{
-          pt: { xs: 2, sm: 4 },
-          pb: 6,
-          mt: { xs: 7, sm: 9 },
-          position: "relative",
-        }}
-      >
-        <Grid container spacing={3}>
-          {/* Main Content */}
-          <Grid item xs={12} lg={8}>
-            <Box sx={{ mb: 4 }}>
-              <ImageGallery
-                images={accommodation.images}
-                imageStyle={{ borderRadius: theme.shape.borderRadius }}
-              />
-            </Box>
-
-                    {/* Amenities Card */}
-<DetailCard
-  title="Amenities"
-  icon={<BusinessCenter color="primary" />}
-  content={
-    <Grid container spacing={1.5} sx={{ py: 1 }}>
-      {accommodation?.amenities?.map((amenity, index) => (
-        <Grid item xs={6} sm={4} md={3} key={index}>
-          <Box
-            sx={{
-              px: 1.5,
-              py: 1,
-              borderRadius: 6,
-              bgcolor: 'background.paper',
-              border: '1px solid',
-              borderColor: 'divider',
-              transition: 'all 0.2s ease',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: 2,
-                borderColor: 'primary.main',
-              },
-              textAlign: 'center',
-            }}
-          >
-            <Typography 
-              variant="body2" 
-              sx={{
-                fontWeight: 600,
-                color: 'text.primary',
-                letterSpacing: '0.03em',
-                fontSize: '0.8rem',
-                lineHeight: 1.2,
-              }}
-            >
-              {amenity}
-            </Typography>
-          </Box>
-        </Grid>
-      ))}
-    </Grid>
-  }
-/>
-
-            {/* Details Section */}
-            <Stack spacing={3}>
-              {/* Destination & Rating */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-               
-                {accommodation.rating && (
-                  <Chip
-                    icon={<RatingIcon fontSize="small" />}
-                    label={`${accommodation.rating}/5`}
-                    color="warning"
-                  />
-                )}
-              </Box>
-
-              {/* Overview Card */}
-              <DetailCard
-                title="Overview"
-                icon={<OverviewIcon color="primary" />}
-                content={accommodation.overview}
-              />
-
-              {/* Themes Card */}
-              <DetailCard
-                title="Themes"
-                icon={<ThemeIcon color="primary" />}
-                content={
-                  <Stack direction="row" flexWrap="wrap" gap={1}>
-                    {accommodation.themes.map((theme, index) => (
-                      <Chip
-                        key={index}
-                        label={theme}
-                        variant="outlined"
-                        color="secondary"
-                      />
-                    ))}
-                  </Stack>
-                }
-              />
-
-              {/* Inclusions & Exclusions */}
-              <Grid >
-                <Grid item xs={12} md={6}>
-                  <DetailCard
-                    title="Inclusions"
-                    icon={<InclusionIcon color="success" />}
-                    content={
-                      <Stack spacing={1}>
-                        {accommodation.inclusions.map((item, index) => (
-                          <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <CheckCircle fontSize="small" color="success" />
-                            <Typography variant="body2">{item}</Typography>
-                          </Box>
-                        ))}
-                      </Stack>
-                    }
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <DetailCard
-                    title="Exclusions"
-                    icon={<ExclusionIcon color="error" />}
-                    content={
-                      <Stack spacing={1}>
-                        {accommodation.exclusions.map((item, index) => (
-                          <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Cancel fontSize="small" color="error" />
-                            <Typography variant="body2">{item}</Typography>
-                          </Box>
-                        ))}
-                      </Stack>
-                    }
-                  />
-                </Grid>
-              </Grid>
+      <StickyHeader accommodation={accommodation} />
+      <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
+        <Grid container spacing={{ xs: 3, md: 5 }}>
+          <Grid item xs={12} md={7} lg={8}>
+            <Stack spacing={4}>
+              <ImageGallery images={accommodation.images} />
+              <AccommodationInfo accommodation={accommodation} />
             </Stack>
           </Grid>
 
-          {/* Booking Sidebar */}
-          <Grid item xs={12} lg={4}>
-            <Box
-              sx={{
-                position: { lg: "sticky" },
-                top: { lg: 100 },
-                mb: { xs: 3, lg: 0 },
-                p: { xs: 0, sm: 2 },
-                borderRadius: theme.shape.borderRadius,
-                border: `1px solid ${theme.palette.divider}`,
-              }}
-            >
+          <Grid item xs={12} md={5} lg={4}>
+            <Box sx={{ position: 'sticky', top: 100 }} id="booking-section">
+              {/* The BookNow component expects a 'trip' prop, so we pass the accommodation object to it */}
               <BookNow trip={accommodation} />
-              
-              {/* Special Offers */}
-              {accommodation.specialOffers && (
-                <Box sx={{ mt: 3, p: 2, bgcolor: 'success.light', borderRadius: 2 }}>
-                  <Typography variant="h6" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <OfferIcon color="success" /> Special Offers
-                  </Typography>
-                  <Typography variant="body2">
-                    {accommodation.specialOffers}
-                  </Typography>
-                </Box>
-              )}
             </Box>
           </Grid>
         </Grid>
@@ -230,26 +156,5 @@ const AccommodationDetailsPage = ({ isMobile }) => {
     </>
   );
 };
-
-// Reusable Detail Card Component
-const DetailCard = ({ title, icon, content }) => (
-  <Card variant="outlined" sx={{ borderRadius: 2 }}>
-    <CardContent>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-        {icon}
-        <Typography variant="h6" component="div">
-          {title}
-        </Typography>
-      </Box>
-      {typeof content === 'string' ? (
-        <Typography variant="body1" color="text.secondary">
-          {content}
-        </Typography>
-      ) : (
-        content
-      )}
-    </CardContent>
-  </Card>
-);
 
 export default AccommodationDetailsPage;

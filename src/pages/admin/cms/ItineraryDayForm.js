@@ -1,4 +1,3 @@
-// --- START OF FILE src/components/admin/cms/ItineraryDayForm.js ---
 import React, { useState } from "react";
 import {
   TextField,
@@ -7,11 +6,12 @@ import {
   Typography,
   Grid,
   Chip,
-  Autocomplete,
-  useMediaQuery,
+  Stack,
+  Paper,
+  IconButton,
+  Tooltip
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useTheme } from "@mui/material/styles";
+import { Delete as DeleteIcon, AddCircleOutline } from "@mui/icons-material";
 
 const ItineraryDayForm = ({
   dayIndex,
@@ -21,10 +21,7 @@ const ItineraryDayForm = ({
   onRemoveHighlight,
   onDeleteDay,
 }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [highlightText, setHighlightText] = useState("");
-  const [highlightOptions] = useState([]);
 
   const handleAddHighlightClick = () => {
     if (highlightText.trim() !== "") {
@@ -33,83 +30,37 @@ const ItineraryDayForm = ({
     }
   };
 
-  const handleRemoveHighlightClick = (index) => {
-    onRemoveHighlight(dayIndex, index);
-  };
-
-  const handleTitleChange = (e) => {
-    const prefix = `Day ${dayIndex + 1}: `;
-    const newValue = e.target.value.startsWith(prefix)
-      ? e.target.value
-      : `${prefix}${e.target.value}`;
-    
-    onChangeDayData(dayIndex, {
-      ...dayData,
-      dayTitle: newValue,
-    });
-  };
-
-  const displayedTitle = dayData.dayTitle?.replace(`Day ${dayIndex + 1}: `, "") || "";
-
   return (
-    <Box
-      sx={{
-        border: "1px solid",
-        borderColor: theme.palette.divider,
-        borderRadius: 2,
-        p: 3,
-        mb: 3,
-        backgroundColor: theme.palette.background.paper,
-      }}
+    <Paper
+      elevation={0}
+      variant="outlined"
+      sx={{ p: 3, mb: 3, borderRadius: 2 }}
     >
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 3,
-        }}
-      >
-        <Typography variant="h6" component="div">
-          Day {dayIndex + 1}
-        </Typography>
-        <Button
-          variant="contained"
-          color="error"
-          size={isMobile ? "small" : "medium"}
-          onClick={() => onDeleteDay(dayIndex)}
-          startIcon={<DeleteIcon />}
-        >
-          Delete Day
-        </Button>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+        <Typography variant="h6" component="div">Day {dayIndex + 1}</Typography>
+        <Tooltip title="Delete Day">
+          <IconButton onClick={() => onDeleteDay(dayIndex)} color="error" size="small">
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           <TextField
             label="Day Title"
             fullWidth
-            variant="outlined"
-            value={displayedTitle}
-            onChange={handleTitleChange}
-            helperText="The prefix 'Day X' will be automatically added"
+            value={dayData.dayTitle || ''}
+            onChange={(e) => onChangeDayData(dayIndex, { ...dayData, dayTitle: e.target.value })}
           />
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           <TextField
             label="Short Description"
             fullWidth
-            variant="outlined"
-            value={dayData.shortDescription || ""}
-            onChange={(e) =>
-              onChangeDayData(dayIndex, {
-                ...dayData,
-                shortDescription: e.target.value,
-              })
-            }
-            helperText="Brief summary (max 150 characters)"
-            inputProps={{ maxLength: 150 }}
+            value={dayData.shortDescription || ''}
+            onChange={(e) => onChangeDayData(dayIndex, { ...dayData, shortDescription: e.target.value })}
           />
         </Grid>
 
@@ -119,71 +70,41 @@ const ItineraryDayForm = ({
             fullWidth
             multiline
             rows={4}
-            variant="outlined"
-            value={dayData.description || ""}
-            onChange={(e) =>
-              onChangeDayData(dayIndex, {
-                ...dayData,
-                description: e.target.value,
-              })
-            }
-            helperText="Full itinerary details for this day"
+            value={dayData.description || ''}
+            onChange={(e) => onChangeDayData(dayIndex, { ...dayData, description: e.target.value })}
           />
         </Grid>
 
         <Grid item xs={12}>
-          <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 2 }}>
+          <Typography variant="subtitle1" fontWeight="500" sx={{ mb: 1 }}>
             Day Highlights
           </Typography>
-          
-          <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
+          <Stack direction="row" spacing={1} sx={{ mb: 1, flexWrap: 'wrap', useFlexGap: true }}>
             {dayData.highlights?.map((item, index) => (
               <Chip
                 key={index}
                 label={item}
-                onDelete={() => handleRemoveHighlightClick(index)}
-                deleteIcon={
-                  <DeleteIcon sx={{ "&:hover": { color: theme.palette.error.dark } }} />
-                }
-                sx={{
-                  backgroundColor: theme.palette.primary.light,
-                  "& .MuiChip-deleteIcon": { color: theme.palette.error.main },
-                }}
+                onDelete={() => onRemoveHighlight(dayIndex, index)}
               />
             ))}
-          </Box>
-
-          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-            <Autocomplete
-              freeSolo
+          </Stack>
+          <Stack direction="row" spacing={1}>
+            <TextField
+              label="Add Highlight"
+              size="small"
               fullWidth
-              options={highlightOptions}
-              getOptionLabel={(option) => option}
-              inputValue={highlightText}
-              onInputChange={(_, newValue) => setHighlightText(newValue)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Add Highlight"
-                  variant="outlined"
-                  helperText="Press Enter to add"
-                />
-              )}
-              onKeyPress={(e) => e.key === "Enter" && handleAddHighlightClick()}
+              value={highlightText}
+              onChange={(e) => setHighlightText(e.target.value)}
+              onKeyPress={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddHighlightClick(); }}}
             />
-            <Button
-              variant="contained"
-              onClick={handleAddHighlightClick}
-              sx={{ height: 56 }}
-            >
+            <Button onClick={handleAddHighlightClick} variant="outlined" startIcon={<AddCircleOutline />}>
               Add
             </Button>
-          </Box>
+          </Stack>
         </Grid>
       </Grid>
-    </Box>
+    </Paper>
   );
 };
 
 export default ItineraryDayForm;
-// --- END OF FILE src/components/admin/cms/ItineraryDayForm.js ---

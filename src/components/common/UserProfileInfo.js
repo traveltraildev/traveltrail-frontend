@@ -1,101 +1,65 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Box, Typography, Button, Grid } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import {
+  Box,
+  Typography,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Stack,
+  Divider
+} from '@mui/material';
+import { Email, Phone, Person, Edit, Lock } from '@mui/icons-material';
 
 const UserProfileInfo = ({ user }) => {
+  const profileItems = [
+    { label: 'Name', value: user.name, icon: <Person /> },
+    { label: 'Email', value: user.email, icon: <Email /> },
+    { label: 'Phone', value: user.phone || 'Not provided', icon: <Phone /> },
+    { label: 'Username', value: user.username, icon: <Person /> },
+  ];
+
   return (
     <Box>
-      <Grid container spacing={2}>
-        {/* Name Field */}
-        <Grid item xs={12} sm={6}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: 500, mr: 2, flexShrink: 0 }}
-            >
-              <strong>Name:</strong>
-            </Typography>
-            <Typography variant="body1">{user.name}</Typography>
-          </Box>
-        </Grid>
+      <List dense sx={{ mb: 3 }}>
+        {profileItems.map((item, index) => (
+          <React.Fragment key={item.label}>
+            <ListItem>
+              <ListItemIcon sx={{minWidth: 40}}>{item.icon}</ListItemIcon>
+              <ListItemText 
+                primary={item.label}
+                secondary={item.value}
+                primaryTypographyProps={{ fontWeight: '500', color: 'text.secondary' }}
+                secondaryTypographyProps={{ fontWeight: '600', color: 'text.primary', variant: 'body1' }}
+              />
+            </ListItem>
+            {index < profileItems.length - 1 && <Divider component="li" variant="inset" />}
+          </React.Fragment>
+        ))}
+      </List>
 
-        {/* Email Field */}
-        <Grid item xs={12} sm={6}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: 500, mr: 2, flexShrink: 0 }}
-            >
-              <strong>Email:</strong>
-            </Typography>
-            <Typography variant="body1">{user.email}</Typography>
-          </Box>
-        </Grid>
-
-        {/* Phone Field */}
-        <Grid item xs={12} sm={6}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: 500, mr: 2, flexShrink: 0 }}
-            >
-              <strong>Phone:</strong>
-            </Typography>
-            <Typography variant="body1">{user.phone}</Typography>
-          </Box>
-        </Grid>
-
-        {/* Username Field */}
-        <Grid item xs={12} sm={6}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: 500, mr: 2, flexShrink: 0 }}
-            >
-              <strong>Username:</strong>
-            </Typography>
-            <Typography variant="body1">{user.username}</Typography>
-          </Box>
-        </Grid>
-      </Grid>
-
-      {/* Action Buttons */}
-      <Box sx={{ mt: 4, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        <Link to="/edit-profile" style={{ textDecoration: 'none' }}>
-          <Button
-            variant="contained"
-            sx={{
-              bgcolor: 'var(--primary-500)',
-              color: 'white',
-              '&:hover': { bgcolor: 'var(--primary-600)' },
-              px: 3,
-              py: 1.5,
-              borderRadius: '8px',
-              flex: 1,
-              minWidth: '120px'
-            }}
-          >
-            Edit Profile
-          </Button>
-        </Link>
-        <Link to="/change-password" style={{ textDecoration: 'none' }}>
-          <Button
-            variant="outlined"
-            sx={{
-              bgcolor: 'var(--neutral-50)',
-              color: 'var(--primary-500)',
-              '&:hover': { bgcolor: 'var(--neutral-100)' },
-              px: 3,
-              py: 1.5,
-              borderRadius: '8px',
-              flex: 1,
-              minWidth: '120px'
-            }}
-          >
-            Change Password
-          </Button>
-        </Link>
-      </Box>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 2 }}>
+        <Button
+          component={RouterLink}
+          to="/edit-profile"
+          variant="contained"
+          startIcon={<Edit />}
+          fullWidth
+        >
+          Edit Profile
+        </Button>
+        <Button
+          component={RouterLink}
+          to="/change-password"
+          variant="outlined"
+          startIcon={<Lock />}
+          fullWidth
+        >
+          Change Password
+        </Button>
+      </Stack>
     </Box>
   );
 };

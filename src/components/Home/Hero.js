@@ -1,178 +1,133 @@
-// src/components/Home/Hero.js
-import React, { useState, useEffect } from "react";
-import { Box, Grid, Typography, TextField, Button, Paper } from "@mui/material";
-import ModeOfTravelIcon from "@mui/icons-material/ModeOfTravel";
-import HotelIcon from "@mui/icons-material/Hotel";
-import Diversity1Icon from "@mui/icons-material/Diversity1";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import {
+  Box,
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Paper,
+  Tabs,
+  Tab,
+  Fade,
+} from '@mui/material';
+import { Search, Flight, Hotel, Groups } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = ({ backgroundImage }) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentMenu, setCurrentMenu] = useState("trips");
-  const [currentPath, setCurrentPath] = useState("trips");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentTab, setCurrentTab] = useState(0);
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    navigate(`/${currentPath}`, { state: { search: searchQuery } });
+    const path = currentTab === 0 ? '/trips' : '/accommodations';
+    navigate(path, { state: { search: searchQuery } });
   };
 
-  const handleCurrentMenu = (item) => {
-    setCurrentMenu(item?.title);
-    setCurrentPath(item?.path);
-  };
-
-  const options = [
-    {
-      title: "trips",
-      path: "trips",
-      label: "Trips",
-      icon: <ModeOfTravelIcon sx={{ fontSize: "24px", color: "#ff6f00" }} />,
-    },
-    {
-      title: "accommodations",
-      path: "accommodations",
-      label: "Stays",
-      icon: <HotelIcon sx={{ fontSize: "24px", color: "#ff6f00" }} />,
-    },
-    {
-      title: "groups",
-      path: "trips",
-      label: "Groups",
-      icon: <Diversity1Icon sx={{ fontSize: "24px", color: "#ff6f00" }} />,
-    },
+  const searchTabs = [
+    { label: 'Trips', icon: <Explore />, path: '/trips' },
+    { label: 'Stays', icon: <Hotel />, path: '/accommodations' },
+    { label: 'Groups', icon: <Groups />, path: '/trips' }, // Assuming groups are a type of trip
   ];
 
   return (
     <Box
       sx={{
+        position: 'relative',
+        height: { xs: '70vh', md: '80vh' },
+        maxHeight: '800px',
         backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        // height: { xs: 400, md: 600 },
-        height: "100%",
-        paddingTop: "68px",
-        paddingBottom: "68px",
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        textAlign: "center",
-        px: 4,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        borderRadius: 3,
+        overflow: 'hidden',
       }}
     >
+      {/* Background Overlay */}
       <Box
         sx={{
-          position: "absolute",
+          position: 'absolute',
           top: 0,
           left: 0,
-          width: "100%",
-          height: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.4)",
+          width: '100%',
+          height: '100%',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1))'
         }}
       />
-      <Typography
-        variant="h2"
-        component="h1"
-        gutterBottom
-        sx={{
-          fontWeight: "bold",
-          color: "white",
-          fontSize: { xs: "1.5rem", md: "3.5rem" },
-          zIndex: 1,
-        }}
-      >
-        Explore Your Next Adventure
-      </Typography>
 
-      <Box sx={{ zIndex: 1 }}>
-        <Grid container justifyContent="center" sx={{ mt: 4, zIndex: 1 }}>
-          <Grid
-            item
-            xs={7}
+      <Fade in={true} timeout={1000}>
+        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+          <Typography
+            variant="h1"
+            component="h1"
             sx={{
-              maxWidth: "fit-content",
-              margin: "0 auto",
-              mb: -7,
-              zIndex: 2,
+              fontWeight: 800,
+              fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem' },
+              textShadow: '2px 2px 8px rgba(0,0,0,0.7)',
             }}
           >
-            <Paper
-              elevation={2}
-              sx={{
-                p: 2,
-                borderRadius: "10px",
-                backgroundColor: "rgba(255, 255, 255, 0.9)",
-                display: "flex",
-                justifyContent: "center",
-                gap: 2,
-              }}
-            >
-              {options.map((item) => (
-                <Box
-                  key={item.title}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    p: 2,
-                    borderRadius: "50%",
-                    bgcolor: "transparent",
-                    cursor: "pointer",
-                    backgroundColor:
-                      currentMenu === item.title ? "#ffecb3" : "inherit",
-                  }}
-                  onClick={() => handleCurrentMenu(item)}
-                >
-                  {item.icon}
-                  <Typography variant="body2" sx={{ mt: 0.5, color: "#333" }}>
-                    {item.label}
-                  </Typography>
-                </Box>
-              ))}
-            </Paper>
-          </Grid>
+            Book Nahi, Belong Karo
+          </Typography>
+          <Typography
+            variant="h6"
+            component="p"
+            sx={{ mt: 2, mb: 4, maxWidth: '600px', mx: 'auto', opacity: 0.9 }}
+          >
+            Discover curated travel experiences and stays that make you feel like you belong.
+          </Typography>
 
-          <Grid item xs={12}>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 3,
-                borderRadius: "10px",
-                backgroundColor: "rgba(255, 255, 255, 0.9)",
-                width: "100%",
-                paddingTop: "80px",
-              }}
+          <Paper
+            elevation={8}
+            sx={{
+              p: 1,
+              borderRadius: '16px',
+              bgcolor: 'rgba(255,255,255,0.9)',
+              backdropFilter: 'blur(10px)',
+              mt: 4,
+            }}
+          >
+            <Tabs
+              value={currentTab}
+              onChange={(e, newValue) => setCurrentTab(newValue)}
+              centered
+              sx={{ mb: 2, minHeight: 'auto' }}
             >
+              {searchTabs.map((tab, index) => (
+                <Tab key={index} label={tab.label} icon={tab.icon} iconPosition="start" sx={{minHeight: 'auto', pt: 1}} />
+              ))}
+            </Tabs>
+
+            <Box sx={{ display: 'flex', gap: 1, p: 1 }}>
               <TextField
-                label={`Search by ${currentMenu}`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
                 fullWidth
                 variant="outlined"
-                sx={{ mb: 2, borderRadius: "8px" }}
+                placeholder={`Search for ${searchTabs[currentTab].label}...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                sx={{ bgcolor: 'white', borderRadius: 2 }}
               />
               <Button
                 variant="contained"
+                color="primary"
+                size="large"
                 onClick={handleSearch}
-                sx={{
-                  px: 5,
-                  py: 1.5,
-                  borderRadius: "30px",
-                  backgroundColor: "#ffa000",
-                  "&:hover": { backgroundColor: "#ff6f00" },
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                }}
+                sx={{ px: 4, borderRadius: 2 }}
               >
-                SEARCH
+                <Search />
               </Button>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Box>
+            </Box>
+          </Paper>
+        </Container>
+      </Fade>
     </Box>
   );
 };
+
+// Dummy icon components if not imported elsewhere
+const Explore = () => <Flight />;
 
 export default Hero;

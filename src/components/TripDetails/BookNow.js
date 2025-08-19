@@ -1,249 +1,136 @@
-// src/components/TripDetails/BookNow.js
+import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
   TextField,
-  Grid,
   Button,
-  Card,
-  CardContent,
+  Paper,
   CircularProgress,
+  Stack,
+  Alert
 } from "@mui/material";
-import React from "react";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
-import { BASE_URL } from '../../endpoints';
+import { BASE_URL, sheetProxy } from '../../endpoints';
 import { getUserAuthHeader } from "../../utils";
-import { sheetProxy } from "../../endpoints";
 
 const BookNow = ({ trip }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState({
     startDate: null,
     endDate: null,
-    firstName: "",
-    lastName: "",
-    phoneNumber: "",
-    adultAttendees: "",
-    childAttendees: "",
+    adults: 1,
+    children: 0,
   });
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setError('');
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.phoneNumber ||
-      !formData.startDate ||
-      !formData.endDate
-    ) {
-      alert("Please fill in all required fields");
-      setLoading(false);
+    if (!formData.startDate || !formData.endDate) {
+      setError('Please select a start and end date.');
       return;
     }
+    setLoading(true);
+    setError('');
 
     try {
-      // Send booking data to your backend API
       const apiResponse = await fetch(`${BASE_URL}/api/bookings`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...getUserAuthHeader()
-        },
+        headers: { "Content-Type": "application/json", ...getUserAuthHeader() },
         body: JSON.stringify({
           tripId: trip._id,
           startDate: dayjs(formData.startDate).format("YYYY-MM-DD"),
           endDate: dayjs(formData.endDate).format("YYYY-MM-DD"),
           attendees: {
-            adults: formData.adultAttendees || 0,
-            children: formData.childAttendees || 0
+            adults: Number(formData.adults) || 1,
+            children: Number(formData.children) || 0,
           }
         })
       });
 
-      if (!apiResponse.ok) throw new Error("Failed to save booking to database");
+      if (!apiResponse.ok) throw new Error("Failed to save booking. Please try again.");
 
-      // Send booking data to Google Sheets
-      const sheetsResponse = await fetch(sheetProxy, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          secret: process.env.REACT_APP_GAS_SECRET,
-          startDate: dayjs(formData.startDate).format("YYYY-MM-DD"),
-          endDate: dayjs(formData.endDate).format("YYYY-MM-DD"),
-          adultAttendees: formData.adultAttendees || 0,
-          childAttendees: formData.childAttendees || 0,
-          tripName: trip.name,
-        }),
-      });
-
-      if (!sheetsResponse.ok) throw new Error("Failed to save booking to Google Sheets");
-
-      // Redirect to confirmation page with booking data
+      // Navigate to a confirmation page upon successful booking
       navigate("/booking-confirmation", {
         state: {
           success: true,
           bookingData: {
-            ...formData,
             tripName: trip.name,
             startDate: dayjs(formData.startDate).format("DD MMM YYYY"),
             endDate: dayjs(formData.endDate).format("DD MMM YYYY"),
-            adults: formData.adultAttendees || 0,
-            children: formData.childAttendees || 0,
+            adults: Number(formData.adults) || 1,
+            children: Number(formData.children) || 0,
           },
         },
       });
-    } catch (error) {
-      console.error('Error submitting booking:', error);
-      navigate("/booking-confirmation", { state: { success: false } });
+
+    } catch (err) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card
-      elevation={2}
-      sx={{
-        borderRadius: "15px",
-        p: 3,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-      }}
-    >
-      <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
+    <Paper elevation={3} sx={{ p: {xs: 2, md: 3}, borderRadius: 2, border: '1px solid', borderColor: 'neutral.200' }}>
+      <Typography variant="h5" fontWeight="600" sx={{ mb: 2 }}>
         Book Your Trip
       </Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="Start Date"
-                value={formData.startDate && dayjs(formData.startDate)}
-                onChange={(date) => handleChange("startDate", date)}
-                minDate={dayjs().add(1, "day")}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    required: true,
-                    size: "small",
-                  },
-                }}
+      <Box component="form" onSubmit={handleSubmit}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Stack spacing={2.5}>
+            {error && <Alert severity="error">{error}</Alert>}
+            <DatePicker
+              label="Start Date"
+              value={formData.startDate}
+              onChange={(date) => handleChange("startDate", date)}
+              minDate={dayjs().add(1, "day")}
+            />
+            <DatePicker
+              label="End Date"
+              value={formData.endDate}
+              onChange={(date) => handleChange("endDate", date)}
+              minDate={formData.startDate ? dayjs(formData.startDate).add(1, "day") : dayjs().add(2, "day")}
+            />
+            <Stack direction="row" spacing={2}>
+              <TextField
+                label="Adults"
+                type="number"
+                value={formData.adults}
+                onChange={(e) => handleChange("adults", e.target.value)}
+                fullWidth
+                InputProps={{ inputProps: { min: 1 } }}
               />
-            </LocalizationProvider>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="End Date"
-                value={formData.endDate && dayjs(formData.endDate)}
-                onChange={(date) => handleChange("endDate", date)}
-                minDate={
-                  formData.startDate
-                    ? dayjs(formData.startDate).add(1, "day")
-                    : dayjs().add(2, "day")
-                }
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    required: true,
-                    size: "small",
-                  },
-                }}
+              <TextField
+                label="Children"
+                type="number"
+                value={formData.children}
+                onChange={(e) => handleChange("children", e.target.value)}
+                fullWidth
+                InputProps={{ inputProps: { min: 0 } }}
               />
-            </LocalizationProvider>
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="First Name"
-              value={formData.firstName}
-              onChange={(e) => handleChange("firstName", e.target.value)}
+            </Stack>
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              disabled={loading}
               fullWidth
-              required
-              size="small"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Last Name"
-              value={formData.lastName}
-              onChange={(e) => handleChange("lastName", e.target.value)}
-              fullWidth
-              required
-              size="small"
-            />
-          </Grid>
-        </Grid>
-
-        <TextField
-          label="Phone Number"
-          value={formData.phoneNumber}
-          onChange={(e) => handleChange("phoneNumber", e.target.value)}
-          fullWidth
-          required
-          size="small"
-          sx={{ mt: 2 }}
-          inputProps={{ pattern: "[+0-9]{10,15}" }}
-        />
-
-        <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid item xs={6}>
-            <TextField
-              label="Adults"
-              type="number"
-              value={formData.adultAttendees}
-              onChange={(e) => handleChange("adultAttendees", e.target.value)}
-              fullWidth
-              size="small"
-              inputProps={{ min: 1 }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Children"
-              type="number"
-              value={formData.childAttendees}
-              onChange={(e) => handleChange("childAttendees", e.target.value)}
-              fullWidth
-              size="small"
-              inputProps={{ min: 0 }}
-            />
-          </Grid>
-        </Grid>
-
-        <Button
-          type="submit"
-          variant="contained"
-          startIcon={
-            loading ? <CircularProgress size={20} color="inherit" /> : null
-          }
-          disabled={loading}
-          sx={{
-            mt: 3,
-            bgcolor: "#f57f17",
-            "&:hover": { bgcolor: "#ff8f00" },
-            width: "100%",
-            py: 1.5,
-          }}
-        >
-          {loading ? "Submitting..." : "Book Now"}
-        </Button>
+            >
+              {loading ? <CircularProgress size={26} color="inherit" /> : "Request to Book"}
+            </Button>
+          </Stack>
+        </LocalizationProvider>
       </Box>
-    </Card>
+    </Paper>
   );
 };
 

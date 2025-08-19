@@ -1,272 +1,113 @@
-// --- START OF FILE TripInfo.js ---
-import React from "react";
-import { Box, Typography, Card,Chip, CardContent } from "@mui/material";
-import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import AccommodationCard from "./AccommodationCard"; // Import AccommodationCard
-import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import React from 'react';
+import {
+  Box,
+  Typography,
+  Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Stack,
+  Paper,
+  ListItemIcon,
+  ListItemText,
+  List,
+  ListItem,
+  Grid
+} from '@mui/material';
+import { ExpandMore, CheckCircleOutline, HighlightOff } from '@mui/icons-material';
 
-
+const Section = ({ title, children }) => (
+  <Paper elevation={0} sx={{ p: 3, mb: 3, borderRadius: 2, border: '1px solid', borderColor: 'neutral.200' }}>
+    <Typography variant="h5" component="h2" fontWeight="600" sx={{ mb: 2 }}>
+      {title}
+    </Typography>
+    {children}
+  </Paper>
+);
 
 const TripInfo = ({ trip }) => {
-  if (!trip || !trip.itineraries || !Array.isArray(trip.itineraries)) {
-    return (
-      <Typography color="error">
-        Itinerary data is not available or in incorrect format
-      </Typography>
-    );
+  if (!trip) {
+    return null; // Or a loading skeleton
   }
 
   return (
-    <Box sx={{ mt: 4 }}>
-      {/* Overview & Themes Section */}
-      <Card
-        elevation={2}
-        sx={{
-          mb: 3,
-          borderRadius: "12px",
-          bgcolor: "background.paper",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)"
-        }}
-      >
-        <CardContent sx={{ p: 3 }}>
-          <Typography
-            variant="h6"
-            component="h2"
-            sx={{
-              fontWeight: 600,
-              color: "text.primary",
-              mb: 2,
-              fontSize: { xs: "1.1rem", md: "1.2rem" }
-            }}
-          >
-            Overview
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{ color: "text.secondary", mb: 3, lineHeight: 1.6 }}
-          >
-            {trip?.desc}
-          </Typography>
+    <Stack spacing={3}>
+      {/* Overview */}
+      <Section title="Overview">
+        <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+          {trip.desc}
+        </Typography>
+      </Section>
 
-          <Typography
-            variant="h6"
-            component="h2"
-            sx={{
-              fontWeight: 600,
-              color: "text.primary",
-              mt: 3,
-              mb: 1,
-              fontSize: { xs: "1.1rem", md: "1.2rem" }
-            }}
-          >
-            Themes
-          </Typography>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-            {trip?.themes?.map((theme) => (
-              <Chip
-                key={theme}
-                label={theme}
-                size="small"
-                sx={{
-                  bgcolor: "#94eff7",
-                  color: "primary.main",
-                  fontWeight: 500,
-                  fontSize: "0.9rem",
-                  px: 1.5,
-                  py: 0.5
-                }}
-              />
+      {/* Themes */}
+      {trip.themes?.length > 0 && (
+        <Section title="Themes">
+          <Stack direction="row" flexWrap="wrap" spacing={1} useFlexGap>
+            {trip.themes.map((theme) => (
+              <Chip key={theme} label={theme} color="primary" variant="outlined" />
             ))}
-          </Box>
-        </CardContent>
-      </Card>
+          </Stack>
+        </Section>
+      )}
 
-      {/* Inclusions & Exclusions Section */}
-      <Card
-        elevation={2}
-        sx={{
-          mb: 3,
-          borderRadius: "12px",
-          bgcolor: "background.paper",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)"
-        }}
-      >
-        <CardContent sx={{ p: 3 }}>
-          <Typography
-            variant="h6"
-            component="h2"
-            sx={{
-              fontWeight: 600,
-              color: "text.primary",
-              mb: 2,
-              fontSize: { xs: "1.1rem", md: "1.2rem" }
-            }}
-          >
-            Inclusions
-          </Typography>
-          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 2 }}>
-            {trip?.inclusions?.map((inclusion) => (
-              <Chip
-                key={inclusion}
-                label={inclusion}
-                size="small"
-                sx={{
-                  bgcolor: "#94eff7",
-                  color: "primary.main",
-                  fontWeight: 500,
-                  fontSize: "0.9rem",
-                  px: 1.5,
-                  py: 0.5
-                }}
-              />
+      {/* Inclusions & Exclusions */}
+      <Grid container spacing={3}>
+        {trip.inclusions?.length > 0 && (
+          <Grid item xs={12} md={6}>
+            <Section title="What's Included">
+              <List dense>
+                {trip.inclusions.map((item) => (
+                  <ListItem key={item} disableGutters>
+                    <ListItemIcon sx={{minWidth: 32}}><CheckCircleOutline color="success" fontSize="small" /></ListItemIcon>
+                    <ListItemText primary={item} />
+                  </ListItem>
+                ))}
+              </List>
+            </Section>
+          </Grid>
+        )}
+        {trip.exclusions?.length > 0 && (
+          <Grid item xs={12} md={6}>
+            <Section title="What's Not Included">
+              <List dense>
+                {trip.exclusions.map((item) => (
+                  <ListItem key={item} disableGutters>
+                    <ListItemIcon sx={{minWidth: 32}}><HighlightOff color="error" fontSize="small" /></ListItemIcon>
+                    <ListItemText primary={item} />
+                  </ListItem>
+                ))}
+              </List>
+            </Section>
+          </Grid>
+        )}
+      </Grid>
+
+      {/* Itinerary */}
+      {trip.itineraries?.length > 0 && (
+        <Section title="Daily Itinerary">
+          <Stack spacing={1.5}>
+            {trip.itineraries.map((day, index) => (
+              <Accordion key={index} sx={{ border: '1px solid', borderColor: 'neutral.200', boxShadow: 'none', '&:before': { display: 'none' } }}>
+                <AccordionSummary expandIcon={<ExpandMore />}>
+                  <Typography fontWeight="600">{day.dayTitle || `Day ${index + 1}`}</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ borderTop: '1px solid', borderColor: 'divider' }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    {day.shortDescription}
+                  </Typography>
+                  <Stack direction="row" flexWrap="wrap" spacing={1} useFlexGap>
+                    {day.highlights?.map((highlight, hIndex) => (
+                      <Chip key={hIndex} label={highlight} size="small" />
+                    ))}
+                  </Stack>
+                </AccordionDetails>
+              </Accordion>
             ))}
-          </Box>
-
-          <Typography
-            variant="h6"
-            component="h2"
-            sx={{
-              fontWeight: 600,
-              color: "text.primary",
-              mt: 3,
-              mb: 1,
-              fontSize: { xs: "1.1rem", md: "1.2rem" }
-            }}
-          >
-            Exclusions
-          </Typography>
-          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 2 }}>
-            {trip?.exclusions?.map((exclusion) => (
-              <Chip
-                key={exclusion}
-                label={exclusion}
-                size="small"
-                sx={{
-                  bgcolor: "#fac5aa",
-                  
-                  color: "error.main",
-                  fontWeight: 500,
-                  fontSize: "0.9rem",
-                  px: 1.5,
-                  py: 0.5
-                }}
-              />
-            ))}
-          </Box>
-        </CardContent>
-      </Card>
-
-      {/* Itinerary Section */}
-      <Card
-        elevation={2}
-        sx={{
-          mb: 3,
-          borderRadius: "12px",
-          bgcolor: "background.paper",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)"
-        }}
-      >
-        <CardContent sx={{ p: 3 }}>
-          <Typography
-            variant="h6"
-            component="h2"
-            sx={{
-              fontWeight: 600,
-              color: "text.primary",
-
-              mb: 2,
-              fontSize: { xs: "1.1rem", md: "1.2rem" }
-            }}
-          >
-            Itinerary
-          </Typography>
-          {trip?.itineraries.map((day, index) => (
-            <Accordion
-              key={index}
-              sx={{
-                my: 1,
-                borderRadius: "8px",
-                overflow: "hidden",
-                border: "1px solid",
-                borderColor: "divider"
-              }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{ color: "primary.main" }} />}
-                sx={{
-                  bgcolor: "background.default",
-                  py: 1.5,
-                  px: 2,
-                  borderBottom: "1px solid",
-                  borderColor: "divider"
-                }}
-              >
-                <Typography
-                  variant="subtitle1"
-                  sx={{ fontWeight: 600, color: "text.primary" }}
-                >
-                  {day.dayTitle || `Day ${index + 1}`}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails sx={{ p: 3 }}>
-                <Typography
-                  variant="body1"
-                  sx={{ color: "text.secondary", mb: 2 }}
-                >
-                  {day.shortDescription}
-                </Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
-                  {day.highlights?.map((highlight, hIndex) => (
-                    <Chip
-                      key={hIndex}
-                      label={highlight}
-                      size="small"
-                      sx={{
-                        bgcolor: "94eff7",
-                        color: "primary.main",
-                        fontWeight: 500,
-                        fontSize: "0.9rem",
-                        px: 1.5,
-                        py: 0.5
-                      }}
-                    />
-                  ))}
-                </Box>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "text.secondary", lineHeight: 1.6 }}
-                >
-                  {day.description}
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Accommodation Card */}
-      <Card
-        elevation={2}
-        sx={{
-          mb: 3,
-          borderRadius: "12px",
-          bgcolor: "background.paper",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)"
-        }}
-      >
-        <CardContent sx={{ p: 3 }}>
-          <Link
-            to={`/accommodations/${trip?.id}`}
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            <AccommodationCard trip={trip} />
-          </Link>
-        </CardContent>
-      </Card>
-    </Box>
+          </Stack>
+        </Section>
+      )}
+    </Stack>
   );
 };
 
 export default TripInfo;
-// --- END OF FILE TripInfo.js
