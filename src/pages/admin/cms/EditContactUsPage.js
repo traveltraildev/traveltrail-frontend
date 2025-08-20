@@ -1,17 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { Container, Typography, TextField, Button, Box } from "@mui/material";
-import Navbar from "../../../components/common/Navbar";
-import Navbar2 from "../../../components/common/Navbar2";
-import Footer from "../../../components/common/Footer";
-import ReactQuill from "react-quill"; // Import ReactQuill
-import "react-quill/dist/quill.snow.css"; // Import Quill styles
-import useMediaQuery from "@mui/material/useMediaQuery";
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Paper,
+  Stack,
+  Alert,
+  CircularProgress,
+  useTheme,
+} from "@mui/material";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import { getAdminAuthHeader } from "../../../utils";
 import { contactUsPage } from "../../../endpoints";
+import Navbar from "../../../components/common/Navbar";
+import Footer from "../../../components/common/Footer";
 
 const EditContactUsPage = () => {
   const [pageContent, setPageContent] = useState({ title: "", content: "" });
-  const isMobile = useMediaQuery("(max-width:600px)");
+  const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState({ type: "", message: "" });
+  const theme = useTheme();
 
   useEffect(() => {
     fetch(contactUsPage)
@@ -25,10 +36,11 @@ const EditContactUsPage = () => {
         setPageContent(data);
       })
       .catch((error) => {
-        console.error("Error fetching Contact Us content:", error);
-        alert("Error loading content from API. Check console.");
+        setNotification({ type: "error", message: `Error fetching content: ${error.message}` });
+      })
+      .finally(() => {
+        setLoading(false);
       });
-    window.scrollTo(0, 0);
   }, []);
 
   const handleChange = (e) => {
@@ -41,6 +53,8 @@ const EditContactUsPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setNotification({ type: "", message: "" });
     try {
       const response = await fetch(contactUsPage, {
         method: "PUT",
@@ -53,49 +67,63 @@ const EditContactUsPage = () => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      alert("Contact Us page content updated successfully via API!");
+      setNotification({ type: "success", message: "Contact Us page updated successfully!" });
     } catch (error) {
-      console.error("Error updating Contact Us content via API:", error);
-      alert("Error updating content via API. Check console.");
+      setNotification({ type: "error", message: `Error updating content: ${error.message}` });
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading && !pageContent.title) {
+    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>;
+  }
 
   return (
     <>
       <Navbar />
-      <Container maxWidth="md" sx={{ mt: 4, mb: 4, padding: "20px" }}>
-        <Typography variant="h4" component="h1" align="center" gutterBottom>
-          Edit Contact Us Page
-        </Typography>
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-        >
-          <TextField
-            label="Title"
-            name="title"
-            value={pageContent.title}
-            onChange={handleChange}
-            fullWidth
-            variant="outlined"
-          />
-          <ReactQuill
-            value={pageContent.content}
-            onChange={handleEditorChange}
-            modules={ReactQuill.modules}
-            formats={ReactQuill.formats}
-            theme="snow"
-            placeholder="Enter content..."
-            style={{ height: "300px" }}
-          />
-          <Button type="submit" variant="contained" color="primary">
-            Save Changes
-          </Button>
-        </Box>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Paper sx={{ p: { xs: 2, md: 4 }, borderRadius: 3, boxShadow: theme.shadows[4] }}>
+          <Stack spacing={3}>
+            <Box>
+              <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>Edit Contact Us Page</Typography>
+              <Typography color="text.secondary">Update the content for the Contact Us page.</Typography>
+            </Box>
+
+            {notification.message && (
+              <Alert severity={notification.type} sx={{ width: "100%" }}>
+                {notification.message}
+              </Alert>
+            )}
+
+            <Box component="form" onSubmit={handleSubmit}>
+              <Stack spacing={3}>
+                <TextField
+                  label="Title"
+                  name="title"
+                  value={pageContent.title}
+                  onChange={handleChange}
+                  fullWidth
+                />
+                <Box sx={{ '.ql-editor': { minHeight: '250px' } }}>
+                  <ReactQuill
+                    value={pageContent.content}
+                    onChange={handleEditorChange}
+                    theme="snow"
+                    placeholder="Enter content..."
+                  />
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Button type="submit" variant="contained" size="large" disabled={loading}>
+                    {loading ? <CircularProgress size={26} color="inherit" /> : "Save Changes"}
+                  </Button>
+                </Box>
+              </Stack>
+            </Box>
+          </Stack>
+        </Paper>
       </Container>
       <Footer />
-      {isMobile && <Navbar2 />}
     </>
   );
 };

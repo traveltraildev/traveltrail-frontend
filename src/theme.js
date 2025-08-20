@@ -1,37 +1,21 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 
-// Define the color palette using the structure from your CSS variables
+// Define the color palette using the logo's colors
 const palette = {
   primary: {
-    light: '#ffe082', // Corresponds to --primary-300
-    main: '#ffc107',  // Corresponds to --primary-500
-    dark: '#ffa000',   // Corresponds to --primary-700
-    contrastText: '#222222',
-  },
-  secondary: {
-    light: '#fff59d', // Corresponds to --secondary-300
-    main: '#ffeb3b',  // Corresponds to --secondary-500
-    dark: '#fbc02d',   // Corresponds to --secondary-700
-    contrastText: '#222222',
-  },
-  accent: {
-    main: '#6A8E9A',
+    main: '#D5614A', // Orange-Red from logo
     contrastText: '#ffffff',
   },
-  neutral: {
-    50: '#f5f5f5',
-    100: '#f0f0f0',
-    200: '#e0e0e0',
-    300: '#c0c0c0',
-    400: '#a0a0a0',
-    500: '#808080',
-    600: '#606060',
-    700: '#404040',
-    800: '#303030',
-    900: '#202020',
+  secondary: {
+    main: '#F1CC5A', // Yellow from logo
+    contrastText: '#222222',
+  },
+  info: {
+    main: '#6A8E9A', // Muted Blue-Grey from logo
+    contrastText: '#ffffff',
   },
   background: {
-    default: '#f8f9fa', // A slightly off-white for a softer look
+    default: '#f8f9fa',
     paper: '#ffffff',
   },
   text: {
@@ -40,67 +24,81 @@ const palette = {
   },
   error: { main: '#d32f2f' },
   warning: { main: '#ffa000' },
-  info: { main: '#1976d2' },
   success: { main: '#2e7d32' },
 };
 
 // Create the theme instance
-const theme = createTheme({
+let theme = createTheme({
   palette: palette,
-  spacing: 8, // 1 unit = 8px
+  spacing: 8,
   shape: {
-    borderRadius: 8, // Standard border radius
+    borderRadius: 12,
   },
   typography: {
     fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    h1: { fontWeight: 700, fontSize: '2.75rem' },
-    h2: { fontWeight: 700, fontSize: '2.25rem' },
-    h3: { fontWeight: 600, fontSize: '1.75rem' },
-    h4: { fontWeight: 600, fontSize: '1.5rem' },
-    h5: { fontWeight: 500, fontSize: '1.25rem' },
-    h6: { fontWeight: 500, fontSize: '1.125rem' },
+    h1: { fontWeight: 700 },
+    h2: { fontWeight: 700 },
+    h3: { fontWeight: 600 },
+    h4: { fontWeight: 600 },
+    h5: { fontWeight: 500 },
+    h6: { fontWeight: 500 },
     button: {
       textTransform: 'none',
       fontWeight: 600,
-    }
+    },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: '999px', // Pill-shaped buttons
-          padding: '10px 24px',
-          boxShadow: 'none',
+          borderRadius: 8,
+          padding: '12px 28px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
           transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
           '&:hover': {
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)',
             transform: 'translateY(-2px)',
-          }
+          },
         },
         containedPrimary: {
           '&:hover': {
-            backgroundColor: palette.primary.dark,
-          }
+            backgroundColor: '#C05640', // A darker shade of the primary color
+          },
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 16, // Softer, larger radius for cards
-          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+          borderRadius: 16,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
         },
       },
     },
     MuiAppBar: {
-        styleOverrides: {
-            root: {
-                boxShadow: 'none',
-                borderBottom: `1px solid ${palette.neutral[200]}`
-            }
+      styleOverrides: {
+        root: {
+          boxShadow: 'none',
+          borderBottom: `1px solid #e0e0e0`,
+        },
+      },
+    },
+    MuiTextField: {
+        defaultProps: {
+            variant: 'outlined',
+            fullWidth: true,
+        }
+    },
+    MuiSelect: {
+        defaultProps: {
+            variant: 'outlined',
+            fullWidth: true,
         }
     }
   },
 });
+
+// Make typography responsive
+theme = responsiveFontSizes(theme);
 
 export default theme;

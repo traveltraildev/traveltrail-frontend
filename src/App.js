@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles'; // Import ThemeProvider
-import CssBaseline from '@mui/material/CssBaseline'; // Import CssBaseline for baseline styling
+import { ThemeProvider, useTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider } from './context/AuthContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
-import theme from './theme'; // Import the custom theme
+import theme from './theme';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
-// Pagescd ..
+// Pages
 import Home from './pages/Home';
 import Trips from './pages/Trips';
 import TripDetails from './pages/TripDetails';
@@ -42,45 +43,30 @@ import LoginPage from './pages/LoginPage';
 import Logout from './pages/Logout';
 import ManageBookingsPage from './pages/ManageBookingsPage';
 
-
 // Components
-import Navbar from './components/common/Navbar';
-import Navbar2 from './components/common/Navbar2';
-import Footer from './components/common/Footer';
-
+import BottomNavBar from './components/common/BottomNavBar';
 
 // Context
 import RequireAuth from './components/common/RequireAuth';
-import { useAuth } from './context/AuthContext';
 
 function App() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const appTheme = useTheme();
+  const isMobile = useMediaQuery(appTheme.breakpoints.down('md'));
 
   return (
-    <ThemeProvider theme={theme}> {/* Wrap with ThemeProvider */}
-      <CssBaseline /> {/* Apply baseline styles */}
-      <AdminAuthProvider> {/* Wrap with AdminAuthProvider */}
-        <AuthProvider> {/* Wrap with AuthProvider */}
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AdminAuthProvider>
+        <AuthProvider>
           <Router>
             <div className="App">
-              <Navbar />
-              {isMobile && <Navbar2 />}
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/trips" element={<Trips />} />
                 <Route path="/accommodations" element={<Accommodations />} />
-                <Route path="/trips/:id" element={<TripDetails isMobile={isMobile} />} />
-                <Route path="/accommodations/:id" element={<AccommodationDetailsPage isMobile={isMobile} />} />
+                <Route path="/trips/:id" element={<TripDetails />} />
+                <Route path="/accommodations/:id" element={<AccommodationDetailsPage />} />
                 <Route path="/about-us" element={<AboutUsPage />} />
                 <Route path="/contact-us" element={<ContactUsPage />} />
                 <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
@@ -91,19 +77,18 @@ function App() {
                 <Route path="/logout" element={<Logout />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/booking-confirmation" element={<BookingConfirmation />} />
-                <Route path="/admin/login" element={<AdminLoginPage />} /> {/* Admin Login moved to Public Routes */}
+                <Route path="/admin/login" element={<AdminLoginPage />} />
 
                 <Route element={<RequireAuth />}>
                   <Route path="/profile" element={<UserProfilePage />} />
                   <Route path="/edit-profile" element={<EditProfilePage />} />
                   <Route path="/change-password" element={<ChangePasswordPage />} />
-                 
                 </Route>
 
                 {/* Admin Protected Routes */}
                 <Route element={<RequireAuth isAdmin />}>
                   <Route path="/admin/dashboard" element={<Dashboard />} />
-                   <Route path="/admin/manage-bookings" element={<ManageBookingsPage />} />
+                  <Route path="/admin/manage-bookings" element={<ManageBookingsPage />} />
                   <Route path="/admin/cms" element={<CMSAdminPanel />} />
                   <Route path="/admin/cms/trips-list" element={<AdminTripsPage />} />
                   <Route path="/admin/cms/edit/about-us" element={<EditAboutUsPage />} />
@@ -115,17 +100,17 @@ function App() {
                   <Route path="/admin/add-accommodation" element={<AddAccommodation />} />
                   <Route path="/admin/edit-accommodation/:id" element={<EditAccommodation />} />
                   <Route path="/admin/accommodations" element={<AccommodationsList />} />
-                  <Route path="/admin/cms/add-trip" element={<AddTripPage isMobile={isMobile} />} />
+                  <Route path="/admin/cms/add-trip" element={<AddTripPage />} />
                   <Route path="/admin/edit-trip/:tripId" element={<EditTripPage />} />
                 </Route>
               </Routes>
-              {!isMobile && <Footer />}
+              {isMobile && <BottomNavBar />}
             </div>
           </Router>
         </AuthProvider>
       </AdminAuthProvider>
     </ThemeProvider>
- );
+  );
 }
 
 export default App;

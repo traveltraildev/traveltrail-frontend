@@ -6,36 +6,55 @@ import {
   Grid,
   Typography,
   Skeleton,
-  AppBar,
-  Toolbar,
   Button,
   Slide,
   useScrollTrigger,
-  Stack
+  Stack,
+  useTheme,
+  Link,
+  Paper
 } from "@mui/material";
 import ImageGallery from "../components/TripDetails/ImageGallery";
 import TripInfo from "../components/TripDetails/TripInfo";
 import BookNow from "../components/TripDetails/BookNow";
 import { getAllTrips } from "../endpoints";
+import Navbar from "../components/common/Navbar";
+import Footer from "../components/common/Footer";
 
-// A new sticky header that appears on scroll
 const StickyHeader = ({ trip }) => {
+  const theme = useTheme();
   const trigger = useScrollTrigger({
     disableHysteresis: true,
-    threshold: 400, // Appears after scrolling 400px
+    threshold: 500, // Appears after scrolling 500px
   });
 
   return (
     <Slide appear={false} direction="down" in={trigger}>
-      <AppBar component="div" elevation={2} sx={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(8px)' }}>
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <Box>
-            <Typography variant="h6" color="text.primary" fontWeight="600">{trip.name}</Typography>
-            <Typography variant="body2" color="text.secondary">{trip.daysCount} Days / {trip.nightsCount} Nights</Typography>
+      <Paper 
+        elevation={6} 
+        sx={{ 
+          position: 'fixed', 
+          top: '80px', 
+          left: 0, 
+          right: 0, 
+          zIndex: 1100, 
+          backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+          backdropFilter: 'blur(10px)', 
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          py: 1.5,
+          px: {xs: 2, md: 3}
+        }}
+      >
+        <Container maxWidth="lg">
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box>
+              <Typography variant="h6" color="text.primary" fontWeight="600" noWrap>{trip.name}</Typography>
+              <Typography variant="body2" color="text.secondary">{trip.daysCount} Days / {trip.nightsCount} Nights</Typography>
+            </Box>
+            <Button variant="contained" href="#booking-section" size="small">Book Now</Button>
           </Box>
-          <Button variant="contained" href="#booking-section">Book Now</Button>
-        </Toolbar>
-      </AppBar>
+        </Container>
+      </Paper>
     </Slide>
   );
 };
@@ -57,51 +76,63 @@ const TripDetails = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
-        <Skeleton variant="rectangular" width="100%" height={500} sx={{ borderRadius: 2, mb: 3 }} />
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={8}>
-            <Skeleton variant="text" height={60} />
-            <Skeleton variant="text" />
-            <Skeleton variant="text" width="80%" />
+      <>
+        <Navbar />
+        <Container maxWidth="lg" sx={{ pt: 12, pb: 4 }}>
+          <Skeleton variant="rectangular" width="100%" height={550} sx={{ borderRadius: 3, mb: 4 }} />
+          <Grid container spacing={5}>
+            <Grid item xs={12} md={8}>
+              <Skeleton variant="text" height={80} width="80%" />
+              <Skeleton variant="text" height={40} />
+              <Skeleton variant="rectangular" height={200} sx={{mt: 2, borderRadius: 2}}/>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Skeleton variant="rectangular" width="100%" height={350} sx={{ borderRadius: 3 }} />
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 2 }} />
-          </Grid>
-        </Grid>
-      </Container>
+        </Container>
+        <Footer />
+      </>
     );
   }
 
   if (!trip) {
     return (
-      <Container sx={{ textAlign: 'center', py: 12 }}>
-        <Typography variant="h4">Trip not found</Typography>
-      </Container>
+      <>
+        <Navbar />
+        <Container sx={{ textAlign: 'center', py: 15 }}>
+          <Typography variant="h4">Trip not found</Typography>
+          <Typography color="text.secondary" sx={{mt: 1}}>We couldn't find the trip you're looking for.</Typography>
+          <Button component={Link} to="/trips" variant="contained" sx={{mt: 3}}>Explore Other Trips</Button>
+        </Container>
+        <Footer />
+      </>
     );
   }
 
   return (
     <>
+      <Navbar />
       <StickyHeader trip={trip} />
-      <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
-        <Grid container spacing={{ xs: 3, md: 5 }}>
-          {/* Left Column: Gallery and Info */}
-          <Grid item xs={12} md={7} lg={8}>
-            <Stack spacing={4}>
-              <ImageGallery images={trip.images} />
-              <TripInfo trip={trip} />
-            </Stack>
-          </Grid>
+      <Box sx={{pt: 8}}>
+        <Container maxWidth="lg" sx={{ mb: 4 }}>
+          <Grid container spacing={{ xs: 4, md: 6 }}>
+            <Grid item xs={12} md={7} lg={8}>
+              <Stack spacing={5}>
+                <ImageGallery images={trip.images} />
+                <TripInfo trip={trip} />
+              </Stack>
+            </Grid>
 
-          {/* Right Column: Booking Form */}
-          <Grid item xs={12} md={5} lg={4}>
-            <Box sx={{ position: 'sticky', top: 100 }} id="booking-section">
-              <BookNow trip={trip} />
-            </Box>
+            <Grid item xs={12} md={5} lg={4}>
+              <Box sx={{ position: 'sticky', top: 100 }} id="booking-section">
+                <BookNow trip={trip} />
+              </Box>
+            </Grid>
           </Grid>
-        </Grid>
-      </Container>
+        </Container>
+      </Box>
+      <Footer />
     </>
   );
 };

@@ -8,16 +8,19 @@ import {
   Paper,
   CircularProgress,
   Stack,
-  Alert
+  Alert,
+  Divider,
+  useTheme
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import { BASE_URL, sheetProxy } from '../../endpoints';
+import { BASE_URL } from '../../endpoints';
 import { getUserAuthHeader } from "../../utils";
 
 const BookNow = ({ trip }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
   const [formData, setFormData] = useState({
     startDate: null,
     endDate: null,
@@ -58,7 +61,6 @@ const BookNow = ({ trip }) => {
 
       if (!apiResponse.ok) throw new Error("Failed to save booking. Please try again.");
 
-      // Navigate to a confirmation page upon successful booking
       navigate("/booking-confirmation", {
         state: {
           success: true,
@@ -79,57 +81,71 @@ const BookNow = ({ trip }) => {
     }
   };
 
+  const totalPrice = trip.price * formData.adults;
+
   return (
-    <Paper elevation={3} sx={{ p: {xs: 2, md: 3}, borderRadius: 2, border: '1px solid', borderColor: 'neutral.200' }}>
-      <Typography variant="h5" fontWeight="600" sx={{ mb: 2 }}>
-        Book Your Trip
-      </Typography>
-      <Box component="form" onSubmit={handleSubmit}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Stack spacing={2.5}>
-            {error && <Alert severity="error">{error}</Alert>}
-            <DatePicker
-              label="Start Date"
-              value={formData.startDate}
-              onChange={(date) => handleChange("startDate", date)}
-              minDate={dayjs().add(1, "day")}
-            />
-            <DatePicker
-              label="End Date"
-              value={formData.endDate}
-              onChange={(date) => handleChange("endDate", date)}
-              minDate={formData.startDate ? dayjs(formData.startDate).add(1, "day") : dayjs().add(2, "day")}
-            />
-            <Stack direction="row" spacing={2}>
-              <TextField
-                label="Adults"
-                type="number"
-                value={formData.adults}
-                onChange={(e) => handleChange("adults", e.target.value)}
-                fullWidth
-                InputProps={{ inputProps: { min: 1 } }}
+    <Paper elevation={12} sx={{ p: {xs: 2.5, md: 3.5}, borderRadius: 4, border: `1px solid ${theme.palette.divider}` }}>
+      <Stack spacing={3}>
+        <Box>
+            <Typography variant="h4" fontWeight="700">Book Your Trip</Typography>
+            <Typography color="text.secondary">Starting from <Typography component="span" fontWeight="700" color="primary">₹{trip.price?.toLocaleString()}</Typography>/person</Typography>
+        </Box>
+        <Divider />
+        <Box component="form" onSubmit={handleSubmit}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Stack spacing={2.5}>
+              {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
+              <DatePicker
+                label="Start Date"
+                value={formData.startDate}
+                onChange={(date) => handleChange("startDate", date)}
+                minDate={dayjs().add(1, "day")}
+                sx={{width: '100%'}}
               />
-              <TextField
-                label="Children"
-                type="number"
-                value={formData.children}
-                onChange={(e) => handleChange("children", e.target.value)}
-                fullWidth
-                InputProps={{ inputProps: { min: 0 } }}
+              <DatePicker
+                label="End Date"
+                value={formData.endDate}
+                onChange={(date) => handleChange("endDate", date)}
+                minDate={formData.startDate ? dayjs(formData.startDate).add(1, "day") : dayjs().add(2, "day")}
+                sx={{width: '100%'}}
               />
+              <Stack direction="row" spacing={2}>
+                <TextField
+                  label="Adults"
+                  type="number"
+                  value={formData.adults}
+                  onChange={(e) => handleChange("adults", e.target.value)}
+                  fullWidth
+                  InputProps={{ inputProps: { min: 1 } }}
+                />
+                <TextField
+                  label="Children"
+                  type="number"
+                  value={formData.children}
+                  onChange={(e) => handleChange("children", e.target.value)}
+                  fullWidth
+                  InputProps={{ inputProps: { min: 0 } }}
+                />
+              </Stack>
+              <Divider sx={{pt: 1}}/>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography variant="h6" fontWeight="600">Total Price:</Typography>
+                <Typography variant="h5" fontWeight="700" color="primary">₹{totalPrice.toLocaleString()}</Typography>
+              </Stack>
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                disabled={loading}
+                fullWidth
+                sx={{py: 1.5}}
+              >
+                {loading ? <CircularProgress size={26} color="inherit" /> : "Request to Book"}
+              </Button>
             </Stack>
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              disabled={loading}
-              fullWidth
-            >
-              {loading ? <CircularProgress size={26} color="inherit" /> : "Request to Book"}
-            </Button>
-          </Stack>
-        </LocalizationProvider>
-      </Box>
+          </LocalizationProvider>
+        </Box>
+      </Stack>
     </Paper>
   );
 };

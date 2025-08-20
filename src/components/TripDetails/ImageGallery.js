@@ -18,7 +18,7 @@ const ImageGallery = ({ images }) => {
 
   if (!images || images.length === 0) {
     return (
-      <Paper sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'neutral.100' }}>
+      <Paper sx={{ height: 450, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'neutral.100', borderRadius: 3 }}>
         <Typography>No images available.</Typography>
       </Paper>
     );
@@ -32,18 +32,18 @@ const ImageGallery = ({ images }) => {
   };
 
   return (
-    <Stack spacing={2}>
-      <Paper sx={{ position: 'relative', overflow: 'hidden', borderRadius: 2 }} elevation={3}>
-        <Box sx={{ paddingTop: '56.25%', position: 'relative' }}>
+    <Stack spacing={1.5}>
+      <Paper sx={{ position: 'relative', overflow: 'hidden', borderRadius: 3 }} elevation={0}>
+        <Box sx={{ paddingTop: '60%', position: 'relative' }}>
           <AnimatePresence initial={false}>
             <motion.img
               key={currentIndex}
               src={images[currentIndex]}
               alt={`Gallery image ${currentIndex + 1}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
               style={{
                 position: 'absolute',
                 top: 0,
@@ -60,22 +60,24 @@ const ImageGallery = ({ images }) => {
           <>
             <IconButton
               onClick={() => handleNavigation('prev')}
-              sx={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: 'rgba(0,0,0,0.4)', color: 'white', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)' } }}
+              size="small"
+              sx={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', bgcolor: 'rgba(0,0,0,0.5)', color: 'white', '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' } }}
             >
-              <ArrowBackIosNew />
+              <ArrowBackIosNew sx={{fontSize: '1rem'}} />
             </IconButton>
             <IconButton
               onClick={() => handleNavigation('next')}
-              sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: 'rgba(0,0,0,0.4)', color: 'white', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)' } }}
+              size="small"
+              sx={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', bgcolor: 'rgba(0,0,0,0.5)', color: 'white', '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' } }}
             >
-              <ArrowForwardIos />
+              <ArrowForwardIos sx={{fontSize: '1rem'}}/>
             </IconButton>
           </>
         )}
       </Paper>
 
       {images.length > 1 && (
-        <Stack direction="row" spacing={1} sx={{ overflowX: 'auto', pb: 1 }}>
+        <Stack direction="row" spacing={1.5} sx={{ overflowX: 'auto', pb: 1 }}>
           {images.map((img, index) => (
             <Box
               key={index}
@@ -83,16 +85,17 @@ const ImageGallery = ({ images }) => {
               src={img}
               onClick={() => setCurrentIndex(index)}
               sx={{
-                height: isMobile ? 60 : 80,
-                width: isMobile ? 80 : 120,
+                height: isMobile ? 65 : 85,
+                width: isMobile ? 90 : 120,
                 objectFit: 'cover',
-                borderRadius: 1,
+                borderRadius: 2,
                 cursor: 'pointer',
-                border: index === currentIndex ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent',
-                opacity: index === currentIndex ? 1 : 0.6,
-                transition: 'opacity 0.2s, border 0.2s',
+                border: index === currentIndex ? `3px solid ${theme.palette.primary.main}` : `3px solid transparent`,
+                filter: index === currentIndex ? 'none' : 'brightness(0.8)',
+                transition: 'all 0.3s ease',
                 '&:hover': {
-                  opacity: 1,
+                  filter: 'none',
+                  transform: 'scale(1.05)'
                 },
               }}
             />

@@ -11,14 +11,17 @@ import {
   Paper,
   Chip,
   CircularProgress,
-  Alert
+  Alert,
+  useTheme
 } from '@mui/material';
 import { getUserBookingHistory } from '../../api/bookingAPI';
+import { format } from 'date-fns';
 
 const UserBookingHistory = ({ userId }) => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const theme = useTheme();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -53,29 +56,42 @@ const UserBookingHistory = ({ userId }) => {
     return <Alert severity="error">{error}</Alert>;
   }
 
+  const getStatusColor = (status) => {
+      switch(status?.toLowerCase()) {
+          case 'confirmed': return 'success';
+          case 'pending': return 'warning';
+          case 'cancelled': return 'error';
+          default: return 'default';
+      }
+  }
+
   return (
     <Box>
+      <Typography variant="h5" fontWeight="600" sx={{mb: 2}}>Booking History</Typography>
       {bookings.length === 0 ? (
-        <Typography sx={{ textAlign: 'center', p: 4, color: 'text.secondary' }}>
-          You have no bookings yet.
-        </Typography>
+        <Box sx={{ textAlign: 'center', p: 6, border: `2px dashed ${theme.palette.divider}`, borderRadius: 2 }}>
+          <Typography variant="h6" color="text.secondary">
+            You have no bookings yet.
+          </Typography>
+          <Typography color="text.secondary" sx={{mt: 1}}>When you book a trip, it will appear here.</Typography>
+        </Box>
       ) : (
-        <TableContainer component={Paper} elevation={0} variant="outlined">
+        <TableContainer component={Paper} elevation={0} variant="outlined" sx={{borderRadius: 2}}>
           <Table aria-label="booking history table">
-            <TableHead sx={{ bgcolor: 'neutral.100' }}>
+            <TableHead sx={{ bgcolor: theme.palette.background.paper, borderBottom: `1px solid ${theme.palette.divider}` }}>
               <TableRow>
-                <TableCell>Trip Name</TableCell>
-                <TableCell>Dates</TableCell>
-                <TableCell>Status</TableCell>
+                <TableCell sx={{fontWeight: 'bold'}}>Trip Name</TableCell>
+                <TableCell sx={{fontWeight: 'bold'}}>Dates</TableCell>
+                <TableCell sx={{fontWeight: 'bold'}}>Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {bookings.map((booking) => (
                 <TableRow key={booking._id} hover>
                   <TableCell sx={{ fontWeight: 500 }}>{booking.tripName}</TableCell>
-                  <TableCell>{`${new Date(booking.startDate).toLocaleDateString()} - ${new Date(booking.endDate).toLocaleDateString()}`}</TableCell>
+                  <TableCell>{`${format(new Date(booking.startDate), 'dd MMM yyyy')} - ${format(new Date(booking.endDate), 'dd MMM yyyy')}`}</TableCell>
                   <TableCell>
-                    <Chip label={booking.status || 'Confirmed'} color="success" size="small" />
+                    <Chip label={booking.status || 'Confirmed'} color={getStatusColor(booking.status)} size="small" />
                   </TableCell>
                 </TableRow>
               ))}

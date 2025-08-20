@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { DataGrid, GridToolbar, GridActionsCellItem } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import {
   CircularProgress,
   Alert,
@@ -8,9 +8,8 @@ import {
   Box,
   Typography,
   Container,
-  useTheme,
-  styled,
   Paper,
+  useTheme
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -28,63 +27,6 @@ const AccommodationsList = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const theme = useTheme();
-
-  const columns = [
-    {
-      field: "sno",
-      headerName: "#",
-      width: 80,
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-    },
-    { field: "name", headerName: "Name", flex: 2 },
-    { field: "price", headerName: "Price (INR)", type: "number", width: 150 },
-    { field: "roomType", headerName: "Room Type", width: 150 },
-    {
-      field: "maxOccupancy",
-      headerName: "Capacity",
-      type: "number",
-      width: 120,
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 180,
-      sortable: false,
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
-          <IconButton
-            color="info"
-            size="small"
-            onClick={() => handleView(params.row._id)}
-          >
-            <Tooltip title="View Details" arrow>
-              <ViewIcon />
-            </Tooltip>
-          </IconButton>
-          <IconButton
-            color="primary"
-            size="small"
-            onClick={() => handleEdit(params.row._id)}
-          >
-            <Tooltip title="Edit Accommodation" arrow>
-              <EditIcon />
-            </Tooltip>
-          </IconButton>
-          <IconButton
-            color="error"
-            size="small"
-            onClick={() => handleDelete(params.row._id)}
-          >
-            <Tooltip title="Delete Accommodation" arrow>
-              <DeleteIcon />
-            </Tooltip>
-          </IconButton>
-        </Box>
-      ),
-    },
-  ];
 
   const handleView = (id) => {
     navigate(`/accommodations/${id}`);
@@ -115,6 +57,53 @@ const AccommodationsList = () => {
     }
   };
 
+  const columns = [
+    { 
+      field: "sno", 
+      headerName: "#", 
+      width: 80, 
+      headerAlign: "center", 
+      align: "center", 
+      sortable: false 
+    },
+    { field: "name", headerName: "Name", flex: 1, minWidth: 200 },
+    { field: "price", headerName: "Price (INR)", type: "number", width: 150 },
+    { field: "roomType", headerName: "Room Type", width: 150 },
+    {
+      field: "maxOccupancy",
+      headerName: "Capacity",
+      type: "number",
+      width: 120,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 180,
+      sortable: false,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => (
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Tooltip title="View Details">
+            <IconButton color="info" size="small" onClick={() => handleView(params.row._id)}>
+              <ViewIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Edit Accommodation">
+            <IconButton color="primary" size="small" onClick={() => handleEdit(params.row._id)}>
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete Accommodation">
+            <IconButton color="error" size="small" onClick={() => handleDelete(params.row._id)}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ),
+    },
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("adminToken");
@@ -142,7 +131,6 @@ const AccommodationsList = () => {
           throw new Error(result.error || "Failed to fetch data");
         }
 
-        // Add S.No based on initial data order
         const formattedData = result.data.map((item, index) => ({
           ...item,
           sno: index + 1,
@@ -159,48 +147,25 @@ const AccommodationsList = () => {
     fetchData();
   }, [navigate]);
 
-  const PageContainer = styled(Paper)(({ theme }) => ({
-    padding: theme.spacing(3),
-    borderRadius: theme.shape.borderRadius * 2,
-    boxShadow: theme.shadows[3],
-    backgroundColor: theme.palette.background.paper,
-  }));
-
-  const Header = styled(Box)(({ theme }) => ({
-    marginBottom: theme.spacing(3),
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    paddingBottom: theme.spacing(2),
-  }));
-
   if (error) {
     return (
-      <Alert severity="error" sx={{ m: 2, mt: 8 }}>
-        {error}
-      </Alert>
+      <Container sx={{ py: 4 }}>
+        <Alert severity="error">{error}</Alert>
+      </Container>
     );
   }
 
   return (
     <>
       <Navbar />
-      <Container maxWidth="lg" sx={{ py: theme.spacing(6) }}>
-        <PageContainer>
-          <Header>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
-              Accommodations List
-            </Typography>
-          </Header>
-
-          <Box sx={{ height: "calc(100vh - 400px)", width: "100%" }}>
+      <Container maxWidth="xl" sx={{ pt: 12, pb: 4 }}>
+        <Paper sx={{ p: 3, borderRadius: 3, boxShadow: theme.shadows[4] }}>
+          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+            Accommodations
+          </Typography>
+          <Box sx={{ height: 650, width: '100%' }}>
             {loading ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  minHeight: "300px",
-                }}
-              >
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                 <CircularProgress />
               </Box>
             ) : (
@@ -210,31 +175,29 @@ const AccommodationsList = () => {
                 getRowId={(row) => row._id}
                 pageSize={10}
                 rowsPerPageOptions={[10, 25, 50]}
-                components={{
-                  Toolbar: () => (
-                    <GridToolbar sx={{ justifyContent: "flex-end" }} />
-                  ),
-                }}
+                components={{ Toolbar: GridToolbar }}
                 sx={{
-                  "& .MuiDataGrid-columnHeaders": {
-                    backgroundColor: theme.palette.action.hover,
-                    color: theme.palette.text.primary,
+                  border: 0,
+                  '& .MuiDataGrid-columnHeaders': {
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.text.primary, // Changed to text.primary for visibility
+                    fontSize: '1rem',
+                  },
+                  '& .MuiDataGrid-cell': {
                     borderBottom: `1px solid ${theme.palette.divider}`,
                   },
-                  "& .MuiDataGrid-cell": {
-                    borderBottom: `1px solid ${theme.palette.divider}`,
+                  '& .MuiDataGrid-footerContainer': {
+                    borderTop: `1px solid ${theme.palette.divider}`,
                   },
-                  "& .MuiDataGrid-row:hover": {
-                    backgroundColor: theme.palette.action.hover,
-                  },
-                  "& .MuiDataGrid-actionsCell": {
-                    justifyContent: "center",
-                  },
+                  '& .MuiDataGrid-toolbarContainer': {
+                    padding: theme.spacing(1),
+                    justifyContent: 'flex-end'
+                  }
                 }}
               />
             )}
           </Box>
-        </PageContainer>
+        </Paper>
       </Container>
       <Footer />
     </>

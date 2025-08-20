@@ -1,107 +1,112 @@
 import React, { useState, useEffect } from "react";
-import { Container, Typography, Box, Card } from "@mui/material";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import { Container, Typography, Box, Card, CircularProgress, useTheme } from "@mui/material";
 import { tacPage } from "../endpoints";
+import Navbar from "../components/common/Navbar";
+import Footer from "../components/common/Footer";
 
 const TermsAndConditionsPage = () => {
   const [pageContent, setPageContent] = useState(null);
-  const isMobile = useMediaQuery("(max-width:600px)");
+  const [loading, setLoading] = useState(true);
+  const theme = useTheme();
 
   useEffect(() => {
-    fetch(tacPage)
-      .then((response) => {
+    const fetchPageContent = async () => {
+      try {
+        const response = await fetch(tacPage);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response.json();
-      })
-      .then((data) => {
+        const data = await response.json();
         setPageContent(data);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching Terms & Conditions content:", error);
-        alert("Error loading content from API. Check console.");
-      });
+        setPageContent({ title: "Error Loading Content", content: "<p>There was an error loading the content for this page.</p>" });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPageContent();
     window.scrollTo(0, 0);
   }, []);
 
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   if (!pageContent) {
-    return <Typography>Loading Terms & Conditions content...</Typography>;
+    return (
+      <Box sx={{ textAlign: 'center', py: 12 }}>
+        <Typography variant="h4">Failed to load Terms & Conditions content.</Typography>
+      </Box>
+    );
   }
 
   return (
-    <Container maxWidth="md" sx={{ mt: 8, mb: 4, px: 2 }}>
-      <Typography
-        variant="h4"
-        component="h1"
-        align="center"
-        gutterBottom
-        sx={{ fontWeight: "bold" }}
-      >
-        {pageContent.title}
-      </Typography>
+    <>
+      <Navbar />
+      <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          align="center"
+          gutterBottom
+          sx={{ fontWeight: "bold", color: theme.palette.primary.main }}
+        >
+          {pageContent.title}
+        </Typography>
 
-      <Card
-        elevation={3}
-        sx={{
-          borderRadius: "12px",
-          p: 4,
-          width: "100%",
-          maxWidth: "100%",
-          overflow: "hidden",
-        }}
-      >
-        <Box
+        <Card
+          elevation={3}
           sx={{
-            "& p": {
-              mb: 2,
-              color: "text.secondary",
-              fontSize: "1rem",
-              lineHeight: 1.6,
-              overflowWrap: "break-word",
-              wordBreak: "break-word",
-              whiteSpace: "normal",
-              maxWidth: "100%",
-              width: "100%",
-              textAlign: "left", // Left-align text
-            },
-            "& a": { color: "primary.main", textDecoration: "none" },
-            "& ul": {
-              pl: 4, // Add left padding for bullet points
-              ml: 2, // Add left margin for bullet points
-            },
-            "& ol": {
-              pl: 4, // Add left padding for numbered lists
-              ml: 2, // Add left margin for numbered lists
-            },
-            "& li": {
-              mb: 1,
-              ml: 0, // Reset left margin for list items
-              textAlign: "left", // Left-align list items
-            },
-            "& h1": {
-              fontSize: "2rem",
-              fontWeight: "bold",
-              mb: 2,
-              textAlign: "center", // Center-align headings
-            },
-            "& h2": {
-              fontSize: "1.5rem",
-              fontWeight: "bold",
-              mb: 1.5,
-              textAlign: "left", // Left-align subheadings
-            },
-            "& h3": {
-              fontSize: "1.25rem",
-              fontWeight: "bold",
-              mb: 1,
-              textAlign: "left", // Left-align subheadings
-            },
+            borderRadius: 3,
+            p: {xs: 2, md: 4},
+            width: "100%",
+            maxWidth: "100%",
+            overflow: "hidden",
           }}
-          dangerouslySetInnerHTML={{ __html: pageContent.content }}
-        />
-      </Card>
-    </Container>
+        >
+          <Box
+            sx={{
+              "& p": {
+                mb: 2,
+                color: "text.primary",
+                fontSize: "1rem",
+                lineHeight: 1.7,
+                overflowWrap: "break-word",
+                wordBreak: "break-word",
+                whiteSpace: "normal",
+                maxWidth: "100%",
+                width: "100%",
+                textAlign: "left",
+              },
+              "& h1, & h2, & h3, & h4, & h5, & h6": {
+                mt: 3, mb: 1.5, fontWeight: 'bold', color: theme.palette.text.primary
+              },
+              "& ul": {
+                pl: 4,
+                ml: 2,
+              },
+              "& ol": {
+                pl: 4,
+                ml: 2,
+              },
+              "& li": {
+                mb: 1,
+                ml: 0,
+                textAlign: "left",
+              },
+              "& a": { color: theme.palette.primary.main, textDecoration: "none", '&:hover': { textDecoration: 'underline' } },
+            }}
+            dangerouslySetInnerHTML={{ __html: pageContent.content }}
+          />
+        </Card>
+      </Container>
+      <Footer />
+    </>
   );
 };
 

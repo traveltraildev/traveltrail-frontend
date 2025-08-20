@@ -8,45 +8,43 @@ import {
   Paper,
   Tabs,
   Tab,
-  Fade,
+  useTheme,
 } from '@mui/material';
-import { Search, Flight, Hotel, Groups } from '@mui/icons-material';
+import { Search, Flight, Hotel, Groups, Explore } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
-const Hero = ({ backgroundImage }) => {
+const Hero = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTab, setCurrentTab] = useState(0);
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const handleSearch = () => {
-    const path = currentTab === 0 ? '/trips' : '/accommodations';
+    const path = searchTabs[currentTab].path;
     navigate(path, { state: { search: searchQuery } });
   };
 
   const searchTabs = [
     { label: 'Trips', icon: <Explore />, path: '/trips' },
     { label: 'Stays', icon: <Hotel />, path: '/accommodations' },
-    { label: 'Groups', icon: <Groups />, path: '/trips' }, // Assuming groups are a type of trip
+    { label: 'Groups', icon: <Groups />, path: '/trips' },
   ];
 
   return (
     <Box
       sx={{
         position: 'relative',
-        height: { xs: '70vh', md: '80vh' },
-        maxHeight: '800px',
-        backgroundImage: `url(${backgroundImage})`,
+        height: { xs: '80vh', md: '90vh' },
+        maxHeight: '950px',
+        backgroundImage: `url('/images/hero1.jpg')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         color: 'white',
-        borderRadius: 3,
-        overflow: 'hidden',
       }}
     >
-      {/* Background Overlay */}
       <Box
         sx={{
           position: 'absolute',
@@ -54,80 +52,103 @@ const Hero = ({ backgroundImage }) => {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1))'
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0.1) 100%)',
         }}
       />
 
-      <Fade in={true} timeout={1000}>
-        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
-          <Typography
-            variant="h1"
-            component="h1"
-            sx={{
-              fontWeight: 800,
-              fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem' },
-              textShadow: '2px 2px 8px rgba(0,0,0,0.7)',
-            }}
-          >
-            Book Nahi, Belong Karo
-          </Typography>
-          <Typography
-            variant="h6"
-            component="p"
-            sx={{ mt: 2, mb: 4, maxWidth: '600px', mx: 'auto', opacity: 0.9 }}
-          >
-            Discover curated travel experiences and stays that make you feel like you belong.
-          </Typography>
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+        <Typography
+          variant="h1"
+          component="h1"
+          sx={{
+            fontWeight: 800,
+            fontSize: { xs: '3rem', sm: '4.5rem', md: '5.5rem' },
+            textShadow: '2px 4px 10px rgba(0,0,0,0.6)',
+            letterSpacing: '-1px',
+          }}
+        >
+          Book Nahi, Belong Karo
+        </Typography>
+        <Typography
+          variant="h5"
+          component="p"
+          sx={{ mt: 2, mb: 5, maxWidth: '700px', mx: 'auto', opacity: 0.9, fontWeight: 300 }}
+        >
+          Discover unique destinations and unforgettable experiences. Travel with us and create memories that last a lifetime.
+        </Typography>
 
-          <Paper
-            elevation={8}
+        <Paper
+          elevation={12}
+          sx={{
+            p: 1.5,
+            borderRadius: '24px',
+            bgcolor: 'rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.2)',
+          }}
+        >
+          <Tabs
+            value={currentTab}
+            onChange={(e, newValue) => setCurrentTab(newValue)}
+            centered
             sx={{
-              p: 1,
-              borderRadius: '16px',
-              bgcolor: 'rgba(255,255,255,0.9)',
-              backdropFilter: 'blur(10px)',
-              mt: 4,
+              mb: 2,
+              minHeight: 'auto',
+              '& .MuiTabs-indicator': {
+                backgroundColor: theme.palette.secondary.main,
+                height: 4,
+                borderRadius: 4
+              },
+              '& .MuiTab-root': {
+                color: 'white',
+                minHeight: 'auto',
+                pt: 1.5,
+                pb: 1.5,
+                fontSize: '1rem',
+                opacity: 0.8,
+                '&.Mui-selected': {
+                  opacity: 1,
+                  color: 'white',
+                  fontWeight: 'bold'
+                }
+              }
             }}
           >
-            <Tabs
-              value={currentTab}
-              onChange={(e, newValue) => setCurrentTab(newValue)}
-              centered
-              sx={{ mb: 2, minHeight: 'auto' }}
+            {searchTabs.map((tab, index) => (
+              <Tab key={index} label={tab.label} icon={tab.icon} iconPosition="start" />
+            ))}
+          </Tabs>
+
+          <Box sx={{ display: 'flex', gap: 1.5, p: 1 }}>
+            <TextField
+              fullWidth
+              variant="filled"
+              placeholder={`Search for ${searchTabs[currentTab].label}...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              sx={{ 
+                bgcolor: 'rgba(255,255,255,0.9)', 
+                borderRadius: 2, 
+                '& .MuiFilledInput-underline:before': { borderBottom: 0 },
+                '& .MuiFilledInput-root': { bgcolor: 'transparent' },
+                '&:hover': { bgcolor: 'rgba(255,255,255,1)' }
+              }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={handleSearch}
+              sx={{ px: {xs: 3, sm: 5}, borderRadius: 2, boxShadow: theme.shadows[6] }}
             >
-              {searchTabs.map((tab, index) => (
-                <Tab key={index} label={tab.label} icon={tab.icon} iconPosition="start" sx={{minHeight: 'auto', pt: 1}} />
-              ))}
-            </Tabs>
-
-            <Box sx={{ display: 'flex', gap: 1, p: 1 }}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                placeholder={`Search for ${searchTabs[currentTab].label}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                sx={{ bgcolor: 'white', borderRadius: 2 }}
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                onClick={handleSearch}
-                sx={{ px: 4, borderRadius: 2 }}
-              >
-                <Search />
-              </Button>
-            </Box>
-          </Paper>
-        </Container>
-      </Fade>
+              <Search />
+            </Button>
+          </Box>
+        </Paper>
+      </Container>
     </Box>
   );
 };
-
-// Dummy icon components if not imported elsewhere
-const Explore = () => <Flight />;
 
 export default Hero;

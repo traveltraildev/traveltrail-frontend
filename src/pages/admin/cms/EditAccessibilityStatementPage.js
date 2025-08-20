@@ -1,19 +1,54 @@
 import React, { useState, useEffect } from "react";
-import { Container, Typography, TextField, Button, Box, CircularProgress, Snackbar, Alert } from "@mui/material";
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Paper,
+  Stack,
+  Alert,
+  CircularProgress,
+  useTheme,
+} from "@mui/material";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { getAdminAuthHeader } from "../../../utils"; // Assuming getAdminAuthHeader is in utils
-import { BASE_URL } from "../../../endpoints"; // Assuming BASE_URL is in endpoints
+import { getAdminAuthHeader } from "../../../utils";
+import { BASE_URL } from "../../../endpoints";
+import Navbar from "../../../components/common/Navbar";
+import Footer from "../../../components/common/Footer";
 
 const EditAccessibilityStatementPage = () => {
   const pageKey = "accessibility-statement";
   const [pageContent, setPageContent] = useState({ title: "", content: "" });
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [notification, setNotification] = useState({ type: "", message: "" });
+  const theme = useTheme();
+
+  const modules = {
+    toolbar: [
+      [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      ['bold', 'italic', 'underline', 'strike'],
+      ['link', 'image'],
+      [{ 'align': [] }],
+      ['clean']
+    ],
+  };
+
+  const formats = [
+    'header',
+    'font',
+    'list',
+    'bullet',
+    'bold',
+    'italic',
+    'underline',
+    'strike',
+    'link',
+    'image',
+    'align'
+  ];
 
   useEffect(() => {
     const fetchPageContent = async () => {
@@ -21,8 +56,7 @@ const EditAccessibilityStatementPage = () => {
         const response = await fetch(`${BASE_URL}/api/cms/pages/${pageKey}`);
         if (!response.ok) {
            if (response.status === 404) {
-            console.log(`Content for ${pageKey} not found, starting with empty form.`);
-            setPageContent({ title: "", content: "" });
+            setPageContent({ title: "Accessibility Statement", content: "" });
           } else {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
@@ -31,17 +65,13 @@ const EditAccessibilityStatementPage = () => {
           setPageContent(data);
         }
       } catch (error) {
-        console.error(`Error fetching ${pageKey} content:`, error);
-        setSnackbarMessage(`Failed to load ${pageKey} content.`);
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
+        setNotification({ type: "error", message: `Failed to load content: ${error.message}` });
       } finally {
         setLoading(false);
       }
     };
 
     fetchPageContent();
-    window.scrollTo(0, 0);
   }, [pageKey]);
 
   const handleChange = (e) => {
@@ -60,13 +90,14 @@ const EditAccessibilityStatementPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSaving(true);
+    setLoading(true);
+    setNotification({ type: "", message: "" });
     try {
       const response = await fetch(`${BASE_URL}/api/cms/pages/${pageKey}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...getAdminAuthHeader(), // Use the same getAdminAuthHeader as working pages
+          ...getAdminAuthHeader(),
         },
         body: JSON.stringify(pageContent),
       });
@@ -75,97 +106,67 @@ const EditAccessibilityStatementPage = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      setSnackbarMessage(`${pageKey} content updated successfully!`);
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
+      setNotification({ type: "success", message: "Accessibility Statement updated successfully!" });
     } catch (error) {
-      console.error(`Error updating ${pageKey} content:`, error);
-      setSnackbarMessage(`Failed to update ${pageKey} content.`);
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      setNotification({ type: "error", message: `Failed to update content: ${error.message}` });
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   };
 
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
+  if (loading && !pageContent.title) {
+    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>;
   }
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4, padding: "20px" }}>
-      <Typography variant="h4" component="h1" align="center" gutterBottom>
-        Edit Accessibility Statement Page
-      </Typography>
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-      >
-        <TextField
-          label="Title"
-          name="title"
-          value={pageContent.title}
-          onChange={handleChange}
-          fullWidth
-          variant="outlined"
-        />
-        <ReactQuill
-          value={pageContent.content}
-          onChange={handleEditorChange}
-          modules={EditAccessibilityStatementPage.modules}
-          formats={EditAccessibilityStatementPage.formats}
-          theme="snow"
-          placeholder="Enter content..."
-          style={{ height: "300px" }}
-        />
-        <Button type="submit" variant="contained" color="primary" disabled={saving}>
-          {saving ? <CircularProgress size={24} /> : "Save Changes"}
-        </Button>
-      </Box>
-      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </Container>
+    <>
+      <Navbar />
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Paper sx={{ p: { xs: 2, md: 4 }, borderRadius: 3, boxShadow: theme.shadows[4] }}>
+          <Stack spacing={3}>
+            <Box>
+              <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>Edit Accessibility Statement</Typography>
+              <Typography color="text.secondary">Update the content for the accessibility statement page.</Typography>
+            </Box>
+
+            {notification.message && (
+              <Alert severity={notification.type} sx={{ width: "100%" }}>
+                {notification.message}
+              </Alert>
+            )}
+
+            <Box component="form" onSubmit={handleSubmit}>
+              <Stack spacing={3}>
+                <TextField
+                  label="Title"
+                  name="title"
+                  value={pageContent.title}
+                  onChange={handleChange}
+                  fullWidth
+                />
+                <Box sx={{ '.ql-editor': { minHeight: '250px' } }}>
+                  <ReactQuill
+                    value={pageContent.content}
+                    onChange={handleEditorChange}
+                    modules={modules}
+                    formats={formats}
+                    theme="snow"
+                    placeholder="Enter content..."
+                  />
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Button type="submit" variant="contained" size="large" disabled={loading}>
+                    {loading ? <CircularProgress size={26} color="inherit" /> : "Save Changes"}
+                  </Button>
+                </Box>
+              </Stack>
+            </Box>
+          </Stack>
+        </Paper>
+      </Container>
+      <Footer />
+    </>
   );
 };
-
-EditAccessibilityStatementPage.modules = {
-  toolbar: [
-    [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
-    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-    ['bold', 'italic', 'underline', 'strike'],
-    ['link', 'image'],
-    [{ 'align': [] }],
-    ['clean']
-  ],
-};
-
-EditAccessibilityStatementPage.formats = [
-  'header',
-  'font',
-  'list',
-  'bullet',
-  'bold',
-  'italic',
-  'underline',
-  'strike',
-  'link',
-  'image',
-  'align'
-];
 
 export default EditAccessibilityStatementPage;

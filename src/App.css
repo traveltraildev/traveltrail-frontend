@@ -1,6 +1,6 @@
 /* App.css */
 .app-container {
-  background-color: var(--neutral-50);
+  background-color: #f8f9fa;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -8,14 +8,17 @@
 
 .content-wrapper {
   flex: 1;
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1400px; /* Increased max-width for a more spacious layout */
   margin: 0 auto;
-  padding: var(--spacing-lg);
+  padding: 24px;
 }
 
-body {
-  margin: 0;
-  overflow-x: hidden;
+/* Responsive padding for smaller screens */
+@media (max-width: 600px) {
+  .content-wrapper {
+    padding: 16px;
+  }
 }
 
 a,
@@ -23,36 +26,4 @@ Link {
   text-decoration: none;
   color: inherit;
   text-decoration-line: none;
-}
-
-/* Add these styles to your app.css */
-.navbar {
-  background: linear-gradient(to bottom, #ffa000, #ffeb3b);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px); /* For Safari and older browsers */
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  transition: background 0.3s ease;
-}
-
-.navbar.scrolled {
-  background: linear-gradient(to bottom, #ffffff, var(--primary-100));
-}
-
-.navbar-logo {
-  height: 40px;
-  width: auto;
-}
-
-.navbar-menu {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.hamburger-menu {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
 }

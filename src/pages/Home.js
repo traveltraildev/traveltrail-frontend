@@ -12,18 +12,19 @@ import {
   Skeleton,
   Stack,
   Paper,
-  TextField
+  TextField,
+  useTheme,
 } from "@mui/material";
 import { Link as RouterLink } from 'react-router-dom';
+import Navbar from "../components/common/Navbar";
+import Footer from "../components/common/Footer";
 import Hero from "../components/Home/Hero";
 import { getAllTrips, getAllAccommodations } from "../endpoints";
-import { useTheme } from '@mui/material/styles';
 
-// Reusable Section Wrapper
 const SectionWrapper = ({ title, children, ...props }) => (
-  <Box component="section" sx={{ py: { xs: 6, md: 8 } }} {...props}>
+  <Box component="section" sx={{ py: { xs: 6, md: 10 } }} {...props}>
     <Container maxWidth="xl">
-      <Typography variant="h3" component="h2" sx={{ textAlign: 'center', mb: 6, fontWeight: 700 }}>
+      <Typography variant="h2" component="h2" sx={{ textAlign: 'center', mb: 8, fontWeight: 700 }}>
         {title}
       </Typography>
       {children}
@@ -31,26 +32,25 @@ const SectionWrapper = ({ title, children, ...props }) => (
   </Box>
 );
 
-// Reusable Horizontal Scrolling Container
 const HorizontalScrollContainer = ({ children }) => (
   <Stack direction="row" spacing={4} sx={{
     overflowX: 'auto',
     py: 2,
     '::-webkit-scrollbar': { height: 8 },
-    '::-webkit-scrollbar-thumb': { bgcolor: 'neutral.300', borderRadius: 4 },
+    '::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 4 },
+    '::-webkit-scrollbar-track': { bgcolor: 'transparent' },
   }}>
     {children}
   </Stack>
 );
 
-// Reusable Trip Card
 const TripCard = ({ trip }) => {
   const theme = useTheme();
   return (
-    <Card sx={{ minWidth: 320, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <Card sx={{ minWidth: 340, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] } }}>
       <CardMedia
         component="img"
-        height="200"
+        height="220"
         image={trip?.images[0] || "/images/placeholder.jpg"}
         alt={trip?.name}
       />
@@ -58,8 +58,8 @@ const TripCard = ({ trip }) => {
         <Typography variant="h6" component="h3" fontWeight="600">{trip.name}</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{trip.destination}</Typography>
         <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-          <Chip label={`${trip.daysCount} Days`} size="small" />
-          <Chip label={`${trip.nightsCount} Nights`} size="small" />
+          <Chip label={`${trip.daysCount} Days`} size="small" variant="outlined" />
+          <Chip label={`${trip.nightsCount} Nights`} size="small" variant="outlined" />
         </Stack>
         <Typography variant="h5" fontWeight="700" color="primary">₹{trip.price?.toLocaleString()}</Typography>
       </CardContent>
@@ -70,12 +70,13 @@ const TripCard = ({ trip }) => {
   );
 };
 
-// Reusable Accommodation Card
-const AccommodationCard = ({ accommodation }) => (
-    <Card sx={{ minWidth: 320, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
+const AccommodationCard = ({ accommodation }) => {
+  const theme = useTheme();
+  return (
+    <Card sx={{ minWidth: 340, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] } }}>
         <CardMedia
             component="img"
-            height="200"
+            height="220"
             image={accommodation?.images[0] || "/images/placeholder.jpg"}
             alt={accommodation?.name}
         />
@@ -83,23 +84,23 @@ const AccommodationCard = ({ accommodation }) => (
             <Typography variant="h6" component="h3" fontWeight="600">{accommodation.name}</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{accommodation.destination}</Typography>
             <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-                <Chip label={accommodation.roomType} size="small" />
+                <Chip label={accommodation.roomType} size="small" variant="outlined" />
             </Stack>
             <Typography variant="h5" fontWeight="700" color="primary">₹{accommodation.price?.toLocaleString()}/night</Typography>
         </CardContent>
         <Box sx={{ p: 2, pt: 0 }}>
-            <Button component={RouterLink} to={`/accommodations/${accommodation._id}`} variant="outlined" fullWidth>View Details</Button>
+            <Button component={RouterLink} to={`/accommodations/${accommodation._id}`} variant="contained" fullWidth>View Details</Button>
         </Box>
     </Card>
-);
+  )
+};
 
-// Skeleton Card for Loading State
 const CardSkeleton = () => (
-  <Box sx={{ minWidth: 320, flexShrink: 0 }}>
-    <Skeleton variant="rectangular" height={200} />
-    <Box sx={{ pt: 1 }}>
-      <Skeleton />
-      <Skeleton width="60%" />
+  <Box sx={{ minWidth: 340, flexShrink: 0 }}>
+    <Skeleton variant="rectangular" height={220} sx={{ borderRadius: 3 }} />
+    <Box sx={{ pt: 1.5 }}>
+      <Skeleton height={30} />
+      <Skeleton width="60%" sx={{ mt: 1 }} />
     </Box>
   </Box>
 );
@@ -108,6 +109,7 @@ const Home = () => {
   const [trips, setTrips] = useState([]);
   const [accommodations, setAccommodations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const theme = useTheme();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -118,8 +120,8 @@ const Home = () => {
         ]);
         const tripsData = await tripsResponse.json();
         const accommodationsData = await accommodationsResponse.json();
-        setTrips(tripsData.slice(0, 7));
-        setAccommodations(accommodationsData.data?.slice(0, 7) || []);
+        setTrips(tripsData.slice(0, 8));
+        setAccommodations(accommodationsData.data?.slice(0, 8) || []);
       } catch (error) {
         console.error("Error fetching homepage data:", error);
       } finally {
@@ -131,9 +133,9 @@ const Home = () => {
 
   return (
     <Box>
-      <Hero backgroundImage="/images/hero.jpg" />
+      <Navbar />
+      <Hero />
 
-      {/* Featured Trips */}
       <SectionWrapper title="Featured Trips">
         <HorizontalScrollContainer>
           {loading ? (
@@ -144,8 +146,7 @@ const Home = () => {
         </HorizontalScrollContainer>
       </SectionWrapper>
 
-      {/* Featured Stays */}
-      <SectionWrapper title="Featured Stays" sx={{ bgcolor: 'neutral.100' }}>
+      <SectionWrapper title="Featured Stays" sx={{ bgcolor: 'background.paper' }}>
         <HorizontalScrollContainer>
           {loading ? (
             Array.from(new Array(5)).map((_, index) => <CardSkeleton key={index} />)
@@ -155,19 +156,33 @@ const Home = () => {
         </HorizontalScrollContainer>
       </SectionWrapper>
 
-      {/* Newsletter Section */}
       <SectionWrapper title="Stay in the Loop">
-          <Container maxWidth="sm">
-              <Typography variant="body1" color="text.secondary" sx={{textAlign: 'center', mb: 3}}>
-                  Join our newsletter to get the latest deals, insider tips, and inspiration delivered to your inbox.
+          <Container maxWidth="md">
+            <Paper sx={{ p: {xs: 3, sm: 5}, borderRadius: 3, textAlign: 'center', background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`, color: 'white' }}>
+              <Typography variant="h4" component="h3" sx={{mb: 2, fontWeight: 'bold'}}>
+                  Join Our Newsletter
               </Typography>
-              <Stack direction={{xs: 'column', sm: 'row'}} spacing={2}>
-                  <TextField fullWidth placeholder="Enter your email address" />
-                  <Button variant="contained" size="large" sx={{px: 4}}>Subscribe</Button>
+              <Typography variant="body1" sx={{mb: 4, opacity: 0.9}}>
+                  Get the latest deals, insider tips, and travel inspiration delivered straight to your inbox.
+              </Typography>
+              <Stack direction={{xs: 'column', sm: 'row'}} spacing={2} justifyContent="center">
+                  <TextField 
+                    variant="filled" 
+                    placeholder="Enter your email address" 
+                    sx={{ 
+                      flexGrow: 1, 
+                      bgcolor: 'rgba(255,255,255,0.9)', 
+                      borderRadius: 1, 
+                      '& .MuiFilledInput-root': { bgcolor: 'transparent' },
+                      '&:hover': { bgcolor: 'rgba(255,255,255,1)' }
+                    }}
+                  />
+                  <Button variant="contained" color="secondary" size="large" sx={{px: 4, color: theme.palette.secondary.contrastText, fontWeight: 'bold'}}>Subscribe</Button>
               </Stack>
+            </Paper>
           </Container>
       </SectionWrapper>
-
+      <Footer />
     </Box>
   );
 };

@@ -14,11 +14,14 @@ import {
   Divider,
   Alert,
   FormControlLabel,
+  useTheme,
 } from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import ItineraryDayForm from "./ItineraryDayForm";
 import { getAllTrips } from "../../../endpoints";
+import Navbar from "../../../components/common/Navbar";
+import Footer from "../../../components/common/Footer";
 
 // Define options for Autocomplete components
 const themeOptions = [
@@ -54,6 +57,7 @@ const AddTripPage = () => {
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ type: '', message: '' });
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -134,8 +138,7 @@ const AddTripPage = () => {
         itineraries: [{ dayTitle: "", shortDescription: "", description: "", highlights: [] }],
         availability: true, isInternational: false,
       });
-      // Optionally navigate after a delay
-      // setTimeout(() => navigate(`/admin/cms/trips-list`), 1500);
+      setTimeout(() => navigate(`/admin/trips`), 2000);
     } catch (error) {
       setNotification({ type: 'error', message: `Error adding trip: ${error.message}` });
       console.error("Error adding new trip package:", error);
@@ -145,12 +148,14 @@ const AddTripPage = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
-      <Paper sx={{ p: { xs: 2, md: 4 }, borderRadius: 2 }}>
+    <>
+    <Navbar />
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Paper sx={{ p: { xs: 2, md: 4 }, borderRadius: 3, boxShadow: theme.shadows[4] }}>
         <Stack spacing={3}>
           <Box>
-            <Typography variant="h4" component="h1" fontWeight="600">Add New Trip Package</Typography>
-            <Typography color="text.secondary">Fill in the details to create a new travel package.</Typography>
+            <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>Add New Trip</Typography>
+            <Typography color="text.secondary">Create a new travel package with all the details.</Typography>
           </Box>
 
           {notification.message && 
@@ -160,66 +165,60 @@ const AddTripPage = () => {
           }
 
           <Box component="form" onSubmit={handleSubmit}>
-            <Stack spacing={4}>
+            <Stack spacing={4} divider={<Divider />}>
               {/* Basic Details */}
               <Box>
                 <Typography variant="h5" fontWeight="600" sx={{ mb: 2 }}>Basic Information</Typography>
                 <Grid container spacing={3}>
                   <Grid item xs={12} md={6}>
-                    <TextField label="Trip Name" name="name" value={formData.name} onChange={(e) => handleChange("name", e.target.value)} fullWidth required />
+                    <TextField label="Trip Name" name="name" value={formData.name} onChange={(e) => handleChange("name", e.target.value)} required />
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <TextField label="Destination" name="destination" value={formData.destination} onChange={(e) => handleChange("destination", e.target.value)} fullWidth />
+                    <TextField label="Destination" name="destination" value={formData.destination} onChange={(e) => handleChange("destination", e.target.value)} />
                   </Grid>
                   <Grid item xs={12}>
-                    <TextField label="Description" name="desc" multiline rows={4} value={formData.desc} onChange={(e) => handleChange("desc", e.target.value)} fullWidth />
+                    <TextField label="Description" name="desc" multiline rows={4} value={formData.desc} onChange={(e) => handleChange("desc", e.target.value)} />
                   </Grid>
                 </Grid>
               </Box>
-
-              <Divider />
 
               {/* Pricing & Duration */}
               <Box>
                 <Typography variant="h5" fontWeight="600" sx={{ mb: 2 }}>Pricing & Duration</Typography>
                 <Grid container spacing={3}>
                   <Grid item xs={12} md={4}>
-                    <TextField label="Price" name="price" type="number" value={formData.price} onChange={(e) => handleChange("price", e.target.value)} fullWidth required />
+                    <TextField label="Price" name="price" type="number" value={formData.price} onChange={(e) => handleChange("price", e.target.value)} required />
                   </Grid>
                   <Grid item xs={12} md={4}>
-                    <TextField label="Days Count" name="daysCount" type="number" value={formData.daysCount} onChange={(e) => handleChange("daysCount", e.target.value)} fullWidth required />
+                    <TextField label="Days Count" name="daysCount" type="number" value={formData.daysCount} onChange={(e) => handleChange("daysCount", e.target.value)} required />
                   </Grid>
                   <Grid item xs={12} md={4}>
-                    <TextField label="Nights Count" name="nightsCount" type="number" value={formData.nightsCount} onChange={(e) => handleChange("nightsCount", e.target.value)} fullWidth required />
+                    <TextField label="Nights Count" name="nightsCount" type="number" value={formData.nightsCount} onChange={(e) => handleChange("nightsCount", e.target.value)} required />
                   </Grid>
                 </Grid>
               </Box>
-
-              <Divider />
 
               {/* Categorization & Media */}
               <Box>
                 <Typography variant="h5" fontWeight="600" sx={{ mb: 2 }}>Categorization & Media</Typography>
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
-                    <Autocomplete multiple options={themeOptions} value={formData.themes} onChange={(event, newValue) => handleChange("themes", newValue)} renderInput={(params) => (<TextField {...params} label="Themes" placeholder="Select themes" fullWidth />)} />
+                    <Autocomplete multiple options={themeOptions} value={formData.themes} onChange={(event, newValue) => handleChange("themes", newValue)} renderInput={(params) => (<TextField {...params} label="Themes" placeholder="Select themes" />)} />
                   </Grid>
                   <Grid item xs={12}>
-                    <Autocomplete multiple options={inclusionOptions} value={formData.inclusions} onChange={(event, newValue) => handleChange("inclusions", newValue)} renderInput={(params) => (<TextField {...params} label="Inclusions" placeholder="Select inclusions" fullWidth />)} />
+                    <Autocomplete multiple options={inclusionOptions} value={formData.inclusions} onChange={(event, newValue) => handleChange("inclusions", newValue)} renderInput={(params) => (<TextField {...params} label="Inclusions" placeholder="Select inclusions" />)} />
                   </Grid>
                   <Grid item xs={12}>
-                    <Autocomplete multiple options={exclusionOptions} value={formData.exclusions} onChange={(event, newValue) => handleChange("exclusions", newValue)} renderInput={(params) => (<TextField {...params} label="Exclusions" placeholder="Select exclusions" fullWidth />)} />
+                    <Autocomplete multiple options={exclusionOptions} value={formData.exclusions} onChange={(event, newValue) => handleChange("exclusions", newValue)} renderInput={(params) => (<TextField {...params} label="Exclusions" placeholder="Select exclusions" />)} />
                   </Grid>
                   <Grid item xs={12}>
-                    <TextField label="Image URLs (comma-separated)" name="images" multiline rows={3} value={formData.images.join(", ")} onChange={(e) => handleChange("images", e.target.value.split(",").map((url) => url.trim()))} fullWidth helperText="Enter full image URLs separated by commas" />
+                    <TextField label="Image URLs (comma-separated)" name="images" multiline rows={3} value={formData.images.join(", ")} onChange={(e) => handleChange("images", e.target.value.split(",").map((url) => url.trim()))} helperText="Enter full image URLs separated by commas" />
                   </Grid>
                   <Grid item xs={12}>
                     <FormControlLabel control={<Checkbox checked={formData.isInternational} onChange={(e) => handleChange("isInternational", e.target.checked)} />} label="Is this an international trip?" />
                   </Grid>
                 </Grid>
               </Box>
-
-              <Divider />
 
               {/* Itinerary */}
               <Box>
@@ -240,17 +239,19 @@ const AddTripPage = () => {
                 <Button variant="outlined" onClick={handleAddDay} sx={{ mt: 3 }} startIcon={<AddCircleOutline />}>Add Another Day</Button>
               </Box>
 
-              <Divider />
-
               {/* Submit Button */}
-              <Button type="submit" variant="contained" size="large" fullWidth disabled={loading} sx={{ py: 1.5 }}>
-                {loading ? <CircularProgress size={26} color="inherit" /> : "Publish Trip"}
-              </Button>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button type="submit" variant="contained" size="large" disabled={loading} sx={{ py: 1.5, px: 5 }}>
+                  {loading ? <CircularProgress size={26} color="inherit" /> : "Publish Trip"}
+                </Button>
+              </Box>
             </Stack>
           </Box>
         </Stack>
       </Paper>
     </Container>
+    <Footer />
+    </>
   );
 };
 

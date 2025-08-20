@@ -9,9 +9,22 @@ import {
   ListItemText,
   ListItemIcon,
   Stack,
-  Divider
+  Divider,
+  Grid
 } from '@mui/material';
 import { Email, Phone, Person, Edit, Lock } from '@mui/icons-material';
+
+const InfoItem = ({icon, label, value}) => (
+    <ListItem>
+        <ListItemIcon sx={{minWidth: 42, color: 'primary.main'}}>{icon}</ListItemIcon>
+        <ListItemText 
+            primary={label}
+            secondary={value}
+            primaryTypographyProps={{ fontWeight: '500', color: 'text.secondary' }}
+            secondaryTypographyProps={{ fontWeight: '600', color: 'text.primary', variant: 'body1' }}
+        />
+    </ListItem>
+)
 
 const UserProfileInfo = ({ user }) => {
   const profileItems = [
@@ -23,39 +36,25 @@ const UserProfileInfo = ({ user }) => {
 
   return (
     <Box>
-      <List dense sx={{ mb: 3 }}>
-        {profileItems.map((item, index) => (
-          <React.Fragment key={item.label}>
-            <ListItem>
-              <ListItemIcon sx={{minWidth: 40}}>{item.icon}</ListItemIcon>
-              <ListItemText 
-                primary={item.label}
-                secondary={item.value}
-                primaryTypographyProps={{ fontWeight: '500', color: 'text.secondary' }}
-                secondaryTypographyProps={{ fontWeight: '600', color: 'text.primary', variant: 'body1' }}
-              />
-            </ListItem>
-            {index < profileItems.length - 1 && <Divider component="li" variant="inset" />}
-          </React.Fragment>
-        ))}
-      </List>
+        <Typography variant="h5" fontWeight="600" sx={{mb: 2}}>Account Details</Typography>
+        <List dense>
+            <Grid container spacing={1}>
+                {profileItems.map((item) => (
+                    <Grid item xs={12} sm={6} key={item.label}>
+                        <InfoItem {...item} />
+                    </Grid>
+                ))}
+            </Grid>
+        </List>
+
+      <Divider sx={{my: 3}}/>
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 2 }}>
-        <Button
-          component={RouterLink}
-          to="/edit-profile"
-          variant="contained"
-          startIcon={<Edit />}
-          fullWidth
-        >
-          Edit Profile
-        </Button>
         <Button
           component={RouterLink}
           to="/change-password"
           variant="outlined"
           startIcon={<Lock />}
-          fullWidth
         >
           Change Password
         </Button>

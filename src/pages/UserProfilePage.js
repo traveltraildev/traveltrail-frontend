@@ -8,12 +8,17 @@ import {
   Tab,
   Avatar,
   Stack,
-  CircularProgress
+  CircularProgress,
+  useTheme,
+  Button
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import UserProfileInfo from '../components/common/UserProfileInfo';
 import UserBookingHistory from '../components/common/UserBookingHistory';
-import { Person, History } from '@mui/icons-material';
+import { Person, History, Edit } from '@mui/icons-material';
+import Navbar from '../components/common/Navbar';
+import Footer from '../components/common/Footer';
+import { Link } from 'react-router-dom';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -27,6 +32,7 @@ function TabPanel(props) {
 const UserProfilePage = () => {
   const { user, isAuthenticated, loading } = useAuth();
   const [tabValue, setTabValue] = useState(0);
+  const theme = useTheme();
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -34,36 +40,42 @@ const UserProfilePage = () => {
 
   if (loading) {
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-            <CircularProgress />
-        </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <CircularProgress />
+      </Box>
     )
   }
 
   if (!isAuthenticated || !user) {
     return (
-      <Box sx={{ textAlign: 'center', py: 12 }}>
-        <Typography variant="h5">Please log in to view your profile.</Typography>
-      </Box>
+      <>
+        <Navbar />
+        <Container sx={{ textAlign: 'center', py: 15 }}>
+          <Typography variant="h4">Please log in</Typography>
+          <Typography color="text.secondary" sx={{mt: 1}}>You need to be logged in to view your profile.</Typography>
+          <Button component={Link} to="/login" variant="contained" sx={{mt: 3}}>Login</Button>
+        </Container>
+        <Footer />
+      </>
     );
   }
 
   return (
-    <Box sx={{ bgcolor: 'neutral.100', minHeight: '100vh' }}>
+    <Box sx={{ bgcolor: theme.palette.background.default, minHeight: '100vh' }}>
+      <Navbar />
       <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
-        {/* Profile Header */}
-        <Paper elevation={0} sx={{ p: 3, mb: 4, display: 'flex', alignItems: 'center', gap: 3, borderRadius: 2 }}>
-            <Avatar sx={{ width: 70, height: 70, fontSize: '2rem', bgcolor: 'primary.main' }}>
+        <Paper elevation={0} sx={{ p: {xs:2, sm:4}, mb: 4, display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, alignItems: 'center', gap: 3, borderRadius: 3, border: `1px solid ${theme.palette.divider}` }}>
+            <Avatar sx={{ width: 90, height: 90, fontSize: '3rem', bgcolor: 'primary.main' }}>
                 {user.name?.charAt(0).toUpperCase()}
             </Avatar>
-            <Box>
+            <Box sx={{flexGrow: 1, textAlign: {xs: 'center', sm: 'left'}}}>
                 <Typography variant="h4" component="h1" fontWeight="600">{user.name}</Typography>
                 <Typography variant="body1" color="text.secondary">{user.email}</Typography>
             </Box>
+            <Button component={Link} to="/edit-profile" variant="outlined" startIcon={<Edit />}>Edit Profile</Button>
         </Paper>
 
-        {/* Tabs and Content */}
-        <Paper elevation={0} sx={{ borderRadius: 2, overflow: 'hidden' }}>
+        <Paper elevation={0} sx={{ borderRadius: 3, overflow: 'hidden', border: `1px solid ${theme.palette.divider}` }}>
             <Tabs 
                 value={tabValue} 
                 onChange={handleTabChange} 
@@ -82,6 +94,7 @@ const UserProfilePage = () => {
             </TabPanel>
         </Paper>
       </Container>
+      <Footer />
     </Box>
   );
 };
