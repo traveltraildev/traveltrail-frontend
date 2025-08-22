@@ -22,6 +22,7 @@ import {
   CardMedia,
   CardContent,
   InputAdornment,
+  MenuItem
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { getAllTrips } from "../endpoints";
@@ -56,88 +57,234 @@ const TripCard = ({ trip }) => {
   );
 };
 
-const FilterSidebar = ({ filters, setFilters, options }) => {
+const FilterSidebar = ({
+  initialFilters,
+  onApply,
+  onReset,
+  options,
+  sortBy,
+  onSortChange,
+}) => {
+  const [localFilters, setLocalFilters] = useState(initialFilters);
+
+  useEffect(() => {
+    setLocalFilters(initialFilters);
+  }, [initialFilters]);
+
   const handlePriceChange = (event, newValue) => {
-    setFilters(prev => ({ ...prev, priceRange: newValue }));
+    setLocalFilters((prev) => ({ ...prev, priceRange: newValue }));
   };
 
   const handleCheckboxChange = (category, value) => {
-    setFilters(prev => ({
+    setLocalFilters((prev) => ({
       ...prev,
       [category]: prev[category].includes(value)
-        ? prev[category].filter(item => item !== value)
+        ? prev[category].filter((item) => item !== value)
         : [...prev[category], value],
     }));
+  };
+
+  const handleReset = () => {
+    const resetFilters = {
+      ...initialFilters,
+      priceRange: [0, 100000],
+      selectedDestinations: [],
+      selectedThemes: [],
+      selectedInclusions: [],
+      selectedExclusions: [],
+    };
+    setLocalFilters(resetFilters);
+    onReset(resetFilters);
   };
 
   return (
     <Stack spacing={2} sx={{ p: 2.5 }}>
       <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMore />}><Typography fontWeight="600">Price Range</Typography></AccordionSummary>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Typography fontWeight="600">Sort By</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <TextField
+            select
+            value={sortBy}
+            onChange={onSortChange}
+            variant="outlined"
+            fullWidth
+          >
+            <MenuItem value="recommended">Recommended</MenuItem>
+            <MenuItem value="price_asc">Price: Low to High</MenuItem>
+            <MenuItem value="price_desc">Price: High to Low</MenuItem>
+            <MenuItem value="name_asc">Name: A to Z</MenuItem>
+            <MenuItem value="name_desc">Name: Z to A</MenuItem>
+          </TextField>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion defaultExpanded>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Typography fontWeight="600">Price Range</Typography>
+        </AccordionSummary>
         <AccordionDetails>
           <Slider
-            value={filters.priceRange}
+            value={localFilters.priceRange}
             onChange={handlePriceChange}
             valueLabelDisplay="auto"
             min={0}
             max={100000}
             step={5000}
-            sx={{ml: 1}}
+            sx={{ ml: 1 }}
           />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 1 }}>
+            <Typography variant="body2">₹{localFilters.priceRange[0]}</Typography>
+            <Typography variant="body2">₹{localFilters.priceRange[1]}</Typography>
+          </Box>
         </AccordionDetails>
       </Accordion>
       <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMore />}><Typography fontWeight="600">Destinations</Typography></AccordionSummary>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Typography fontWeight="600">Destinations</Typography>
+        </AccordionSummary>
         <AccordionDetails>
-          <Stack sx={{maxHeight: 200, overflowY: 'auto'}}>
-            {options.destinations.map(dest => (
-              <FormControlLabel key={dest} control={<Checkbox checked={filters.selectedDestinations.includes(dest)} onChange={() => handleCheckboxChange('selectedDestinations', dest)} />} label={dest} />
+          <Stack sx={{ maxHeight: 200, overflowY: "auto" }}>
+            {options.destinations.map((dest) => (
+              <FormControlLabel
+                key={dest}
+                control={
+                  <Checkbox
+                    checked={localFilters.selectedDestinations.includes(dest)}
+                    onChange={() =>
+                      handleCheckboxChange("selectedDestinations", dest)
+                    }
+                  />
+                }
+                label={dest}
+              />
             ))}
           </Stack>
         </AccordionDetails>
       </Accordion>
       <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMore />}><Typography fontWeight="600">Themes</Typography></AccordionSummary>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Typography fontWeight="600">Themes</Typography>
+        </AccordionSummary>
         <AccordionDetails>
-          <Stack sx={{maxHeight: 200, overflowY: 'auto'}}>
-            {options.themes.map(theme => (
-              <FormControlLabel key={theme} control={<Checkbox checked={filters.selectedThemes.includes(theme)} onChange={() => handleCheckboxChange('selectedThemes', theme)} />} label={theme} />
+          <Stack sx={{ maxHeight: 200, overflowY: "auto" }}>
+            {options.themes.map((theme) => (
+              <FormControlLabel
+                key={theme}
+                control={
+                  <Checkbox
+                    checked={localFilters.selectedThemes.includes(theme)}
+                    onChange={() => handleCheckboxChange("selectedThemes", theme)}
+                  />
+                }
+                label={theme}
+              />
             ))}
           </Stack>
         </AccordionDetails>
       </Accordion>
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Typography fontWeight="600">Inclusions</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Stack sx={{ maxHeight: 200, overflowY: "auto" }}>
+            {options.inclusions.map((inclusion) => (
+              <FormControlLabel
+                key={inclusion}
+                control={
+                  <Checkbox
+                    checked={localFilters.selectedInclusions.includes(inclusion)}
+                    onChange={() => handleCheckboxChange("selectedInclusions", inclusion)}
+                  />
+                }
+                label={inclusion}
+              />
+            ))}
+          </Stack>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Typography fontWeight="600">Exclusions</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Stack sx={{ maxHeight: 200, overflowY: "auto" }}>
+            {options.exclusions.map((exclusion) => (
+              <FormControlLabel
+                key={exclusion}
+                control={
+                  <Checkbox
+                    checked={localFilters.selectedExclusions.includes(exclusion)}
+                    onChange={() => handleCheckboxChange("selectedExclusions", exclusion)}
+                  />
+                }
+                label={exclusion}
+              />
+            ))}
+          </Stack>
+        </AccordionDetails>
+      </Accordion>
+      <Stack direction="row" spacing={2} sx={{ p: 2.5 }}>
+        <Button variant="contained" onClick={() => onApply(localFilters)} fullWidth>
+          Apply
+        </Button>
+        <Button variant="outlined" onClick={handleReset} fullWidth>
+          Reset
+        </Button>
+      </Stack>
     </Stack>
   );
 };
 
+
 const TripsPage = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const location = useLocation();
 
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterOptions, setFilterOptions] = useState({ destinations: [], themes: [] });
+  const [filterOptions, setFilterOptions] = useState({ destinations: [], themes: [], inclusions: [], exclusions: [] });
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [sortBy, setSortBy] = useState("recommended");
 
-  const [filters, setFilters] = useState({
-    searchTerm: location.state?.search || '',
+  const initialFilters = {
+    searchTerm: location.state?.search || "",
     priceRange: [0, 100000],
     selectedDestinations: [],
     selectedThemes: [],
-  });
+    selectedInclusions: [],
+    selectedExclusions: [],
+  };
+
+  const [filters, setFilters] = useState(initialFilters);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(getAllTrips);
-        const tripsData = await response.json();
-        setTrips(tripsData);
+        const [tripsResponse, destResponse, themesResponse, inclusionsResponse, exclusionsResponse] = await Promise.all([
+          fetch(getAllTrips),
+          fetch(`${getAllTrips}/filters/destinations`),
+          fetch(`${getAllTrips}/filters/themes`),
+          fetch(`${getAllTrips}/filters/inclusions`),
+          fetch(`${getAllTrips}/filters/exclusions`),
+        ]);
 
-        const destinations = [...new Set(tripsData.map(trip => trip.destination))];
-        const themes = [...new Set(tripsData.flatMap(trip => trip.themes))];
-        setFilterOptions({ destinations, themes });
+        const tripsData = await tripsResponse.json();
+        const destinations = await destResponse.json();
+        const themes = await themesResponse.json();
+        const inclusions = await inclusionsResponse.json();
+        const exclusions = await exclusionsResponse.json();
+
+        setTrips(tripsData);
+        setFilterOptions({ 
+          destinations: destinations || [], 
+          themes: themes || [], 
+          inclusions: inclusions || [], 
+          exclusions: exclusions || [] 
+        });
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -148,15 +295,42 @@ const TripsPage = () => {
     fetchData();
   }, []);
 
+  const handleApplyFilters = (newFilters) => {
+    setFilters(newFilters);
+    setMobileFiltersOpen(false);
+  };
+
+  const handleResetFilters = (resetFilters) => {
+    setFilters(resetFilters);
+  };
+
+  const handleSortChange = (event) => {
+    setSortBy(event.target.value);
+  };
+
   const filteredTrips = useMemo(() => {
-    return trips.filter(trip => {
+    const filtered = trips.filter(trip => {
       const searchMatch = trip.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) || trip.destination.toLowerCase().includes(filters.searchTerm.toLowerCase());
       const priceMatch = trip.price >= filters.priceRange[0] && trip.price <= filters.priceRange[1];
       const destinationMatch = filters.selectedDestinations.length === 0 || filters.selectedDestinations.includes(trip.destination);
       const themeMatch = filters.selectedThemes.length === 0 || filters.selectedThemes.some(theme => trip.themes?.includes(theme));
-      return searchMatch && priceMatch && destinationMatch && themeMatch;
+      const inclusionMatch = filters.selectedInclusions.length === 0 || filters.selectedInclusions.some(inclusion => trip.inclusions?.includes(inclusion));
+      const exclusionMatch = filters.selectedExclusions.length === 0 || filters.selectedExclusions.some(exclusion => trip.exclusions?.includes(exclusion));
+      return searchMatch && priceMatch && destinationMatch && themeMatch && inclusionMatch && exclusionMatch;
     });
-  }, [trips, filters]);
+
+    if (sortBy === "price_asc") {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price_desc") {
+      filtered.sort((a, b) => b.price - a.price);
+    } else if (sortBy === "name_asc") {
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === "name_desc") {
+      filtered.sort((a, b) => b.name.localeCompare(a.name));
+    }
+
+    return filtered;
+  }, [trips, filters, sortBy]);
 
   return (
     <>
@@ -174,7 +348,14 @@ const TripsPage = () => {
           <Grid item md={3}>
             <Paper elevation={0} sx={{ p: 0, position: 'sticky', top: 100, border: `1px solid ${theme.palette.divider}`, borderRadius: 3 }}>
               <Typography variant="h6" sx={{ p: 2.5, pb: 1, fontWeight: 600 }}>Filters</Typography>
-              <FilterSidebar filters={filters} setFilters={setFilters} options={filterOptions} />
+              <FilterSidebar 
+                initialFilters={filters}
+                onApply={handleApplyFilters}
+                onReset={handleResetFilters}
+                options={filterOptions}
+                sortBy={sortBy}
+                onSortChange={handleSortChange}
+              />
             </Paper>
           </Grid>
         )}
@@ -231,8 +412,15 @@ const TripsPage = () => {
       <Drawer anchor="left" open={mobileFiltersOpen} onClose={() => setMobileFiltersOpen(false)} PaperProps={{sx: {width: 320}}}>
         <Box sx={{ p: 2 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Filters</Typography>
-          <FilterSidebar filters={filters} setFilters={setFilters} options={filterOptions} />
-          <Button fullWidth variant="contained" onClick={() => setMobileFiltersOpen(false)} sx={{ mt: 3 }}>Apply Filters</Button>
+          <FilterSidebar 
+            initialFilters={filters}
+            onApply={handleApplyFilters}
+            onReset={handleResetFilters}
+            options={filterOptions}
+            sortBy={sortBy}
+            onSortChange={handleSortChange}
+            isMobile
+          />
         </Box>
       </Drawer>
     </Container>
