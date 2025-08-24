@@ -67,6 +67,7 @@ const FilterSidebar = ({
 }) => {
   const [localFilters, setLocalFilters] = useState(initialFilters);
 
+  // Sync localFilters with initialFilters and navigation state
   useEffect(() => {
     setLocalFilters(initialFilters);
   }, [initialFilters]);
@@ -85,8 +86,9 @@ const FilterSidebar = ({
   };
 
   const handleReset = () => {
+    // Always reset to default filters (no themes selected)
     const resetFilters = {
-      ...initialFilters,
+      searchTerm: "",
       priceRange: [0, 100000],
       selectedDestinations: [],
       selectedThemes: [],
@@ -249,16 +251,46 @@ const TripsPage = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState("recommended");
 
-  const initialFilters = {
-    searchTerm: location.state?.search || "",
-    priceRange: [0, 100000],
-    selectedDestinations: [],
-    selectedThemes: [],
-    selectedInclusions: [],
-    selectedExclusions: [],
-  };
+  // Acceptance criteria: If coming from Home > Groups, pre-check 'group' theme
+  const initialFilters = React.useMemo(() => {
+    // If coming from Home > Groups, mimic manual 'Apply' of only 'group' theme
+    if (location.state?.theme?.toLowerCase() === 'group') {
+      return {
+        searchTerm: "",
+        priceRange: [0, 100000],
+        selectedDestinations: [],
+        selectedThemes: ['group'],
+        selectedInclusions: [],
+        selectedExclusions: [],
+      };
+    }
+    return {
+      searchTerm: location.state?.search || "",
+      priceRange: [0, 100000],
+      selectedDestinations: [],
+      selectedThemes: [],
+      selectedInclusions: [],
+      selectedExclusions: [],
+    };
+  }, [location.state]);
 
   const [filters, setFilters] = useState(initialFilters);
+
+  // Reset filters when navigation state changes (e.g., coming from Home > Groups)
+  useEffect(() => {
+    setFilters(initialFilters);
+    // If coming from Home > Groups, auto-apply the filter as if user clicked 'Apply'
+    if (location.state?.theme?.toLowerCase() === 'group') {
+      setFilters({
+        searchTerm: "",
+        priceRange: [0, 100000],
+        selectedDestinations: [],
+        selectedThemes: ['group'],
+        selectedInclusions: [],
+        selectedExclusions: [],
+      });
+    }
+  }, [initialFilters, location.state]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -309,14 +341,20 @@ const TripsPage = () => {
   };
 
   const filteredTrips = useMemo(() => {
-    const filtered = trips.filter(trip => {
-      const searchMatch = trip.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) || trip.destination.toLowerCase().includes(filters.searchTerm.toLowerCase());
+    let filtered = trips.filter(trip => {
+      // Always require 'group' in themes if coming from Home > Groups (case-insensitive)
+      const groupThemeRequired = location.state?.theme?.toLowerCase() === 'group'
+        ? (Array.isArray(trip.themes) && trip.themes.some(t => t.toLowerCase() === 'group'))
+        : true;
+      // Search string matches name or destination
+      const searchMatch = filters.searchTerm === '' || trip.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) || trip.destination.toLowerCase().includes(filters.searchTerm.toLowerCase());
       const priceMatch = trip.price >= filters.priceRange[0] && trip.price <= filters.priceRange[1];
       const destinationMatch = filters.selectedDestinations.length === 0 || filters.selectedDestinations.includes(trip.destination);
-      const themeMatch = filters.selectedThemes.length === 0 || filters.selectedThemes.some(theme => trip.themes?.includes(theme));
+      // For theme filter, also case-insensitive
+      const themeMatch = filters.selectedThemes.length === 0 || filters.selectedThemes.some(theme => Array.isArray(trip.themes) && trip.themes.some(t => t.toLowerCase() === theme.toLowerCase()));
       const inclusionMatch = filters.selectedInclusions.length === 0 || filters.selectedInclusions.some(inclusion => trip.inclusions?.includes(inclusion));
       const exclusionMatch = filters.selectedExclusions.length === 0 || filters.selectedExclusions.some(exclusion => trip.exclusions?.includes(exclusion));
-      return searchMatch && priceMatch && destinationMatch && themeMatch && inclusionMatch && exclusionMatch;
+      return groupThemeRequired && searchMatch && priceMatch && destinationMatch && themeMatch && inclusionMatch && exclusionMatch;
     });
 
     if (sortBy === "price_asc") {

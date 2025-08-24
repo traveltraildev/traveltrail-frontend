@@ -22,3 +22,5 @@ export const aboutUsPage = BASE_URL + "/api/cms/pages/about-us";
 export const contactUsPage = BASE_URL + "/api/cms/pages/contact-us";
 export const tacPage = BASE_URL + "/api/cms/pages/terms-and-conditions";
 export const getUserBookingHistory = BASE_URL + "/api/bookings/history";
+export const newsletterSubscription = BASE_URL + "/api/newsletter/subscribe";
+export const getNewsletterSubscribers = BASE_URL + "/api/newsletter/subscribers";

@@ -20,14 +20,24 @@ const Hero = () => {
   const theme = useTheme();
 
   const handleSearch = () => {
-    const path = searchTabs[currentTab].path;
-    navigate(path, { state: { search: searchQuery } });
+    const { path, category, theme } = searchTabs[currentTab];
+    const state = {};
+    if (searchQuery) {
+      state.search = searchQuery;
+    }
+    if (category) {
+      state.category = category;
+    }
+    if (theme) {
+      state.theme = theme;
+    }
+    navigate(path, { state });
   };
 
   const searchTabs = [
     { label: 'Trips', icon: <Explore />, path: '/trips' },
     { label: 'Stays', icon: <Hotel />, path: '/accommodations' },
-    { label: 'Groups', icon: <Groups />, path: '/trips' },
+    { label: 'Groups', icon: <Groups />, path: '/trips', theme: 'group' },
   ];
 
   return (

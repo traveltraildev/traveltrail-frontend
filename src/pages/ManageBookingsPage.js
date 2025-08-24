@@ -147,12 +147,34 @@ const ManageBookingsPage = () => {
     setSelectedBooking(null);
   };
 
+  const getCustomerInfo = (booking) => {
+    let name = 'Guest User';
+    let email = 'No Email';
+
+    if (booking.user) {
+      // Prioritize user object if available
+      name = `${booking.user.firstName || ''} ${booking.user.lastName || ''}`.trim();
+      if (!name) name = booking.user.name || 'Guest User'; // Fallback to user.name if first/last are empty
+      email = booking.user.email || 'No Email';
+    } else {
+      // Fallback to direct booking properties for guest users
+      name = `${booking.firstName || ''} ${booking.lastName || ''}`.trim();
+      if (!name) name = booking.name || 'Guest User'; // Fallback to booking.name if first/last are empty
+      email = booking.email || 'No Email';
+    }
+
+    return { name, email };
+  };
+
   const filteredAndSortedBookings = useMemo(() => {
-    let filtered = bookings.filter(b => 
-      (b.user?.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      (b.user?.email?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      (b.trip?.name?.toLowerCase() || '').includes(searchTerm.toLowerCase())
-    );
+    let filtered = bookings.filter(b => {
+        const customer = getCustomerInfo(b);
+        return (
+            customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (b.trip?.name?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+        );
+    });
 
     filtered.sort((a, b) => {
         const fieldA = a[sort.field] || '';
@@ -215,37 +237,40 @@ const ManageBookingsPage = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginatedBookings.map((booking) => (
-                  <TableRow hover key={booking._id}>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight="500">{booking.user?.name || 'N/A'}</Typography>
-                      <Typography variant="caption" color="text.secondary">{booking.user?.email || 'No Email'}</Typography>
-                    </TableCell>
-                    <TableCell>{booking.trip?.name || 'N/A'}</TableCell>
-                    <TableCell align="center">{((booking.attendees?.adults || 0) + (booking.attendees?.children || 0)) || 1}</TableCell>
-                    <TableCell sx={{ minWidth: 180 }}>
-                      <Select
-                        value={booking.status || 'New'}
-                        onChange={(e) => handleStatusChange(booking._id, e.target.value)}
-                        size="small"
-                        fullWidth
-                        renderValue={(selected) => (
-                            <Chip label={selected} color={statusColors[selected]} size="small" />
-                        )}
-                      >
-                        {bookingStatusOptions.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
-                      </Select>
-                    </TableCell>
-                    <TableCell>
-                      <Tooltip title="View/Add Annotations">
-                        <IconButton onClick={() => handleOpenDialog(booking)} size="small">
-                          {booking.annotations?.length > 0 ? <Notes color="primary" /> : <AddComment />}
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell align="right">{new Date(booking.createdAt).toLocaleDateString()}</TableCell>
-                  </TableRow>
-                ))}
+                {paginatedBookings.map((booking) => {
+                    const customer = getCustomerInfo(booking);
+                    return (
+                        <TableRow hover key={booking._id}>
+                            <TableCell>
+                            <Typography variant="body2" fontWeight="500">{customer.name}</Typography>
+                            <Typography variant="caption" color="text.secondary">{customer.email}</Typography>
+                            </TableCell>
+                            <TableCell>{booking.trip?.name || 'N/A'}</TableCell>
+                            <TableCell align="center">{((booking.attendees?.adults || 0) + (booking.attendees?.children || 0)) || 1}</TableCell>
+                            <TableCell sx={{ minWidth: 180 }}>
+                            <Select
+                                value={booking.status || 'New'}
+                                onChange={(e) => handleStatusChange(booking._id, e.target.value)}
+                                size="small"
+                                fullWidth
+                                renderValue={(selected) => (
+                                    <Chip label={selected} color={statusColors[selected]} size="small" />
+                                )}
+                            >
+                                {bookingStatusOptions.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
+                            </Select>
+                            </TableCell>
+                            <TableCell>
+                            <Tooltip title="View/Add Annotations">
+                                <IconButton onClick={() => handleOpenDialog(booking)} size="small">
+                                {booking.annotations?.length > 0 ? <Notes color="primary" /> : <AddComment />}
+                                </IconButton>
+                            </Tooltip>
+                            </TableCell>
+                            <TableCell align="right">{new Date(booking.createdAt).toLocaleDateString()}</TableCell>
+                        </TableRow>
+                    );
+                })}
               </TableBody>
             </Table>
           </TableContainer>

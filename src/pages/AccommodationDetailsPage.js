@@ -7,8 +7,6 @@ import {
   Typography,
   Skeleton,
   Button,
-  Slide,
-  useScrollTrigger,
   Stack,
   Paper,
   Chip,
@@ -25,44 +23,6 @@ import { getAllAccommodations } from "../endpoints";
 import { Bed, People, CheckCircleOutline, Place, SquareFoot } from '@mui/icons-material';
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
-
-const StickyHeader = ({ accommodation }) => {
-  const theme = useTheme();
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 500,
-  });
-
-  return (
-    <Slide appear={false} direction="down" in={trigger}>
-      <Paper 
-        elevation={6} 
-        sx={{ 
-          position: 'fixed', 
-          top: '80px', 
-          left: 0, 
-          right: 0, 
-          zIndex: 1100, 
-          backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-          backdropFilter: 'blur(10px)', 
-          borderBottom: `1px solid ${theme.palette.divider}`,
-          py: 1.5,
-          px: {xs: 2, md: 3}
-        }}
-      >
-        <Container maxWidth="lg">
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box>
-              <Typography variant="h6" color="text.primary" fontWeight="600" noWrap>{accommodation.name}</Typography>
-              <Typography variant="body2" color="text.secondary">{accommodation.destination}</Typography>
-            </Box>
-            <Button variant="contained" href="#booking-section" size="small">Book Now</Button>
-          </Box>
-        </Container>
-      </Paper>
-    </Slide>
-  );
-};
 
 const Section = ({ title, children }) => (
   <Box>
@@ -167,7 +127,6 @@ const AccommodationDetailsPage = () => {
   return (
     <>
       <Navbar />
-      <StickyHeader accommodation={accommodation} />
       <Box sx={{pt: 8}}>
         <Container maxWidth="lg" sx={{ mb: 4 }}>
           <Grid container spacing={{ xs: 4, md: 6 }}>

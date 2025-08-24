@@ -42,6 +42,7 @@ import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import Logout from './pages/Logout';
 import ManageBookingsPage from './pages/ManageBookingsPage';
+import NewsletterSubscribers from './pages/admin/NewsletterSubscribers';
 
 // Components
 import BottomNavBar from './components/common/BottomNavBar';
@@ -102,6 +103,7 @@ function App() {
                   <Route path="/admin/accommodations" element={<AccommodationsList />} />
                   <Route path="/admin/cms/add-trip" element={<AddTripPage />} />
                   <Route path="/admin/edit-trip/:tripId" element={<EditTripPage />} />
+                  <Route path="/admin/newsletter-subscribers" element={<NewsletterSubscribers />} />
                 </Route>
               </Routes>
               {isMobile && <BottomNavBar />}

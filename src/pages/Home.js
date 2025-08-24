@@ -19,7 +19,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import Hero from "../components/Home/Hero";
-import { getAllTrips, getAllAccommodations } from "../endpoints";
+import { getAllTrips, getAllAccommodations, newsletterSubscription } from "../endpoints";
 
 const SectionWrapper = ({ title, children, ...props }) => (
   <Box component="section" sx={{ py: { xs: 6, md: 10 } }} {...props}>
@@ -109,6 +109,9 @@ const Home = () => {
   const [trips, setTrips] = useState([]);
   const [accommodations, setAccommodations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [showNewsletterAnim, setShowNewsletterAnim] = useState(false);
+  const [newsletterError, setNewsletterError] = useState("");
   const theme = useTheme();
 
   useEffect(() => {
@@ -130,6 +133,36 @@ const Home = () => {
     };
     fetchData();
   }, []);
+
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    setNewsletterError("");
+    if (!email) {
+      setNewsletterError("Please enter a valid email address.");
+      return;
+    }
+    try {
+      const response = await fetch(newsletterSubscription, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      if (response.ok) {
+        setShowNewsletterAnim(true);
+        setEmail("");
+        setTimeout(() => setShowNewsletterAnim(false), 2500);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        setNewsletterError(errorData?.message || 'Newsletter subscription failed');
+        console.error('Newsletter subscription failed', errorData);
+      }
+    } catch (error) {
+      setNewsletterError("Network error. Please try again later.");
+      console.error("Newsletter subscription error:", error);
+    }
+  };
 
   return (
     <Box>
@@ -157,18 +190,49 @@ const Home = () => {
       </SectionWrapper>
 
       <SectionWrapper title="Stay in the Loop">
-          <Container maxWidth="md">
-            <Paper sx={{ p: {xs: 3, sm: 5}, borderRadius: 3, textAlign: 'center', background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`, color: 'white' }}>
-              <Typography variant="h4" component="h3" sx={{mb: 2, fontWeight: 'bold'}}>
-                  Join Our Newsletter
-              </Typography>
-              <Typography variant="body1" sx={{mb: 4, opacity: 0.9}}>
-                  Get the latest deals, insider tips, and travel inspiration delivered straight to your inbox.
-              </Typography>
-              <Stack direction={{xs: 'column', sm: 'row'}} spacing={2} justifyContent="center">
+        <Container maxWidth="md">
+          <Paper sx={{ p: {xs: 3, sm: 5}, borderRadius: 3, textAlign: 'center', background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`, color: 'white', minHeight: 220, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <Typography variant="h4" component="h3" sx={{mb: 2, fontWeight: 'bold'}}>
+                Join Our Newsletter
+            </Typography>
+            <Typography variant="body1" sx={{mb: 4, opacity: 0.9}}>
+                Get the latest deals, insider tips, and travel inspiration delivered straight to your inbox.
+            </Typography>
+            {showNewsletterAnim ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
+                <Box sx={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mb: 2,
+                  animation: 'fadeInScale 0.7s',
+                  '@keyframes fadeInScale': {
+                    '0%': { opacity: 0, transform: 'scale(0.5)' },
+                    '100%': { opacity: 1, transform: 'scale(1)' }
+                  }
+                }}>
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="20" cy="20" r="20" fill="#fff" fillOpacity="0.7"/>
+                    <path d="M12 21l6 6 10-12" stroke="#43a047" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </Box>
+                <Typography variant="h6" sx={{ color: 'white', fontWeight: 600, animation: 'fadeIn 1s' }}>
+                  You’ve been added to our list!
+                </Typography>
+              </Box>
+            ) : (
+              <>
+                <Stack component="form" onSubmit={handleNewsletterSubmit} direction={{xs: 'column', sm: 'row'}} spacing={2} justifyContent="center">
                   <TextField 
                     variant="filled" 
                     placeholder="Enter your email address" 
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     sx={{ 
                       flexGrow: 1, 
                       bgcolor: 'rgba(255,255,255,0.9)', 
@@ -177,10 +241,17 @@ const Home = () => {
                       '&:hover': { bgcolor: 'rgba(255,255,255,1)' }
                     }}
                   />
-                  <Button variant="contained" color="secondary" size="large" sx={{px: 4, color: theme.palette.secondary.contrastText, fontWeight: 'bold'}}>Subscribe</Button>
-              </Stack>
-            </Paper>
-          </Container>
+                  <Button type="submit" variant="contained" color="secondary" size="large" sx={{px: 4, color: theme.palette.secondary.contrastText, fontWeight: 'bold'}}>Subscribe</Button>
+                </Stack>
+                {newsletterError && (
+                  <Typography variant="body2" sx={{ color: '#ffeb3b', mt: 2, fontWeight: 500 }}>
+                    {newsletterError}
+                  </Typography>
+                )}
+              </>
+            )}
+          </Paper>
+        </Container>
       </SectionWrapper>
       <Footer />
     </Box>

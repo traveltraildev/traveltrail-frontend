@@ -107,6 +107,7 @@ const Dashboard = () => {
                   <Grid item xs={6} md={3}><ActionButton to="/admin/add-accommodation" title="Add New Stay" icon={<AddCircle />} /></Grid>
                   <Grid item xs={6} md={3}><ActionButton to="/admin/cms" title="Manage Content (CMS)" icon={<Description />} /></Grid>
                   <Grid item xs={6} md={3}><ActionButton to="#" title="View Reports" icon={<Assessment />} /></Grid>
+                  <Grid item xs={6} md={3}><ActionButton to="/admin/newsletter-subscribers" title="Newsletter Subscribers" icon={<People />} /></Grid>
               </Grid>
           </Paper>
 

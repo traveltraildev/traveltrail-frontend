@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -7,8 +8,6 @@ import {
   Typography,
   Skeleton,
   Button,
-  Slide,
-  useScrollTrigger,
   Stack,
   useTheme,
   Link,
@@ -20,44 +19,6 @@ import BookNow from "../components/TripDetails/BookNow";
 import { getAllTrips } from "../endpoints";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
-
-const StickyHeader = ({ trip }) => {
-  const theme = useTheme();
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 500, // Appears after scrolling 500px
-  });
-
-  return (
-    <Slide appear={false} direction="down" in={trigger}>
-      <Paper 
-        elevation={6} 
-        sx={{ 
-          position: 'fixed', 
-          top: '80px', 
-          left: 0, 
-          right: 0, 
-          zIndex: 1100, 
-          backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-          backdropFilter: 'blur(10px)', 
-          borderBottom: `1px solid ${theme.palette.divider}`,
-          py: 1.5,
-          px: {xs: 2, md: 3}
-        }}
-      >
-        <Container maxWidth="lg">
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box>
-              <Typography variant="h6" color="text.primary" fontWeight="600" noWrap>{trip.name}</Typography>
-              <Typography variant="body2" color="text.secondary">{trip.daysCount} Days / {trip.nightsCount} Nights</Typography>
-            </Box>
-            <Button variant="contained" href="#booking-section" size="small">Book Now</Button>
-          </Box>
-        </Container>
-      </Paper>
-    </Slide>
-  );
-};
 
 const TripDetails = () => {
   const [trip, setTrip] = useState(null);
@@ -113,7 +74,6 @@ const TripDetails = () => {
   return (
     <>
       <Navbar />
-      <StickyHeader trip={trip} />
       <Box sx={{pt: 8}}>
         <Container maxWidth="lg" sx={{ mb: 4 }}>
           <Grid container spacing={{ xs: 4, md: 6 }}>
