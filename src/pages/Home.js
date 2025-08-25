@@ -19,14 +19,20 @@ import { Link as RouterLink } from 'react-router-dom';
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import Hero from "../components/Home/Hero";
+import { motion } from "framer-motion";
 import { getAllTrips, getAllAccommodations, newsletterSubscription } from "../endpoints";
 
-const SectionWrapper = ({ title, children, ...props }) => (
+const SectionWrapper = ({ title, subtitle, children, ...props }) => (
   <Box component="section" sx={{ py: { xs: 6, md: 10 } }} {...props}>
     <Container maxWidth="xl">
-      <Typography variant="h2" component="h2" sx={{ textAlign: 'center', mb: 8, fontWeight: 700 }}>
+      <Typography variant="h2" component="h2" sx={{ textAlign: 'center', mb: 2, fontWeight: 700 }}>
         {title}
       </Typography>
+      {subtitle && (
+        <Typography variant="h6" component="p" color="text.secondary" sx={{ textAlign: 'center', mb: 8, maxWidth: 700, mx: 'auto' }}>
+          {subtitle}
+        </Typography>
+      )}
       {children}
     </Container>
   </Box>
@@ -169,7 +175,10 @@ const Home = () => {
       <Navbar />
       <Hero />
 
-      <SectionWrapper title="Featured Trips">
+      <SectionWrapper
+        title="Discover Our Top Travel Packages"
+        subtitle="Explore our handpicked selection of unforgettable journeys and vacation packages to breathtaking destinations worldwide. Find your next adventure with Trishelta Travels."
+      >
         <HorizontalScrollContainer>
           {loading ? (
             Array.from(new Array(5)).map((_, index) => <CardSkeleton key={index} />)
@@ -179,7 +188,11 @@ const Home = () => {
         </HorizontalScrollContainer>
       </SectionWrapper>
 
-      <SectionWrapper title="Featured Stays" sx={{ bgcolor: 'background.paper' }}>
+      <SectionWrapper
+        title="Featured Accommodations & Stays"
+        subtitle="From luxurious resorts to cozy boutique hotels, discover our curated collection of accommodations designed for comfort and an exceptional travel experience."
+        sx={{ bgcolor: 'background.paper' }}
+      >
         <HorizontalScrollContainer>
           {loading ? (
             Array.from(new Array(5)).map((_, index) => <CardSkeleton key={index} />)
@@ -189,7 +202,116 @@ const Home = () => {
         </HorizontalScrollContainer>
       </SectionWrapper>
 
-      <SectionWrapper title="Stay in the Loop">
+      {/* Why Choose Us Section */}
+      <SectionWrapper
+        title="Why Choose Trishelta Travels for Your Next Adventure?"
+        subtitle="Experience the difference with Trishelta Travels. We are committed to providing seamless travel planning, exceptional value, and unparalleled support for every journey."
+      >
+        <Grid container spacing={4} justifyContent="center">
+    {[{
+      image: "/images/expert (2).png",
+      title: "Expertly Curated Travel Experiences",
+      content: "Every Trishelta Travels itinerary is meticulously crafted by seasoned travel professionals. We design unique, authentic, and stress-free journeys, ensuring every detail is perfect for your adventure."
+    }, {
+      image: "/images/money.png",
+      title: "Unbeatable Value & Transparent Pricing",
+      content: "We partner directly with trusted hotels, airlines, and local operators to bring you the best travel deals. Enjoy transparent pricing with no hidden fees, guaranteeing real value for your investment."
+    }, {
+      image: "/images/call.png",
+      title: "Dedicated 24/7 Customer Support",
+      content: "From the moment you book until you return home, our dedicated Trishelta Travels team is available 24/7. Your peace of mind is our top priority, with support just a call away, any time, any day."
+    }].map((card, idx) => (
+      <Grid item xs={12} md={4} key={card.title}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85, y: 40 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ delay: idx * 0.2, duration: 0.6, type: "spring" }}
+          whileHover={{ scale: 1.06, y: -10 }}
+        >
+          <Card
+            sx={{
+              p: 4,
+              borderRadius: 4,
+              textAlign: 'center',
+              height: '100%',
+              boxShadow: '0 12px 24px rgba(0,0,0,0.08)',
+              background: 'linear-gradient(135deg, #ffffff 60%, #f9f5f3 100%)',
+              position: 'relative',
+              transition: 'all 0.35s ease',
+              '&:hover': {
+                boxShadow: '0 16px 32px rgba(0,0,0,0.12)',
+                background: 'linear-gradient(135deg, #f9f5f3 60%, #ffffff 100%)'
+              }
+            }}
+            elevation={0}
+          >
+            {/* Glow Accent */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: -40,
+                left: -40,
+                width: 120,
+                height: 120,
+                background: '#FFE5DB',
+                filter: 'blur(70px)',
+                opacity: 0.5,
+                zIndex: 0
+              }}
+            />
+            <CardMedia
+              component="img"
+              image={card.image}
+              alt={card.title}
+              sx={{
+                width: 220,
+                height: 220,
+                objectFit: 'contain',
+                mx: 'auto',
+                mb: 3,
+                borderRadius: 3,
+                background: '#fff',
+                boxShadow: 3,
+                position: 'relative',
+                zIndex: 1,
+                transition: 'transform 0.45s ease',
+                '&:hover': { transform: 'scale(1.1) rotate(2deg)' }
+              }}
+            />
+            <Typography
+              variant="h5"
+              fontWeight={700}
+              gutterBottom
+              sx={{ color: '#D5614A', letterSpacing: 1.2, zIndex: 1, position: 'relative' }}
+            >
+              {card.title}
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: '#000',
+                minHeight: 80,
+                lineHeight: 1.6,
+                zIndex: 1,
+                position: 'relative',
+                textAlign: 'justify'
+              }}
+            >
+              {card.content}
+            </Typography>
+          </Card>
+        </motion.div>
+      </Grid>
+    ))}
+  </Grid>
+</SectionWrapper>
+
+
+
+      <SectionWrapper
+        title="Stay Connected: Join Our Travel Community"
+        subtitle="Don't miss out on exclusive travel deals, insider tips, and inspiring destination guides. Subscribe to the Trishelta Travels newsletter today!"
+      >
         <Container maxWidth="md">
           <Paper sx={{ p: {xs: 3, sm: 5}, borderRadius: 3, textAlign: 'center', background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`, color: 'white', minHeight: 220, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <Typography variant="h4" component="h3" sx={{mb: 2, fontWeight: 'bold'}}>

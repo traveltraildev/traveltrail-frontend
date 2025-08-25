@@ -366,10 +366,10 @@ const AccommodationsPage = () => {
     <Navbar />
     <Container maxWidth="xl" sx={{ pt: 12, pb: 6 }}>
       <Typography variant="h2" component="h1" fontWeight="700" sx={{ textAlign: 'center', mb: 2 }}>
-        Find Your Perfect Stay
+        Find Your Perfect Stay with Trishelta Travels
       </Typography>
-      <Typography color="text.secondary" sx={{ textAlign: 'center', mb: 6, maxWidth: '600px', mx: 'auto' }}>
-        From cozy apartments to luxurious villas, discover the perfect accommodation for your next getaway.
+      <Typography color="text.secondary" sx={{ textAlign: 'center', mb: 6, maxWidth: '800px', mx: 'auto' }}>
+        Discover a wide range of accommodations with Trishelta Travels, from cozy apartments and charming guesthouses to luxurious hotels and spacious villas. Use our intuitive filters to find the ideal place that suits your needs, budget, and travel style for an unforgettable experience.
       </Typography>
       
       <Grid container spacing={4}>

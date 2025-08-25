@@ -375,10 +375,10 @@ const TripsPage = () => {
     <Navbar />
     <Container maxWidth="xl" sx={{ pt: 12, pb: 6 }}>
       <Typography variant="h2" component="h1" fontWeight="700" sx={{ textAlign: 'center', mb: 2 }}>
-        Find Your Next Adventure
+        Discover Your Dream Travel Packages with Trishelta Travels
       </Typography>
-      <Typography color="text.secondary" sx={{ textAlign: 'center', mb: 6, maxWidth: '600px', mx: 'auto' }}>
-        Explore our curated list of trips. Use the filters to find the perfect journey that matches your style and budget.
+      <Typography color="text.secondary" sx={{ textAlign: 'center', mb: 6, maxWidth: '800px', mx: 'auto' }}>
+        Embark on unforgettable journeys with Trishelta Travels. Explore our diverse collection of curated travel packages, from thrilling adventure trips to relaxing vacation deals. Use our powerful filters to find the perfect itinerary that matches your interests, budget, and travel style. Your next adventure starts here!
       </Typography>
       
       <Grid container spacing={4}>

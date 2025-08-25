@@ -8,7 +8,8 @@ import {
   IconButton,
   Divider,
   Stack,
-  useTheme
+  useTheme,
+  Button,
 } from '@mui/material';
 import { Facebook, Twitter, Instagram, LinkedIn } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
@@ -57,7 +58,7 @@ const Footer = () => {
             <Box component={RouterLink} to="/" sx={{ display: 'inline-block', mb: 2 }}>
               <img
                 src="/images/mainLogo.svg"
-                alt="TravelTrail Logo"
+                alt="Trishelta Travels Logo"
                 style={{ height: '56px', width: 'auto' }}
               />
             </Box>
@@ -119,10 +120,27 @@ const Footer = () => {
                 </Typography>
                 <Stack spacing={1.5} sx={{ color: 'text.secondary' }}>
                     <Typography variant="body2">
-                        236/8B, New Sarvodaya Colony, Meerut, U.P
+                         Noida | Meerut, U.P
                     </Typography>
                     <Link href="mailto:info@trishelta.com" variant="body2" sx={{color: 'inherit', textDecoration: 'none', '&:hover': {color: theme.palette.primary.main}}}>info@trishelta.com</Link>
-                    <Link href="tel:+917060400357" variant="body2" sx={{color: 'inherit', textDecoration: 'none', '&:hover': {color: theme.palette.primary.main}}}>+91 7060400357</Link>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                        
+                        <Button
+                            variant="contained"
+                            size="small"
+                            href="tel:+917060400357"
+                            sx={{
+                                borderRadius: '20px',
+                                color: 'white',
+                                backgroundColor: theme.palette.primary.main,
+                                '&:hover': {
+                                    backgroundColor: theme.palette.primary.dark,
+                                },
+                            }}
+                        >
+                            Call Us
+                        </Button>
+                    </Stack>
                 </Stack>
               </Grid>
             </Grid>
@@ -133,7 +151,7 @@ const Footer = () => {
 
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            © {new Date().getFullYear()} TravelTrail. All rights reserved. Built with passion.
+            © {new Date().getFullYear()} Trishelta Travels. All rights reserved. Built with passion.
           </Typography>
         </Box>
       </Container>
