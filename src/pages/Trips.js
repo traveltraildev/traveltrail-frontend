@@ -31,11 +31,12 @@ import { Tune, ExpandMore, Search } from "@mui/icons-material";
 import TripCardSkeleton from "../components/common/TripCardSkeleton"; // Corrected import
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
+import FilterSidebarSkeleton from '../components/common/FilterSidebarSkeleton';
 
 const TripCard = ({ trip }) => {
   const theme = useTheme();
   return (
-    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] } }}>
+    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, width: '100%' }}>
       <CardMedia
         component="img"
         height="220"
@@ -247,56 +248,51 @@ const TripsPage = () => {
 
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterOptions, setFilterOptions] = useState({ destinations: [], themes: [], inclusions: [], exclusions: [] });
+  const [filterOptions, setFilterOptions] = useState({
+    destinations: [],
+    themes: [],
+    inclusions: [],
+    exclusions: [],
+  });
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState("recommended");
 
-  // Acceptance criteria: If coming from Home > Groups, pre-check 'group' theme
   const initialFilters = React.useMemo(() => {
-    // If coming from Home > Groups, mimic manual 'Apply' of only 'group' theme
-    if (location.state?.theme?.toLowerCase() === 'group') {
-      return {
-        searchTerm: "",
-        priceRange: [0, 100000],
-        selectedDestinations: [],
-        selectedThemes: ['group'],
-        selectedInclusions: [],
-        selectedExclusions: [],
-      };
-    }
-    return {
-      searchTerm: location.state?.search || "",
+    const defaultFilters = {
+      searchTerm: "",
       priceRange: [0, 100000],
       selectedDestinations: [],
       selectedThemes: [],
       selectedInclusions: [],
       selectedExclusions: [],
     };
+
+    if (location.state?.theme?.toLowerCase() === "group") {
+      return { ...defaultFilters, selectedThemes: ["group"] };
+    }
+    if (location.state?.search) {
+      return { ...defaultFilters, searchTerm: location.state.search };
+    }
+    return defaultFilters;
   }, [location.state]);
 
   const [filters, setFilters] = useState(initialFilters);
 
-  // Reset filters when navigation state changes (e.g., coming from Home > Groups)
   useEffect(() => {
     setFilters(initialFilters);
-    // If coming from Home > Groups, auto-apply the filter as if user clicked 'Apply'
-    if (location.state?.theme?.toLowerCase() === 'group') {
-      setFilters({
-        searchTerm: "",
-        priceRange: [0, 100000],
-        selectedDestinations: [],
-        selectedThemes: ['group'],
-        selectedInclusions: [],
-        selectedExclusions: [],
-      });
-    }
-  }, [initialFilters, location.state]);
+  }, [initialFilters]);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [tripsResponse, destResponse, themesResponse, inclusionsResponse, exclusionsResponse] = await Promise.all([
+        const [
+          tripsResponse,
+          destResponse,
+          themesResponse,
+          inclusionsResponse,
+          exclusionsResponse,
+        ] = await Promise.all([
           fetch(getAllTrips),
           fetch(`${getAllTrips}/filters/destinations`),
           fetch(`${getAllTrips}/filters/themes`),
@@ -311,13 +307,12 @@ const TripsPage = () => {
         const exclusions = await exclusionsResponse.json();
 
         setTrips(tripsData);
-        setFilterOptions({ 
-          destinations: destinations || [], 
-          themes: themes || [], 
-          inclusions: inclusions || [], 
-          exclusions: exclusions || [] 
+        setFilterOptions({
+          destinations: destinations || [],
+          themes: themes || [],
+          inclusions: inclusions || [],
+          exclusions: exclusions || [],
         });
-
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -340,21 +335,57 @@ const TripsPage = () => {
     setSortBy(event.target.value);
   };
 
+  const handleRemoveFilter = (filterType, value) => {
+    const newFilters = { ...filters };
+    if (filterType === "priceRange") {
+      newFilters.priceRange = initialFilters.priceRange;
+    } else if (filterType === "searchTerm") {
+      newFilters.searchTerm = "";
+    } else {
+      newFilters[filterType] = newFilters[filterType].filter(
+        (item) => item !== value
+      );
+    }
+    setFilters(newFilters);
+  };
+
   const filteredTrips = useMemo(() => {
-    let filtered = trips.filter(trip => {
-      // Always require 'group' in themes if coming from Home > Groups (case-insensitive)
-      const groupThemeRequired = location.state?.theme?.toLowerCase() === 'group'
-        ? (Array.isArray(trip.themes) && trip.themes.some(t => t.toLowerCase() === 'group'))
-        : true;
-      // Search string matches name or destination
-      const searchMatch = filters.searchTerm === '' || trip.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) || trip.destination.toLowerCase().includes(filters.searchTerm.toLowerCase());
-      const priceMatch = trip.price >= filters.priceRange[0] && trip.price <= filters.priceRange[1];
-      const destinationMatch = filters.selectedDestinations.length === 0 || filters.selectedDestinations.includes(trip.destination);
-      // For theme filter, also case-insensitive
-      const themeMatch = filters.selectedThemes.length === 0 || filters.selectedThemes.some(theme => Array.isArray(trip.themes) && trip.themes.some(t => t.toLowerCase() === theme.toLowerCase()));
-      const inclusionMatch = filters.selectedInclusions.length === 0 || filters.selectedInclusions.some(inclusion => trip.inclusions?.includes(inclusion));
-      const exclusionMatch = filters.selectedExclusions.length === 0 || filters.selectedExclusions.some(exclusion => trip.exclusions?.includes(exclusion));
-      return groupThemeRequired && searchMatch && priceMatch && destinationMatch && themeMatch && inclusionMatch && exclusionMatch;
+    let filtered = trips.filter((trip) => {
+      const searchMatch =
+        filters.searchTerm === "" ||
+        trip.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+        trip.destination.toLowerCase().includes(filters.searchTerm.toLowerCase());
+      const priceMatch =
+        trip.price >= filters.priceRange[0] &&
+        trip.price <= filters.priceRange[1];
+      const destinationMatch =
+        filters.selectedDestinations.length === 0 ||
+        filters.selectedDestinations.includes(trip.destination);
+      const themeMatch =
+        filters.selectedThemes.length === 0 ||
+        filters.selectedThemes.some(
+          (theme) =>
+            Array.isArray(trip.themes) &&
+            trip.themes.some((t) => t.toLowerCase() === theme.toLowerCase())
+        );
+      const inclusionMatch =
+        filters.selectedInclusions.length === 0 ||
+        filters.selectedInclusions.some((inclusion) =>
+          trip.inclusions?.includes(inclusion)
+        );
+      const exclusionMatch =
+        filters.selectedExclusions.length === 0 ||
+        filters.selectedExclusions.some((exclusion) =>
+          trip.exclusions?.includes(exclusion)
+        );
+      return (
+        searchMatch &&
+        priceMatch &&
+        destinationMatch &&
+        themeMatch &&
+        inclusionMatch &&
+        exclusionMatch
+      );
     });
 
     if (sortBy === "price_asc") {
@@ -370,99 +401,247 @@ const TripsPage = () => {
     return filtered;
   }, [trips, filters, sortBy]);
 
+  const activeFilters = () => {
+    const active = [];
+    if (filters.searchTerm) {
+      active.push({
+        type: "searchTerm",
+        value: `Search: "${filters.searchTerm}"`,
+        display: `Search: "${filters.searchTerm}"`,
+      });
+    }
+    if (
+      filters.priceRange[0] !== initialFilters.priceRange[0] ||
+      filters.priceRange[1] !== initialFilters.priceRange[1]
+    ) {
+      active.push({
+        type: "priceRange",
+        value: "Price",
+        display: `Price: ₹${filters.priceRange[0]} - ₹${filters.priceRange[1]}`,
+      });
+    }
+    filters.selectedDestinations.forEach((dest) =>
+      active.push({ type: "selectedDestinations", value: dest, display: dest })
+    );
+    filters.selectedThemes.forEach((theme) =>
+      active.push({ type: "selectedThemes", value: theme, display: theme })
+    );
+    filters.selectedInclusions.forEach((inc) =>
+      active.push({ type: "selectedInclusions", value: inc, display: inc })
+    );
+    filters.selectedExclusions.forEach((exc) =>
+      active.push({ type: "selectedExclusions", value: exc, display: exc })
+    );
+    return active;
+  };
+
   return (
     <>
-    <Navbar />
-    <Container maxWidth="xl" sx={{ pt: 12, pb: 6 }}>
-      <Typography variant="h2" component="h1" fontWeight="700" sx={{ textAlign: 'center', mb: 2 }}>
-        Discover Your Dream Travel Packages with Trishelta Travels
-      </Typography>
-      <Typography color="text.secondary" sx={{ textAlign: 'center', mb: 6, maxWidth: '800px', mx: 'auto' }}>
-        Embark on unforgettable journeys with Trishelta Travels. Explore our diverse collection of curated travel packages, from thrilling adventure trips to relaxing vacation deals. Use our powerful filters to find the perfect itinerary that matches your interests, budget, and travel style. Your next adventure starts here!
-      </Typography>
-      
-      <Grid container spacing={4}>
-        {!isMobile && (
-          <Grid item md={3}>
-            <Paper elevation={0} sx={{ p: 0, position: 'sticky', top: 100, border: `1px solid ${theme.palette.divider}`, borderRadius: 3 }}>
-              <Typography variant="h6" sx={{ p: 2.5, pb: 1, fontWeight: 600 }}>Filters</Typography>
-              <FilterSidebar 
-                initialFilters={filters}
-                onApply={handleApplyFilters}
-                onReset={handleResetFilters}
-                options={filterOptions}
-                sortBy={sortBy}
-                onSortChange={handleSortChange}
-              />
-            </Paper>
-          </Grid>
-        )}
-
-        <Grid item xs={12} md={9}>
-          <Stack spacing={3}>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                placeholder="Search by trip name or destination..."
-                value={filters.searchTerm}
-                onChange={e => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-                InputProps={{ 
-                  startAdornment: <InputAdornment position="start"><Search sx={{ color: 'text.secondary' }} /></InputAdornment>,
-                  sx: { borderRadius: 2 }
-                }}
-              />
-              {isMobile && (
-                <IconButton onClick={() => setMobileFiltersOpen(true)} sx={{border: `1px solid ${theme.palette.divider}`}}>
-                  <Tune />
-                </IconButton>
-              )}
-            </Box>
-
-            {loading ? (
-              <Grid container spacing={3} sx={{ margin: 0, width: '100%' }}>
-                {Array.from(new Array(9)).map((_, index) => (
-                  <Grid item key={index} xs={12} sm={6} lg={4} sx={{ padding: { xs: '8px', sm: '12px', md: '16px' } }}>
-                    <TripCardSkeleton />
-                  </Grid>
-                ))}
-              </Grid>
-            ) : (
-              <Grid container spacing={3} sx={{ margin: 0, width: '100%' }}>
-                {filteredTrips.length > 0 ? (
-                  filteredTrips.map(trip => (
-                    <Grid item key={trip._id} xs={12} sm={6} lg={4} sx={{ padding: { xs: '8px', sm: '12px', md: '16px' } }}>
-                      <TripCard trip={trip} />
-                    </Grid>
-                  ))
-                ) : (
-                  <Grid item xs={12} sx={{ textAlign: 'center', py: 10 }}>
-                    <Typography variant="h5">No Trips Found</Typography>
-                    <Typography color="text.secondary" sx={{mt: 1}}>Try adjusting your search or filters to find what you're looking for.</Typography>
-                  </Grid>
-                )}
-              </Grid>
-            )}
-          </Stack>
-        </Grid>
-      </Grid>
-
-      <Drawer anchor="left" open={mobileFiltersOpen} onClose={() => setMobileFiltersOpen(false)} PaperProps={{sx: {width: 320}}}>
-        <Box sx={{ p: 2 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Filters</Typography>
-          <FilterSidebar 
-            initialFilters={filters}
-            onApply={handleApplyFilters}
-            onReset={handleResetFilters}
-            options={filterOptions}
-            sortBy={sortBy}
-            onSortChange={handleSortChange}
-            isMobile
-          />
+      <Navbar />
+      <Container maxWidth="xl" sx={{ pt: { xs: 8, md: 12 }, pb: 6 }}>
+        <Box sx={{ textAlign: "center", mb: { xs: 4, md: 6 } }}>
+          <Typography
+            variant={isMobile ? "h4" : "h2"}
+            component="h1"
+            fontWeight="700"
+            sx={{ mb: 2 }}
+          >
+            Discover Your Dream Travel Packages
+          </Typography>
+          <Typography
+            color="text.secondary"
+            sx={{ maxWidth: "800px", mx: "auto" }}
+          >
+            Embark on unforgettable journeys. Explore our diverse collection of
+            curated travel packages, from thrilling adventure trips to relaxing
+            vacation deals.
+          </Typography>
         </Box>
-      </Drawer>
-    </Container>
-    <Footer />
+
+        <Grid container spacing={isMobile ? 2 : 4}>
+          {!isMobile && (
+            <Grid item md={3}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 0,
+                  position: "sticky",
+                  top: 100,
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: 3,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{ p: 2.5, pb: 1, fontWeight: 600 }}
+                >
+                  Filters
+                </Typography>
+                {loading ? (
+                  <FilterSidebarSkeleton />
+                ) : (
+                  <FilterSidebar
+                    initialFilters={filters}
+                    onApply={handleApplyFilters}
+                    onReset={handleResetFilters}
+                    options={filterOptions}
+                    sortBy={sortBy}
+                    onSortChange={handleSortChange}
+                  />
+                )}
+              </Paper>
+            </Grid>
+          )}
+
+          <Grid item xs={12} md={9}>
+            <Stack spacing={3}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  display: "flex",
+                  gap: 2,
+                  position: "sticky",
+                  top: isMobile ? 60 : 80,
+                  bgcolor: "background.paper",
+                  zIndex: 10,
+                  border: isMobile ? `1px solid ${theme.palette.divider}` : "none",
+                  borderRadius: isMobile ? 2 : 0,
+                }}
+              >
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Search by trip name or destination..."
+                  value={filters.searchTerm}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      searchTerm: e.target.value,
+                    }))
+                  }
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search sx={{ color: "text.secondary" }} />
+                      </InputAdornment>
+                    ),
+                    sx: { borderRadius: 2 },
+                  }}
+                />
+                {isMobile && (
+                  <IconButton
+                    onClick={() => setMobileFiltersOpen(true)}
+                    sx={{ border: `1px solid ${theme.palette.divider}` }}
+                  >
+                    <Tune />
+                  </IconButton>
+                )}
+              </Paper>
+
+              {activeFilters().length > 0 && (
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{ flexWrap: "wrap", p: 1, gap: 1 }}
+                >
+                  {activeFilters().map((filter) => (
+                    <Chip
+                      key={filter.value}
+                      label={filter.display}
+                      onDelete={() =>
+                        handleRemoveFilter(filter.type, filter.value)
+                      }
+                      color="primary"
+                      variant="outlined"
+                    />
+                  ))}
+                  <Chip
+                    label="Clear All"
+                    onClick={() => setFilters(initialFilters)}
+                    color="error"
+                    variant="outlined"
+                    sx={{ cursor: 'pointer' }}
+                  />
+                </Stack>
+              )}
+
+              {loading ? (
+                <Grid container spacing={3} sx={{ margin: 0, width: "100%" }}>
+                  {Array.from(new Array(9)).map((_, index) => (
+                    <Grid
+                      item
+                      key={index}
+                      xs={12}
+                      sm={6}
+                      lg={4}
+                      sx={{
+                        padding: { xs: "8px", sm: "12px", md: "16px" },
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <TripCardSkeleton />
+                    </Grid>
+                  ))}
+                </Grid>
+              ) : (
+                <Grid container spacing={3} sx={{ margin: 0, width: "100%" }}>
+                  {filteredTrips.length > 0 ? (
+                    filteredTrips.map((trip) => (
+                      <Grid
+                        item
+                        key={trip._id}
+                        xs={12}
+                        sm={6}
+                        lg={4}
+                        sx={{
+                          padding: { xs: "8px", sm: "12px", md: "16px" },
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <TripCard trip={trip} />
+                      </Grid>
+                    ))
+                  ) : (
+                    <Grid item xs={12} sx={{ textAlign: "center", py: 10 }}>
+                      <Typography variant="h5">No Trips Found</Typography>
+                      <Typography color="text.secondary" sx={{ mt: 1 }}>
+                        Try adjusting your search or filters to find what you're
+                        looking for.
+                      </Typography>
+                    </Grid>
+                  )}
+                </Grid>
+              )}
+            </Stack>
+          </Grid>
+        </Grid>
+
+        <Drawer
+          anchor="left"
+          open={mobileFiltersOpen}
+          onClose={() => setMobileFiltersOpen(false)}
+          PaperProps={{ sx: { width: 320 } }}
+        >
+          <Box sx={{ p: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              Filters
+            </Typography>
+            <FilterSidebar
+              initialFilters={filters}
+              onApply={handleApplyFilters}
+              onReset={handleResetFilters}
+              options={filterOptions}
+              sortBy={sortBy}
+              onSortChange={handleSortChange}
+              isMobile
+            />
+          </Box>
+        </Drawer>
+      </Container>
+      <Footer />
     </>
   );
 };

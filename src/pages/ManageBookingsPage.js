@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Paper,
@@ -35,6 +35,7 @@ import { Search, AddComment, Notes, Person as PersonIcon } from '@mui/icons-mate
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { getAdminAuthHeader } from '../utils';
 import { BASE_URL } from '../endpoints';
+import useDebounce from '../hooks/useDebounce';
 
 const theme = createTheme({
   palette: {
@@ -65,23 +66,35 @@ const ManageBookingsPage = () => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalBookings, setTotalBookings] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [sort, setSort] = useState({ field: 'createdAt', direction: 'desc' });
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [annotationText, setAnnotationText] = useState('');
 
-  const fetchBookings = async () => {
-    if (!loading) setLoading(true);
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const fetchBookings = useCallback(async () => {
+    setLoading(true);
     try {
       const headers = getAdminAuthHeader();
       if (!headers.Authorization) throw new Error('Admin token not found. Please log in.');
 
-      const response = await fetch(`${BASE_URL}/api/admin/bookings`, { headers });
+      const params = new URLSearchParams({
+        page: page + 1,
+        limit: rowsPerPage,
+        sortField: sort.field,
+        sortOrder: sort.direction,
+        searchTerm: debouncedSearchTerm,
+      });
+
+      const response = await fetch(`${BASE_URL}/api/admin/bookings?${params.toString()}`, { headers });
       if (!response.ok) throw new Error('Failed to fetch bookings.');
 
       const result = await response.json();
       if (result.success) {
         setBookings(result.data);
+        setTotalBookings(result.pagination.totalBookings);
       } else {
         throw new Error(result.message || 'An unknown error occurred.');
       }
@@ -90,11 +103,11 @@ const ManageBookingsPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, rowsPerPage, sort, debouncedSearchTerm]);
 
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [fetchBookings]);
 
   const handleStatusChange = async (bookingId, newStatus) => {
     const originalBookings = [...bookings];
@@ -126,7 +139,7 @@ const ManageBookingsPage = () => {
       });
       if (!response.ok) throw new Error('Failed to add annotation');
       
-      await fetchBookings();
+      fetchBookings(); // Refetch to show the new annotation
       handleCloseDialog();
     } catch (err) {
       setError('Failed to add annotation.');
@@ -146,60 +159,15 @@ const ManageBookingsPage = () => {
   const handleCloseDialog = () => {
     setSelectedBooking(null);
   };
-
-  const getCustomerInfo = (booking) => {
-    let name = 'Guest User';
-    let email = 'No Email';
-
-    if (booking.user) {
-      // Prioritize user object if available
-      name = `${booking.user.firstName || ''} ${booking.user.lastName || ''}`.trim();
-      if (!name) name = booking.user.name || 'Guest User'; // Fallback to user.name if first/last are empty
-      email = booking.user.email || 'No Email';
-    } else {
-      // Fallback to direct booking properties for guest users
-      name = `${booking.firstName || ''} ${booking.lastName || ''}`.trim();
-      if (!name) name = booking.name || 'Guest User'; // Fallback to booking.name if first/last are empty
-      email = booking.email || 'No Email';
-    }
-
-    return { name, email };
+  
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
   };
 
-  const filteredAndSortedBookings = useMemo(() => {
-    let filtered = bookings.filter(b => {
-        const customer = getCustomerInfo(b);
-        return (
-            customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (b.trip?.name?.toLowerCase() || '').includes(searchTerm.toLowerCase())
-        );
-    });
-
-    filtered.sort((a, b) => {
-        const fieldA = a[sort.field] || '';
-        const fieldB = b[sort.field] || '';
-        let comparison = 0;
-
-        if (typeof fieldA === 'string') {
-            comparison = fieldA.localeCompare(fieldB);
-        } else if (fieldA > fieldB) {
-            comparison = 1;
-        } else if (fieldA < fieldB) {
-            comparison = -1;
-        }
-
-        return sort.direction === 'asc' ? comparison : -comparison;
-    });
-
-    return filtered;
-  }, [bookings, searchTerm, sort]);
-
-  const paginatedBookings = filteredAndSortedBookings.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
-  if (loading) {
-    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}><CircularProgress /></Box>;
-  }
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   if (error) {
     return <Alert severity="error" sx={{ m: 4 }}>{error}</Alert>;
@@ -225,6 +193,11 @@ const ManageBookingsPage = () => {
         </Box>
         <Paper elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
           <TableContainer>
+            {loading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh' }}>
+                    <CircularProgress />
+                </Box>
+            ) : (
             <Table stickyHeader>
               <TableHead>
                 <TableRow sx={{ '& .MuiTableCell-head': { fontWeight: 'bold', backgroundColor: 'primary.main', color: 'white' } }}>
@@ -237,51 +210,49 @@ const ManageBookingsPage = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginatedBookings.map((booking) => {
-                    const customer = getCustomerInfo(booking);
-                    return (
-                        <TableRow hover key={booking._id}>
-                            <TableCell>
-                            <Typography variant="body2" fontWeight="500">{customer.name}</Typography>
-                            <Typography variant="caption" color="text.secondary">{customer.email}</Typography>
-                            </TableCell>
-                            <TableCell>{booking.trip?.name || 'N/A'}</TableCell>
-                            <TableCell align="center">{((booking.attendees?.adults || 0) + (booking.attendees?.children || 0)) || 1}</TableCell>
-                            <TableCell sx={{ minWidth: 180 }}>
-                            <Select
-                                value={booking.status || 'New'}
-                                onChange={(e) => handleStatusChange(booking._id, e.target.value)}
-                                size="small"
-                                fullWidth
-                                renderValue={(selected) => (
-                                    <Chip label={selected} color={statusColors[selected]} size="small" />
-                                )}
-                            >
-                                {bookingStatusOptions.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
-                            </Select>
-                            </TableCell>
-                            <TableCell>
-                            <Tooltip title="View/Add Annotations">
-                                <IconButton onClick={() => handleOpenDialog(booking)} size="small">
-                                {booking.annotations?.length > 0 ? <Notes color="primary" /> : <AddComment />}
-                                </IconButton>
-                            </Tooltip>
-                            </TableCell>
-                            <TableCell align="right">{new Date(booking.createdAt).toLocaleDateString()}</TableCell>
-                        </TableRow>
-                    );
-                })}
+                {bookings.map((booking) => (
+                    <TableRow hover key={booking._id}>
+                        <TableCell>
+                        <Typography variant="body2" fontWeight="500">{booking.user.name}</Typography>
+                        <Typography variant="caption" color="text.secondary">{booking.user.email}</Typography>
+                        </TableCell>
+                        <TableCell>{booking.trip?.name || 'N/A'}</TableCell>
+                        <TableCell align="center">{((booking.attendees?.adults || 0) + (booking.attendees?.children || 0)) || 1}</TableCell>
+                        <TableCell sx={{ minWidth: 180 }}>
+                        <Select
+                            value={booking.status || 'New'}
+                            onChange={(e) => handleStatusChange(booking._id, e.target.value)}
+                            size="small"
+                            fullWidth
+                            renderValue={(selected) => (
+                                <Chip label={selected} color={statusColors[selected]} size="small" />
+                            )}
+                        >
+                            {bookingStatusOptions.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
+                        </Select>
+                        </TableCell>
+                        <TableCell>
+                        <Tooltip title="View/Add Annotations">
+                            <IconButton onClick={() => handleOpenDialog(booking)} size="small">
+                            {booking.annotations?.length > 0 ? <Notes color="primary" /> : <AddComment />}
+                            </IconButton>
+                        </Tooltip>
+                        </TableCell>
+                        <TableCell align="right">{new Date(booking.createdAt).toLocaleDateString()}</TableCell>
+                    </TableRow>
+                ))}
               </TableBody>
             </Table>
+            )}
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[10, 25, 50]}
             component="div"
-            count={filteredAndSortedBookings.length}
+            count={totalBookings}
             rowsPerPage={rowsPerPage}
             page={page}
-            onPageChange={(e, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
           />
         </Paper>
       </Box>

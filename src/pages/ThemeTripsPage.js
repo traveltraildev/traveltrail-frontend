@@ -9,16 +9,18 @@ import {
   Button,
   useTheme,
   useMediaQuery,
+  Pagination,
 } from "@mui/material";
-import TripsCard from "../components/TripsCard"; // Import your existing TripsCard component
 
 const ThemeTripsPage = () => {
   const { themeName } = useParams();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [allTrips, setAllTrips] = useState([]);
   const [filteredTrips, setFilteredTrips] = useState([]);
+  const [page, setPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [pagination, setPagination] = useState(null);
 
   useEffect(() => {
     const fetchThemeTrips = async () => {
@@ -33,17 +35,21 @@ const ThemeTripsPage = () => {
         const data = await response.json();
         
         if (data.success) {
-          setTrips(data.data);
+          setFilteredTrips(data.data);
           setPagination(data.pagination);
         }
       } catch (error) {
         console.error('Error:', error);
-        navigate('/trips');
+        // Optional: navigate to a generic error page or show a toast
       }
     };
   
     fetchThemeTrips();
-  }, [themeName, page]);
+  }, [themeName, page, itemsPerPage, navigate]);
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
 
   return (
     <Box sx={{ p: "100px 7%", backgroundColor: "#f5f5f5" }}>
@@ -58,27 +64,27 @@ const ThemeTripsPage = () => {
             mb: 2,
           }}
         >
-          {themeName} Tripss
+          {themeName} Trips
         </Typography>
         
-        <Chip
-          label={`Showing ${filteredTrips.length} trips`}
-          variant="outlined"
-          sx={{
-            bgcolor: theme.palette.background.paper,
-            borderColor: theme.palette.primary.main,
-            color: theme.palette.primary.main,
-            fontSize: "1rem",
-            py: 1,
-          }}
-        />
+        {pagination && (
+          <Chip
+            label={`Showing ${filteredTrips.length} of ${pagination.totalTrips} trips`}
+            variant="outlined"
+            sx={{
+              bgcolor: theme.palette.background.paper,
+              borderColor: theme.palette.primary.main,
+              color: theme.palette.primary.main,
+              fontSize: "1rem",
+              py: 1,
+            }}
+          />
+        )}
       </Box>
 
-      {/* Reuse your existing TripsCard component with filtered trips */}
       <Grid container spacing={2} justifyContent="center">
         {filteredTrips.map((trip) => (
           <Grid item key={trip._id} xs={12} sm={6} md={4}>
-            {/* Your existing TripCard component */}
             <Box
               sx={{
                 p: 2,
@@ -142,6 +148,18 @@ const ThemeTripsPage = () => {
           >
             Browse All Trips
           </Button>
+        </Box>
+      )}
+
+      {pagination && pagination.totalPages > 1 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Pagination
+            count={pagination.totalPages}
+            page={page}
+            onChange={handlePageChange}
+            color="primary"
+            size={isMobile ? 'small' : 'large'}
+          />
         </Box>
       )}
     </Box>

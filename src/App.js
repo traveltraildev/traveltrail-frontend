@@ -11,6 +11,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import Home from './pages/Home';
 import Trips from './pages/Trips';
 import TripDetails from './pages/TripDetails';
+import ThemeTripsPage from './pages/ThemeTripsPage';
 import Accommodations from './pages/Accommodations';
 import AccommodationDetailsPage from './pages/AccommodationDetailsPage';
 import AboutUsPage from './pages/AboutUsPage';
@@ -67,6 +68,7 @@ function App() {
                 <Route path="/trips" element={<Trips />} />
                 <Route path="/accommodations" element={<Accommodations />} />
                 <Route path="/trips/:id" element={<TripDetails />} />
+                <Route path="/trips/theme/:themeName" element={<ThemeTripsPage />} />
                 <Route path="/accommodations/:id" element={<AccommodationDetailsPage />} />
                 <Route path="/about-us" element={<AboutUsPage />} />
                 <Route path="/contact-us" element={<ContactUsPage />} />

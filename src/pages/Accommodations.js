@@ -31,11 +31,12 @@ import { useTheme } from "@mui/material/styles";
 import { Tune, ExpandMore, Search, KingBed, People } from "@mui/icons-material";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
+import FilterSidebarSkeleton from '../components/common/FilterSidebarSkeleton';
 
 const AccommodationCard = ({ accommodation }) => {
   const theme = useTheme();
   return (
-    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] } }}>
+    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, width: '100%' }}>
       <CardMedia
         component="img"
         height="220"
@@ -257,17 +258,21 @@ const FilterSidebar = ({
 
 const AccommodationsPage = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const location = useLocation();
 
   const [accommodations, setAccommodations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterOptions, setFilterOptions] = useState({ destinations: [], themes: [], amenities: [] });
+  const [filterOptions, setFilterOptions] = useState({
+    destinations: [],
+    themes: [],
+    amenities: [],
+  });
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState("recommended");
 
   const initialFilters = {
-    searchTerm: location.state?.search || '',
+    searchTerm: location.state?.search || "",
     priceRange: [0, 30000],
     maxOccupancyRange: [1, 10],
     selectedDestinations: [],
@@ -281,12 +286,13 @@ const AccommodationsPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [accResponse, destResponse, themesResponse, amenitiesResponse] = await Promise.all([
-          fetch(getAllAccommodations),
-          fetch(`${getAllAccommodations}/filters/destinations`),
-          fetch(`${getAllAccommodations}/filters/themes`),
-          fetch(`${getAllAccommodations}/filters/amenities`),
-        ]);
+        const [accResponse, destResponse, themesResponse, amenitiesResponse] =
+          await Promise.all([
+            fetch(getAllAccommodations),
+            fetch(`${getAllAccommodations}/filters/destinations`),
+            fetch(`${getAllAccommodations}/filters/themes`),
+            fetch(`${getAllAccommodations}/filters/amenities`),
+          ]);
 
         const accData = await accResponse.json();
         const destinations = await destResponse.json();
@@ -294,12 +300,11 @@ const AccommodationsPage = () => {
         const amenities = await amenitiesResponse.json();
 
         setAccommodations(accData.data || []);
-        setFilterOptions({ 
-          destinations: destinations || [], 
-          themes: themes || [], 
-          amenities: amenities || [] 
+        setFilterOptions({
+          destinations: destinations || [],
+          themes: themes || [],
+          amenities: amenities || [],
         });
-
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -322,30 +327,60 @@ const AccommodationsPage = () => {
     setSortBy(event.target.value);
   };
 
+  const handleRemoveFilter = (filterType, value) => {
+    const newFilters = { ...filters };
+    if (filterType === "priceRange") {
+      newFilters.priceRange = initialFilters.priceRange;
+    } else if (filterType === "maxOccupancyRange") {
+      newFilters.maxOccupancyRange = initialFilters.maxOccupancyRange;
+    } else if (filterType === "searchTerm") {
+      newFilters.searchTerm = "";
+    } else {
+      newFilters[filterType] = newFilters[filterType].filter(
+        (item) => item !== value
+      );
+    }
+    setFilters(newFilters);
+  };
+
   const filteredAccommodations = useMemo(() => {
     const filtered = accommodations.filter((acc) => {
       if (!acc) return false;
 
-      const searchMatch = acc.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-        (acc.destination && acc.destination.toLowerCase().includes(filters.searchTerm.toLowerCase()));
+      const searchMatch =
+        acc.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+        (acc.destination &&
+          acc.destination.toLowerCase().includes(filters.searchTerm.toLowerCase()));
 
-      const priceMatch = acc.price >= filters.priceRange[0] && acc.price <= filters.priceRange[1];
+      const priceMatch =
+        acc.price >= filters.priceRange[0] && acc.price <= filters.priceRange[1];
 
-      const maxOccupancyMatch = acc.maxOccupancy >= filters.maxOccupancyRange[0] && acc.maxOccupancy <= filters.maxOccupancyRange[1];
+      const maxOccupancyMatch =
+        acc.maxOccupancy >= filters.maxOccupancyRange[0] &&
+        acc.maxOccupancy <= filters.maxOccupancyRange[1];
 
       const destinationMatch =
         filters.selectedDestinations.length === 0 ||
         filters.selectedDestinations.includes(acc.destination);
-      
+
       const themeMatch =
         filters.selectedThemes.length === 0 ||
         filters.selectedThemes.some((theme) => acc.themes?.includes(theme));
 
       const amenityMatch =
         filters.selectedAmenities.length === 0 ||
-        filters.selectedAmenities.some((amenity) => acc.amenities?.includes(amenity));
+        filters.selectedAmenities.some((amenity) =>
+          acc.amenities?.includes(amenity)
+        );
 
-      return searchMatch && priceMatch && maxOccupancyMatch && destinationMatch && themeMatch && amenityMatch;
+      return (
+        searchMatch &&
+        priceMatch &&
+        maxOccupancyMatch &&
+        destinationMatch &&
+        themeMatch &&
+        amenityMatch
+      );
     });
 
     if (sortBy === "price_asc") {
@@ -361,100 +396,255 @@ const AccommodationsPage = () => {
     return filtered;
   }, [accommodations, filters, sortBy]);
 
+  const activeFilters = () => {
+    const active = [];
+    if (filters.searchTerm) {
+      active.push({
+        type: "searchTerm",
+        value: `Search: "${filters.searchTerm}"`,
+        display: `Search: "${filters.searchTerm}"`,
+      });
+    }
+    if (
+      filters.priceRange[0] !== initialFilters.priceRange[0] ||
+      filters.priceRange[1] !== initialFilters.priceRange[1]
+    ) {
+      active.push({
+        type: "priceRange",
+        value: "Price",
+        display: `Price: ₹${filters.priceRange[0]} - ₹${filters.priceRange[1]}`,
+      });
+    }
+    if (
+      filters.maxOccupancyRange[0] !== initialFilters.maxOccupancyRange[0] ||
+      filters.maxOccupancyRange[1] !== initialFilters.maxOccupancyRange[1]
+    ) {
+      active.push({
+        type: "maxOccupancyRange",
+        value: "Sleeps",
+        display: `Sleeps: ${filters.maxOccupancyRange[0]} - ${filters.maxOccupancyRange[1]}`,
+      });
+    }
+    filters.selectedDestinations.forEach((dest) =>
+      active.push({ type: "selectedDestinations", value: dest, display: dest })
+    );
+    filters.selectedThemes.forEach((theme) =>
+      active.push({ type: "selectedThemes", value: theme, display: theme })
+    );
+    filters.selectedAmenities.forEach((amenity) =>
+      active.push({ type: "selectedAmenities", value: amenity, display: amenity })
+    );
+    return active;
+  };
+
   return (
     <>
-    <Navbar />
-    <Container maxWidth="xl" sx={{ pt: 12, pb: 6 }}>
-      <Typography variant="h2" component="h1" fontWeight="700" sx={{ textAlign: 'center', mb: 2 }}>
-        Find Your Perfect Stay with Trishelta Travels
-      </Typography>
-      <Typography color="text.secondary" sx={{ textAlign: 'center', mb: 6, maxWidth: '800px', mx: 'auto' }}>
-        Discover a wide range of accommodations with Trishelta Travels, from cozy apartments and charming guesthouses to luxurious hotels and spacious villas. Use our intuitive filters to find the ideal place that suits your needs, budget, and travel style for an unforgettable experience.
-      </Typography>
-      
-      <Grid container spacing={4}>
-        {!isMobile && (
-          <Grid item md={3}>
-            <Paper elevation={0} sx={{ p: 0, position: 'sticky', top: 100, border: `1px solid ${theme.palette.divider}`, borderRadius: 3 }}>
-              <Typography variant="h6" sx={{ p: 2.5, pb: 1, fontWeight: 600 }}>Filters</Typography>
-              <FilterSidebar 
-                initialFilters={filters}
-                onApply={handleApplyFilters}
-                onReset={handleResetFilters}
-                options={filterOptions}
-                sortBy={sortBy}
-                onSortChange={handleSortChange}
-              />
-            </Paper>
-          </Grid>
-        )}
-
-        <Grid item xs={12} md={9}>
-          <Stack spacing={3}>
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                placeholder="Search by stay name or destination..."
-                value={filters.searchTerm}
-                onChange={e => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-                InputProps={{ 
-                  startAdornment: <InputAdornment position="start"><Search sx={{ color: 'text.secondary' }} /></InputAdornment>,
-                  sx: { borderRadius: 2 }
-                }}
-                sx={{ flexGrow: 1 }}
-              />
-              {isMobile && (
-                <IconButton onClick={() => setMobileFiltersOpen(true)} sx={{border: `1px solid ${theme.palette.divider}`}}>
-                  <Tune />
-                </IconButton>
-              )}
-            </Box>
-
-            {loading ? (
-              <Grid container spacing={3} sx={{ margin: 0, width: '100%' }}>
-                {Array.from(new Array(9)).map((_, index) => (
-                  <Grid item key={index} xs={12} sm={6} lg={4} sx={{ padding: { xs: '8px', sm: '12px', md: '16px' } }}>
-                    <AccommodationCardSkeleton />
-                  </Grid>
-                ))}
-              </Grid>
-            ) : (
-              <Grid container spacing={3} sx={{ margin: 0, width: '100%' }}>
-                {filteredAccommodations.length > 0 ? (
-                  filteredAccommodations.map(acc => (
-                    <Grid item key={acc._id} xs={12} sm={6} lg={4} sx={{ padding: { xs: '8px', sm: '12px', md: '16px' } }}>
-                      <AccommodationCard accommodation={acc} />
-                    </Grid>
-                  ))
-                ) : (
-                  <Grid item xs={12} sx={{ textAlign: 'center', py: 10 }}>
-                    <Typography variant="h5">No Stays Found</Typography>
-                    <Typography color="text.secondary" sx={{mt: 1}}>Try adjusting your search or filters to find what you're looking for.</Typography>
-                  </Grid>
-                )}
-              </Grid>
-            )}
-          </Stack>
-        </Grid>
-      </Grid>
-
-      <Drawer anchor="left" open={mobileFiltersOpen} onClose={() => setMobileFiltersOpen(false)} PaperProps={{sx: {width: 320}}}>
-        <Box sx={{ p: 2 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Filters</Typography>
-          <FilterSidebar 
-            initialFilters={filters}
-            onApply={handleApplyFilters}
-            onReset={handleResetFilters}
-            options={filterOptions}
-            sortBy={sortBy}
-            onSortChange={handleSortChange}
-            isMobile
-          />
+      <Navbar />
+      <Container maxWidth="xl" sx={{ pt: { xs: 8, md: 12 }, pb: 6 }}>
+        <Box sx={{ textAlign: "center", mb: { xs: 4, md: 6 } }}>
+          <Typography
+            variant={isMobile ? "h4" : "h2"}
+            component="h1"
+            fontWeight="700"
+            sx={{ mb: 2 }}
+          >
+            Find Your Perfect Stay
+          </Typography>
+          <Typography
+            color="text.secondary"
+            sx={{ maxWidth: "800px", mx: "auto" }}
+          >
+            Discover a wide range of accommodations, from cozy apartments to
+            luxurious hotels. Use our filters to find the ideal place for your
+            next getaway.
+          </Typography>
         </Box>
-      </Drawer>
-    </Container>
-    <Footer />
+
+        <Grid container spacing={isMobile ? 2 : 4}>
+          {!isMobile && (
+            <Grid item md={3}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 0,
+                  position: "sticky",
+                  top: 100,
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: 3,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{ p: 2.5, pb: 1, fontWeight: 600 }}
+                >
+                  Filters
+                </Typography>
+                {loading ? (
+                  <FilterSidebarSkeleton />
+                ) : (
+                  <FilterSidebar
+                    initialFilters={filters}
+                    onApply={handleApplyFilters}
+                    onReset={handleResetFilters}
+                    options={filterOptions}
+                    sortBy={sortBy}
+                    onSortChange={handleSortChange}
+                  />
+                )}
+              </Paper>
+            </Grid>
+          )}
+
+          <Grid item xs={12} md={9}>
+            <Stack spacing={3}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  display: "flex",
+                  gap: 2,
+                  position: "sticky",
+                  top: isMobile ? 60 : 80, // Adjust for mobile header
+                  bgcolor: "background.paper",
+                  zIndex: 10,
+                  border: isMobile ? `1px solid ${theme.palette.divider}` : "none",
+                  borderRadius: isMobile ? 2 : 0,
+                }}
+              >
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Search by stay name or destination..."
+                  value={filters.searchTerm}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      searchTerm: e.target.value,
+                    }))
+                  }
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search sx={{ color: "text.secondary" }} />
+                      </InputAdornment>
+                    ),
+                    sx: { borderRadius: 2 },
+                  }}
+                  sx={{ flexGrow: 1 }}
+                />
+                {isMobile && (
+                  <IconButton
+                    onClick={() => setMobileFiltersOpen(true)}
+                    sx={{ border: `1px solid ${theme.palette.divider}` }}
+                  >
+                    <Tune />
+                  </IconButton>
+                )}
+              </Paper>
+
+              {activeFilters().length > 0 && (
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{ flexWrap: "wrap", p: 1, gap: 1 }}
+                >
+                  {activeFilters().map((filter) => (
+                    <Chip
+                      key={filter.value}
+                      label={filter.display}
+                      onDelete={() =>
+                        handleRemoveFilter(filter.type, filter.value)
+                      }
+                      color="primary"
+                      variant="outlined"
+                    />
+                  ))}
+                  <Chip
+                    label="Clear All"
+                    onClick={() => setFilters(initialFilters)}
+                    color="error"
+                    variant="outlined"
+                    sx={{ cursor: 'pointer' }}
+                  />
+                </Stack>
+              )}
+
+              {loading ? (
+                <Grid container spacing={3} sx={{ margin: 0, width: "100%" }}>
+                  {Array.from(new Array(9)).map((_, index) => (
+                    <Grid
+                      item
+                      key={index}
+                      xs={12}
+                      sm={6}
+                      lg={4}
+                      sx={{
+                        padding: { xs: "8px", sm: "12px", md: "16px" },
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <AccommodationCardSkeleton />
+                    </Grid>
+                  ))}
+                </Grid>
+              ) : (
+                <Grid container spacing={3} sx={{ margin: 0, width: "100%" }}>
+                  {filteredAccommodations.length > 0 ? (
+                    filteredAccommodations.map((acc) => (
+                      <Grid
+                        item
+                        key={acc._id}
+                        xs={12}
+                        sm={6}
+                        lg={4}
+                        sx={{
+                          padding: { xs: "8px", sm: "12px", md: "16px" },
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <AccommodationCard accommodation={acc} />
+                      </Grid>
+                    ))
+                  ) : (
+                    <Grid item xs={12} sx={{ textAlign: "center", py: 10 }}>
+                      <Typography variant="h5">No Stays Found</Typography>
+                      <Typography color="text.secondary" sx={{ mt: 1 }}>
+                        Try adjusting your search or filters to find what you're
+                        looking for.
+                      </Typography>
+                    </Grid>
+                  )}
+                </Grid>
+              )}
+            </Stack>
+          </Grid>
+        </Grid>
+
+        <Drawer
+          anchor="left"
+          open={mobileFiltersOpen}
+          onClose={() => setMobileFiltersOpen(false)}
+          PaperProps={{ sx: { width: 320 } }}
+        >
+          <Box sx={{ p: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              Filters
+            </Typography>
+            <FilterSidebar
+              initialFilters={filters}
+              onApply={handleApplyFilters}
+              onReset={handleResetFilters}
+              options={filterOptions}
+              sortBy={sortBy}
+              onSortChange={handleSortChange}
+              isMobile
+            />
+          </Box>
+        </Drawer>
+      </Container>
+      <Footer />
     </>
   );
 };
