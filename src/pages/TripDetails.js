@@ -86,7 +86,7 @@ const TripDetails = () => {
 
             <Grid item xs={12} md={5} lg={4}>
               <Box sx={{ position: 'sticky', top: 100 }} id="booking-section">
-                <BookNow trip={trip} />
+                <BookNow item={trip} />
               </Box>
             </Grid>
           </Grid>

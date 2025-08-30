@@ -26,7 +26,7 @@ const BookingConfirmation = () => {
 
   const whatsappMessage = `*Booking Inquiry*
 ---------------------
-*Trip Name:* ${bookingData.tripName}
+*Item Name:* ${bookingData.itemName}
 *Name:* ${bookingData.firstName} ${bookingData.lastName}
 *Email:* ${bookingData.email}
 *Phone:* ${bookingData.phone}
@@ -56,8 +56,8 @@ I'd like to confirm the availability and get a quote for this trip.`;
                 <Typography variant="h6" gutterBottom fontWeight="500">Your Inquiry Summary</Typography>
                 <Stack spacing={1.5} sx={{p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2}}>
                     <Grid container>
-                        <Grid item xs={4}><Typography variant="body1" color="text.secondary">Trip:</Typography></Grid>
-                        <Grid item xs={8}><Typography variant="body1" fontWeight="500">{bookingData.tripName}</Typography></Grid>
+                        <Grid item xs={4}><Typography variant="body1" color="text.secondary">Item:</Typography></Grid>
+                        <Grid item xs={8}><Typography variant="body1" fontWeight="500">{bookingData.itemName}</Typography></Grid>
                     </Grid>
                     <Grid container>
                         <Grid item xs={4}><Typography variant="body1" color="text.secondary">Dates:</Typography></Grid>

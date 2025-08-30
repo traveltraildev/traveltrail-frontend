@@ -44,6 +44,7 @@ import LoginPage from './pages/LoginPage';
 import Logout from './pages/Logout';
 import ManageBookingsPage from './pages/ManageBookingsPage';
 import NewsletterSubscribers from './pages/admin/NewsletterSubscribers';
+import ManageUsersPage from './pages/admin/ManageUsersPage';
 
 // Components
 import BottomNavBar from './components/common/BottomNavBar';
@@ -106,6 +107,7 @@ function App() {
                   <Route path="/admin/cms/add-trip" element={<AddTripPage />} />
                   <Route path="/admin/edit-trip/:tripId" element={<EditTripPage />} />
                   <Route path="/admin/newsletter-subscribers" element={<NewsletterSubscribers />} />
+                  <Route path="/admin/users" element={<ManageUsersPage />} />
                 </Route>
               </Routes>
               {isMobile && <BottomNavBar />}

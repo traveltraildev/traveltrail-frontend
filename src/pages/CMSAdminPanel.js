@@ -95,6 +95,17 @@ const CMSAdminPanel = () => {
                 <Button component={RouterLink} to="/admin/accommodations" variant="outlined" startIcon={<VisibilityIcon />} fullWidth>View/Manage Accommodations</Button>
               </SectionCard>
             </Grid>
+
+            {/* User Management */}
+            <Grid item xs={12} md={6} lg={4}>
+              <SectionCard 
+                title="User Management" 
+                description="View and manage all registered users."
+                icon={<ApartmentIcon fontSize="large" />}
+              >
+                <Button component={RouterLink} to="/admin/users" variant="outlined" startIcon={<VisibilityIcon />} fullWidth>View/Manage Users</Button>
+              </SectionCard>
+            </Grid>
           </Grid>
         </Container>
       </Box>

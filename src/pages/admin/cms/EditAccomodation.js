@@ -62,7 +62,10 @@ const EditAccommodation = () => {
 
       const payload = {
         ...formData,
-        price: Number(formData.price),
+        basePrice: Number(formData.basePrice),
+        baseOccupancy: Number(formData.baseOccupancy),
+        extraAdultFee: Number(formData.extraAdultFee),
+        extraChildFee: Number(formData.extraChildFee),
         maxOccupancy: Number(formData.maxOccupancy),
         images: Array.isArray(formData.images) ? formData.images.filter((url) => url.trim() !== "") : [],
         themes: Array.isArray(formData.themes) ? formData.themes.filter((theme) => theme.trim() !== "") : [],
@@ -136,7 +139,16 @@ const EditAccommodation = () => {
                         <TextField fullWidth label="Destination" value={formData.destination} onChange={(e) => handleChange("destination", e.target.value)} required />
                       </Grid>
                       <Grid item xs={12} md={3}>
-                        <TextField fullWidth label="Price per Night" type="number" value={formData.price} onChange={(e) => handleChange("price", e.target.value)} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} required />
+                        <TextField fullWidth label="Base Price per Night" type="number" value={formData.basePrice} onChange={(e) => handleChange("basePrice", e.target.value)} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} required />
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <TextField fullWidth label="Base Occupancy" type="number" value={formData.baseOccupancy} onChange={(e) => handleChange("baseOccupancy", e.target.value)} required />
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <TextField fullWidth label="Extra Adult Fee" type="number" value={formData.extraAdultFee} onChange={(e) => handleChange("extraAdultFee", e.target.value)} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} required />
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <TextField fullWidth label="Extra Child Fee" type="number" value={formData.extraChildFee} onChange={(e) => handleChange("extraChildFee", e.target.value)} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} required />
                       </Grid>
                       <Grid item xs={12} md={3}>
                         <TextField fullWidth label="Room Type" value={formData.roomType} onChange={(e) => handleChange("roomType", e.target.value)} required />

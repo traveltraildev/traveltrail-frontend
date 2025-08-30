@@ -32,7 +32,7 @@ const countryCodes = [
     // Add more countries as needed
   ];
 
-const BookNow = ({ trip }) => {
+const BookNow = ({ item }) => {
   const navigate = useNavigate();
   const theme = useTheme();
   const { isAuthenticated, user } = useAuth();
@@ -85,8 +85,10 @@ const BookNow = ({ trip }) => {
     setError('');
 
     try {
+        const isAccommodation = !!item.basePrice;
+
         const bookingData = {
-            tripId: trip._id,
+            [isAccommodation ? 'accommodationId' : 'tripId']: item._id,
             startDate: dayjs(formData.startDate).format("YYYY-MM-DD"),
             endDate: dayjs(formData.endDate).format("YYYY-MM-DD"),
             attendees: {
@@ -127,7 +129,7 @@ const BookNow = ({ trip }) => {
         body: JSON.stringify({
           ...bookingData,
           secret: process.env.REACT_APP_GAS_SECRET,
-          tripName: trip.name,
+          itemName: item.name,
         }),
       });
 
@@ -141,7 +143,7 @@ const BookNow = ({ trip }) => {
         state: {
           success: true,
           bookingData: {
-            tripName: trip.name,
+            itemName: item.name,
             startDate: dayjs(formData.startDate).format("DD MMM YYYY"),
             endDate: dayjs(formData.endDate).format("DD MMM YYYY"),
             adults: Number(formData.adults) || 1,
@@ -161,14 +163,34 @@ const BookNow = ({ trip }) => {
     }
   };
 
-  const totalPrice = trip.price * formData.adults;
+  const calculateTotalPrice = () => {
+    const isAccommodation = !!item.basePrice;
+    if (isAccommodation) {
+      const { basePrice, baseOccupancy, extraAdultFee, extraChildFee } = item;
+      const { adults, children } = formData;
+
+      let total = basePrice;
+      const totalGuests = adults + children;
+
+      if (totalGuests > baseOccupancy) {
+        const extraAdults = Math.max(0, adults - baseOccupancy);
+        total += extraAdults * extraAdultFee;
+        total += children * extraChildFee;
+      }
+
+      return total;
+    }
+    return item.price * formData.adults;
+  };
+
+  const totalPrice = calculateTotalPrice();
 
   return (
     <Paper elevation={12} sx={{ p: {xs: 2.5, md: 3.5}, borderRadius: 4, border: `1px solid ${theme.palette.divider}` }}>
       <Stack spacing={3}>
         <Box>
             <Typography variant="h4" fontWeight="700">Enquire Now</Typography>
-            <Typography color="text.secondary">Starting from <Typography component="span" fontWeight="700" color="primary">₹{trip.price?.toLocaleString()}</Typography>/person</Typography>
+            <Typography color="text.secondary">Starting from <Typography component="span" fontWeight="700" color="primary">₹{item.basePrice?.toLocaleString() || item.price?.toLocaleString()}</Typography>{item.basePrice ? '/night' : '/person'}</Typography>
         </Box>
         <Divider />
         <Box component="form" onSubmit={handleSubmit}>

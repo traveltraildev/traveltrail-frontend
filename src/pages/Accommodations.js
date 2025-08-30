@@ -50,7 +50,7 @@ const AccommodationCard = ({ accommodation }) => {
           <Chip icon={<KingBed />} label={accommodation.roomType} size="small" variant="outlined" />
           <Chip icon={<People />} label={`${accommodation.maxOccupancy} Guests`} size="small" variant="outlined" />
         </Stack>
-        <Typography variant="h5" fontWeight="700" color="primary">₹{accommodation.price?.toLocaleString()}/night</Typography>
+        <Typography variant="h5" fontWeight="700" color="primary">₹{accommodation.basePrice?.toLocaleString()}/night</Typography>
       </CardContent>
       <Box sx={{ p: 2, pt: 0 }}>
         <Button component={Link} to={`/accommodations/${accommodation._id}`} variant="contained" fullWidth>View Details</Button>
@@ -353,7 +353,7 @@ const AccommodationsPage = () => {
           acc.destination.toLowerCase().includes(filters.searchTerm.toLowerCase()));
 
       const priceMatch =
-        acc.price >= filters.priceRange[0] && acc.price <= filters.priceRange[1];
+        acc.basePrice >= filters.priceRange[0] && acc.basePrice <= filters.priceRange[1];
 
       const maxOccupancyMatch =
         acc.maxOccupancy >= filters.maxOccupancyRange[0] &&
@@ -384,9 +384,9 @@ const AccommodationsPage = () => {
     });
 
     if (sortBy === "price_asc") {
-      filtered.sort((a, b) => a.price - b.price);
+      filtered.sort((a, b) => a.basePrice - b.basePrice);
     } else if (sortBy === "price_desc") {
-      filtered.sort((a, b) => b.price - a.price);
+      filtered.sort((a, b) => b.basePrice - a.basePrice);
     } else if (sortBy === "name_asc") {
       filtered.sort((a, b) => a.name.localeCompare(b.name));
     } else if (sortBy === "name_desc") {

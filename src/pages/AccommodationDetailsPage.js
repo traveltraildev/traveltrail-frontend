@@ -42,6 +42,16 @@ const AccommodationInfo = ({ accommodation }) => (
       </Stack>
     </Box>
 
+    <Section title="Pricing">
+      <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+        Base price of ₹{accommodation.basePrice} is for {accommodation.baseOccupancy} guest(s).
+        <br />
+        An extra fee of ₹{accommodation.extraAdultFee} will be applied for each additional adult.
+        <br />
+        An extra fee of ₹{accommodation.extraChildFee} will be applied for each additional child.
+      </Typography>
+    </Section>
+
     <Section title="Overview">
       <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8 }}>
         {accommodation.overview}
@@ -139,7 +149,7 @@ const AccommodationDetailsPage = () => {
 
             <Grid item xs={12} md={5} lg={4}>
               <Box sx={{ position: 'sticky', top: 100 }} id="booking-section">
-                <BookNow trip={accommodation} />
+                <BookNow item={accommodation} />
               </Box>
             </Grid>
           </Grid>
