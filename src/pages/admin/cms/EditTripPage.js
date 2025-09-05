@@ -20,6 +20,7 @@ import {
 import { AddCircleOutline } from "@mui/icons-material";
 import ItineraryDayForm from "./ItineraryDayForm";
 import { getAllTrips } from "../../../endpoints";
+import { useAuth } from '@clerk/clerk-react';
 import Navbar from "../../../components/common/Navbar";
 import Footer from "../../../components/common/Footer";
 
@@ -37,6 +38,7 @@ const exclusionOptions = [
 ];
 
 const EditTripPage = () => {
+  const { getToken } = useAuth();
   const { tripId } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState(null);
@@ -48,7 +50,12 @@ const EditTripPage = () => {
   useEffect(() => {
     const fetchTripData = async () => {
       try {
-        const response = await fetch(`${getAllTrips}/${tripId}`);
+        const token = await getToken();
+        const response = await fetch(`${getAllTrips}/${tripId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         if (!response.ok) throw new Error("Failed to fetch trip data");
         const data = await response.json();
         setFormData(data);
@@ -60,7 +67,7 @@ const EditTripPage = () => {
     };
 
     fetchTripData();
-  }, [tripId]);
+  }, [tripId, getToken]);
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -114,11 +121,12 @@ const EditTripPage = () => {
     setNotification({ type: '', message: '' });
 
     try {
+      const token = await getToken();
       const response = await fetch(`${getAllTrips}/${tripId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           ...formData,
@@ -134,10 +142,11 @@ const EditTripPage = () => {
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      setNotification({ type: 'success', message: 'Trip updated successfully!' });
-      setTimeout(() => navigate(`/admin/trips`), 2000);
+  setNotification({ type: 'success', message: 'Trip updated successfully!' });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       setNotification({ type: 'error', message: `Error updating trip: ${error.message}` });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       console.error("Error updating trip package:", error);
     } finally {
       setLoading(false);
@@ -249,6 +258,13 @@ const EditTripPage = () => {
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                   <Button variant="outlined" onClick={() => navigate(-1)}>
                     Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => window.open(`/trips/${tripId}`, '_blank')}
+                  >
+                    View Trip
                   </Button>
                   <Button type="submit" variant="contained" size="large" disabled={loading} sx={{ py: 1.5, px: 5 }}>
                     {loading ? <CircularProgress size={26} color="inherit" /> : "Save Changes"}

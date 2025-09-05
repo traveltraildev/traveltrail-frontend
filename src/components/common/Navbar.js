@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   AppBar,
   Toolbar,
@@ -7,16 +7,10 @@ import {
   useMediaQuery,
   useScrollTrigger,
   Container,
-  IconButton,
-  Avatar,
-  Menu,
-  MenuItem,
-  Tooltip,
   useTheme,
 } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { useAdminAuth } from '../../context/AdminAuthContext';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import HamburgerMenu from './HamburgerMenu';
 
 const NavLink = ({ to, children, isTransparent }) => {
@@ -45,8 +39,6 @@ const NavLink = ({ to, children, isTransparent }) => {
 };
 
 export default function Navbar() {
-  const { isAuthenticated, user, logout } = useAuth();
-  const { isAdminAuthenticated, adminLogout } = useAdminAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const location = useLocation();
@@ -56,16 +48,6 @@ export default function Navbar() {
     disableHysteresis: true,
     threshold: 0,
   });
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleMenu = (event) => setAnchorEl(event.currentTarget);
-  const handleClose = () => setAnchorEl(null);
-
-  const handleLogout = () => {
-    handleClose();
-    if (isAuthenticated) logout();
-    if (isAdminAuthenticated) adminLogout();
-  };
 
   const isTransparent = isHomePage && !trigger;
 
@@ -124,39 +106,20 @@ export default function Navbar() {
               <NavLink to="/about-us" isTransparent={isTransparent}>About</NavLink>
               <NavLink to="/contact-us" isTransparent={isTransparent}>Contact</NavLink>
 
-              {(isAuthenticated || isAdminAuthenticated) ? (
-                <>
-                  <Tooltip title="Profile & Settings">
-                    <IconButton onClick={handleMenu} size="small" sx={{color: appBarColor}}>
-                      <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
-                        {user?.name?.charAt(0)?.toUpperCase() || 'A'}
-                      </Avatar>
-                    </IconButton>
-                  </Tooltip>
-                  <Menu
-                    anchorEl={anchorEl}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                    keepMounted
-                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                    open={Boolean(anchorEl)}
-                    onClose={handleClose}
-                    PaperProps={{ sx: { mt: 1.5, borderRadius: 2 } }}
+              <SignedIn>
+                <UserButton afterSignOutUrl="/" />
+              </SignedIn>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ borderRadius: '20px', px: 3, fontWeight: 'bold' }}
                   >
-                    <MenuItem component={RouterLink} to={isAdminAuthenticated ? '/admin/dashboard' : '/profile'} onClick={handleClose}>Dashboard</MenuItem>
-                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                  </Menu>
-                </>
-              ) : (
-                <Button
-                  component={RouterLink}
-                  to="/login"
-                  variant="contained"
-                  color="primary"
-                  sx={{ borderRadius: '20px', px: 3, fontWeight: 'bold' }}
-                >
-                  Login
-                </Button>
-              )}
+                    Login
+                  </Button>
+                </SignInButton>
+              </SignedOut>
             </Box>
           )}
         </Toolbar>

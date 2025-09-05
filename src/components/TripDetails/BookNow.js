@@ -21,8 +21,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { BASE_URL, sheetProxy } from '../../endpoints';
-import { getUserAuthHeader } from "../../utils";
-import { useAuth } from '../../context/AuthContext';
+import { useUser, useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { Person, Email, Phone, People } from '@mui/icons-material';
 
 const countryCodes = [
@@ -35,7 +34,8 @@ const countryCodes = [
 const BookNow = ({ item }) => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const { isAuthenticated, user } = useAuth();
+  const { user, isSignedIn } = useUser();
+  const { getToken } = useClerkAuth();
   const [formData, setFormData] = useState({
     startDate: null,
     endDate: null,
@@ -51,16 +51,16 @@ const BookNow = ({ item }) => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isSignedIn && user) {
       setFormData(prev => ({
         ...prev,
         firstName: user.firstName || '',
         lastName: user.lastName || '',
-        email: user.email || '',
-        phone: user.phone || '',
+        email: user.emailAddresses[0]?.emailAddress || '',
+        phone: user.phoneNumbers[0]?.phoneNumber || '',
       }));
     }
-  }, [isAuthenticated, user]);
+  }, [isSignedIn, user]);
 
   const handleChange = (field, value) => {
     setError('');
@@ -73,7 +73,7 @@ const BookNow = ({ item }) => {
       setError('Please select a start and end date.');
       return;
     }
-    if (!isAuthenticated && (!formData.firstName || !formData.lastName || !formData.email || !formData.phone)) {
+    if (!isSignedIn && (!formData.firstName || !formData.lastName || !formData.email || !formData.phone)) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -95,22 +95,23 @@ const BookNow = ({ item }) => {
               adults: Number(formData.adults) || 1,
               children: Number(formData.children) || 0,
             },
-            firstName: isAuthenticated ? user.firstName : formData.firstName,
-            lastName: isAuthenticated ? user.lastName : formData.lastName,
-            email: isAuthenticated ? user.email : formData.email,
+            firstName: isSignedIn ? user.firstName : formData.firstName,
+            lastName: isSignedIn ? user.lastName : formData.lastName,
+            email: isSignedIn ? user.emailAddresses[0]?.emailAddress : formData.email,
             phone: `${formData.countryCode} ${formData.phone}`,
           };
 
-      if (isAuthenticated) {
-        bookingData.userId = user._id;
+      if (isSignedIn) {
+        bookingData.userId = user.id;
       }
 
       const headers = {
         "Content-Type": "application/json",
       };
 
-      if (isAuthenticated) {
-        Object.assign(headers, getUserAuthHeader());
+      if (isSignedIn) {
+        const token = await getToken();
+        Object.assign(headers, { 'Authorization': `Bearer ${token}` });
       }
 
       // Save booking to the database
@@ -148,9 +149,9 @@ const BookNow = ({ item }) => {
             endDate: dayjs(formData.endDate).format("DD MMM YYYY"),
             adults: Number(formData.adults) || 1,
             children: Number(formData.children) || 0,
-            firstName: isAuthenticated ? user.firstName : formData.firstName,
-            lastName: isAuthenticated ? user.lastName : formData.lastName,
-            email: isAuthenticated ? user.email : formData.email,
+            firstName: isSignedIn ? user.firstName : formData.firstName,
+            lastName: isSignedIn ? user.lastName : formData.lastName,
+            email: isSignedIn ? user.emailAddresses[0]?.emailAddress : formData.email,
             phone: `${formData.countryCode} ${formData.phone}`
           },
         },
@@ -199,7 +200,7 @@ const BookNow = ({ item }) => {
                 <Grid item xs={12}>
                     {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
                 </Grid>
-                {!isAuthenticated && (
+                {!isSignedIn && (
                     <>
                         <Grid item xs={12} sm={6}>
                             <TextField

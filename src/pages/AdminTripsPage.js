@@ -17,18 +17,20 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import { getAllTrips } from "../endpoints";
+import { useAuth } from "@clerk/clerk-react";
 
 const AdminTripsPage = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { getToken } = useAuth();
   const navigate = useNavigate();
   const theme = useTheme();
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this trip?")) {
       try {
-        const token = localStorage.getItem("adminToken");
+        const token = await getToken();
         const response = await fetch(`${getAllTrips}/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
           method: "DELETE",
@@ -82,7 +84,7 @@ const AdminTripsPage = () => {
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        const token = localStorage.getItem("adminToken");
+        const token = await getToken();
         if (!token) {
           navigate("/admin/login");
           return;
@@ -93,7 +95,6 @@ const AdminTripsPage = () => {
         });
 
         if (response.status === 401) {
-          localStorage.removeItem("adminToken");
           navigate("/admin/login");
           return;
         }
@@ -113,7 +114,7 @@ const AdminTripsPage = () => {
       }
     };
     fetchTrips();
-  }, [navigate]);
+  }, [navigate, getToken]);
 
   if (error) {
     return <Container sx={{ py: 4 }}><Alert severity="error">{error}</Alert></Container>;

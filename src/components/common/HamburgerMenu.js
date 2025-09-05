@@ -4,16 +4,14 @@ import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { useAdminAuth } from '../../context/AdminAuthContext';
+import { useUser, SignOutButton } from '@clerk/clerk-react';
 import { useTheme } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 
 export default function HamburgerMenu() {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const { isAuthenticated: isUserAuthenticated, logout, user } = useAuth();
-  const { isAdminAuthenticated, adminLogout } = useAdminAuth();
+  const { user } = useUser();
   const navigate = useNavigate();
   const theme = useTheme();
   const location = useLocation();
@@ -37,8 +35,6 @@ export default function HamburgerMenu() {
 
   const handleLogout = () => {
     handleMenuClose();
-    if (isUserAuthenticated) logout();
-    if (isAdminAuthenticated) adminLogout();
     navigate('/'); // Redirect to home after logout
   };
 
@@ -75,17 +71,17 @@ export default function HamburgerMenu() {
           Contact
         </MenuItem>
 
-        {(isUserAuthenticated || isAdminAuthenticated) ? (
+        {user ? (
           <>
-            <MenuItem onClick={handleMenuClose} component={Link} to={isAdminAuthenticated ? '/admin/dashboard' : '/profile'}>
+            <MenuItem onClick={handleMenuClose} component={Link} to={user.publicMetadata.role === 'admin' ? '/admin/dashboard' : '/profile'}>
               Dashboard
             </MenuItem>
-            <MenuItem onClick={handleLogout}>
-              Logout
+            <MenuItem>
+              <SignOutButton />
             </MenuItem>
           </>
         ) : (
-          <MenuItem onClick={handleMenuClose} component={Link} to="/login">
+          <MenuItem onClick={handleMenuClose} component={Link} to="/sign-in">
             Login
           </MenuItem>
         )}

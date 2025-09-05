@@ -1,16 +1,13 @@
 // src/api/userAPI.js
 import { BASE_URL } from '../endpoints';
-import {  getUserAuthHeader } from '../utils';
 
-export const getUserProfile = async () => {
+export const getUserProfile = async (getToken) => {
   try {
-
-
-
+    const token = await getToken();
     const response = await fetch(`${BASE_URL}/api/users/profile`, {
       headers: {
         'Content-Type': 'application/json',
-        ...getUserAuthHeader()
+        'Authorization': `Bearer ${token}`
       }
     });
     if (!response.ok) throw new Error('Failed to fetch user profile');
@@ -21,13 +18,14 @@ export const getUserProfile = async () => {
   }
 };
 
-export const updateUserProfile = async (userId, data) => {
+export const updateUserProfile = async (userId, data, getToken) => {
   try {
+    const token = await getToken();
     const response = await fetch(`${BASE_URL}/api/users/profile`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        ...getUserAuthHeader()
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(data)
     });
@@ -39,16 +37,14 @@ export const updateUserProfile = async (userId, data) => {
   }
 };
 
-
-
-
-export const changeUserPassword = async (userId, data) => {
+export const changeUserPassword = async (userId, data, getToken) => {
   try {
+    const token = await getToken();
     const response = await fetch(`${BASE_URL}/api/users/password`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        ...getUserAuthHeader()
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(data)
     });

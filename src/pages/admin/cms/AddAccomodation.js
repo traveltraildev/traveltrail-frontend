@@ -17,13 +17,16 @@ import {
   useTheme,
 } from "@mui/material";
 import { getAllAccommodations } from "../../../endpoints";
+import { useAuth } from '@clerk/clerk-react';
 import Navbar from "../../../components/common/Navbar";
 import Footer from "../../../components/common/Footer";
 
 const AddAccommodation = () => {
+  const { getToken } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ type: '', message: '' });
+  const [lastCreatedAccommodationId, setLastCreatedAccommodationId] = useState(null);
   const theme = useTheme();
 
   const [formData, setFormData] = useState({
@@ -55,7 +58,7 @@ const AddAccommodation = () => {
     setNotification({ type: '', message: '' });
 
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = await getToken();
       if (!token) throw new Error("Authentication required");
 
       const payload = {
@@ -82,8 +85,7 @@ const AddAccommodation = () => {
       });
 
       if (response.status === 401) {
-        localStorage.removeItem("adminToken");
-        navigate("/admin/login");
+        navigate("/sign-in");
         return;
       }
 
@@ -93,11 +95,22 @@ const AddAccommodation = () => {
         throw new Error(responseData.message || "Submission failed");
       }
       
-      setNotification({ type: 'success', message: 'Accommodation added successfully!' });
-      setTimeout(() => navigate("/admin/accommodations"), 2000);
+      // Extract created id from various possible response shapes
+      const newId = responseData.accommodationId || responseData.insertedId || responseData._id || responseData.id;
+
+      if (newId) {
+        setLastCreatedAccommodationId(newId);
+  setNotification({ type: 'success', message: 'Accommodation added successfully! Click "View Accommodation" to open it.' });
+  // Ensure admin sees the notification even if the form is long
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        setNotification({ type: 'success', message: 'Accommodation added successfully!' });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
 
     } catch (error) {
-      setNotification({ type: 'error', message: error.message });
+  setNotification({ type: 'error', message: error.message });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setLoading(false);
     }
@@ -182,7 +195,16 @@ const AddAccommodation = () => {
                   </Grid>
                 </Box>
 
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                  {lastCreatedAccommodationId && (
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => window.open(`/accommodations/${lastCreatedAccommodationId}`, '_blank')}
+                    >
+                      View Accommodation
+                    </Button>
+                  )}
                   <Button type="submit" variant="contained" size="large" disabled={loading} sx={{ py: 1.5, px: 5 }}>
                     {loading ? <CircularProgress size={26} color="inherit" /> : "Add Accommodation"}
                   </Button>

@@ -9,6 +9,7 @@ import {
   Typography,
   Container,
   Paper,
+  Button,
   useTheme
 } from "@mui/material";
 import {
@@ -17,6 +18,7 @@ import {
   Visibility as ViewIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '@clerk/clerk-react';
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import { getAllAccommodations } from "../endpoints";
@@ -36,11 +38,13 @@ const AccommodationsList = () => {
     navigate(`/admin/edit-accommodation/${id}`);
   };
 
+  const { getToken } = useAuth();
+
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this accommodation?")) return;
 
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = await getToken();
       const response = await fetch(`${getAllAccommodations}/${id}`, {
         method: "DELETE",
         headers: {
@@ -106,9 +110,11 @@ const AccommodationsList = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        navigate("/admin/login");
+      let token;
+      try {
+        token = await getToken();
+      } catch (err) {
+        navigate('/sign-in');
         return;
       }
 
@@ -120,8 +126,7 @@ const AccommodationsList = () => {
         });
 
         if (response.status === 401) {
-          localStorage.removeItem("adminToken");
-          navigate("/admin/login");
+          navigate('/sign-in');
           return;
         }
 
@@ -139,6 +144,7 @@ const AccommodationsList = () => {
         setData(formattedData);
       } catch (err) {
         setError(err.message || "Failed to fetch accommodations");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } finally {
         setLoading(false);
       }
@@ -160,9 +166,16 @@ const AccommodationsList = () => {
       <Navbar />
       <Container maxWidth="xl" sx={{ pt: 12, pb: 4 }}>
         <Paper sx={{ p: 3, borderRadius: 3, boxShadow: theme.shadows[4] }}>
-          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
-            Accommodations
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+            <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+              Accommodations
+            </Typography>
+            <Box>
+              <Button variant="contained" color="primary" onClick={() => navigate('/admin/add-accommodation')} sx={{ mr: 1 }}>
+                Add New Accommodation
+              </Button>
+            </Box>
+          </Box>
           <Box sx={{ height: 650, width: '100%' }}>
             {loading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>

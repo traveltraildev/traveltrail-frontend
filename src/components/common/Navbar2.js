@@ -21,13 +21,13 @@ import {
   ContactSupport
 } from '@mui/icons-material';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { useAdminAuth } from '../../context/AdminAuthContext';
+import { useUser } from '@clerk/clerk-react';
 
 export default function Navbar2() {
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
-  const { isAdminAuthenticated } = useAdminAuth();
+  const { isSignedIn, user } = useUser();
+  const isAuthenticated = isSignedIn;
+  const isAdminAuthenticated = user?.publicMetadata?.role === 'admin';
   const [value, setValue] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);

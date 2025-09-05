@@ -12,12 +12,13 @@ import {
   Stack,
   Link as RouterLink
 } from '@mui/material';
-import { useAuth } from '../context/AuthContext';
+import { useUser, useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { updateUserProfile } from '../api/userAPI';
 import { useNavigate } from 'react-router-dom';
 
 const EditProfilePage = () => {
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { user, isSignedIn, isLoaded } = useUser();
+  const { getToken } = useClerkAuth();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
@@ -27,9 +28,9 @@ const EditProfilePage = () => {
   useEffect(() => {
     if (user) {
       setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || ''
+        name: user.fullName || '',
+        email: user.emailAddresses[0]?.emailAddress || '',
+        phone: user.phoneNumbers[0]?.phoneNumber || ''
       });
     }
   }, [user]);
@@ -40,7 +41,7 @@ const EditProfilePage = () => {
     setNotification({ type: '', message: '' });
 
     try {
-      await updateUserProfile(user._id, formData);
+      await updateUserProfile(user.id, formData, getToken);
       setNotification({ type: 'success', message: 'Profile updated successfully!' });
     } catch (error) {
       setNotification({ type: 'error', message: 'Failed to update profile. Please try again.' });
@@ -50,15 +51,15 @@ const EditProfilePage = () => {
     }
   };
 
-  if (authLoading) {
+  if (!isLoaded) {
     return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}><CircularProgress /></Box>;
   }
 
-  if (!isAuthenticated) {
+  if (!isSignedIn) {
     return (
       <Container sx={{textAlign: 'center', py: 12}}>
         <Typography variant="h5">Please log in to edit your profile.</Typography>
-        <Button component={RouterLink} to="/login" variant="contained" sx={{mt: 2}}>Login</Button>
+        <Button component={RouterLink} to="/sign-in" variant="contained" sx={{mt: 2}}>Login</Button>
       </Container>
     );
   }
@@ -125,7 +126,20 @@ const EditProfilePage = () => {
                         <Button variant="outlined" onClick={() => navigate('/profile')}>
                             Cancel
                         </Button>
+                        <Button
+                          variant="text"
+                          component="a"
+                          href="/account"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          sx={{ ml: 1 }}
+                        >
+                          Manage account (email / password)
+                        </Button>
                     </Stack>
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                      To change your email or password, use the Clerk account management page which opens in a new tab.
+                    </Typography>
                 </Grid>
               </Grid>
             </Box>

@@ -1,18 +1,22 @@
 // src/pages/Logout.js
 import React, { useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useAdminAuth } from '../context/AdminAuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useClerk } from '@clerk/clerk-react';
 
 const Logout = () => {
-  const { logout } = useAuth();
-  const { adminLogout } = useAdminAuth();
+  const { signOut } = useClerk();
   const navigate = useNavigate();
 
   useEffect(() => {
-    logout();
-    adminLogout();
-    navigate('/');
+    (async () => {
+      try {
+        await signOut();
+      } catch (e) {
+        console.error('Clerk signOut error:', e);
+      }
+  // legacy adminToken cleared on server-side; no client-side admin token to clear
+      navigate('/');
+    })();
   }, []);
 
   return null;

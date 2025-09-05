@@ -2,13 +2,13 @@
 import { BASE_URL } from '../endpoints';
 import { getUserAuthHeader } from '../utils';
 
-export const getUserBookingHistory = async (userId) => {
+export const getUserBookingHistory = async (getToken) => {
   try {
-
+    const token = await getToken();
     const response = await fetch(`${BASE_URL}/api/bookings/history`, {
       headers: {
-        // 'Content-Type': 'application/json',
-        ...getUserAuthHeader()
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       }
     });
     if (!response.ok) throw new Error('Failed to fetch booking history');

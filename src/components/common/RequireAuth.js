@@ -1,25 +1,18 @@
 import React, { useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { useAdminAuth } from '../../context/AdminAuthContext';
+import { useUser } from '@clerk/clerk-react';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 
 const RequireAuth = ({ children, isAdmin = false }) => {
-  const { isAuthenticated, user, loading } = useAuth();
-  const { isAdminAuthenticated, adminLoading } = useAdminAuth();
+  const { user, isSignedIn, isLoaded } = useUser();
+  const loading = !isLoaded; 
   const location = useLocation();
 
-  const overallLoading = loading || adminLoading;
+  const overallLoading = loading; // only Clerk loading is required now
 
-  console.log('RequireAuth - User loading:', loading);
-  console.log('RequireAuth - Admin loading:', adminLoading);
-  console.log('RequireAuth - isAuthenticated:', isAuthenticated);
-  console.log('RequireAuth - isAdminAuthenticated:', isAdminAuthenticated);
-  console.log('RequireAuth - user:', user);
-  console.log('RequireAuth - isAdmin prop:', isAdmin);
   useEffect(() => {
-    console.log('Authentication state changed:', isAuthenticated, user);
-  }, [isAuthenticated, user]);
+    console.log('RequireAuth - loading:', loading, 'isSignedIn:', isSignedIn, 'user:', user, 'isAdmin prop:', isAdmin);
+  }, [loading, isSignedIn, user, isAdmin]);
 
   if (loading) {
     return <CircularProgress />;
@@ -29,20 +22,16 @@ const RequireAuth = ({ children, isAdmin = false }) => {
   }
   
   if (isAdmin) {
-    if (!isAdminAuthenticated) {
-      console.log('RequireAuth - Admin access required, but not authenticated as admin. Redirecting to /login');
+    const isClerkAdmin = user?.publicMetadata?.role === 'admin';
+    if (!isClerkAdmin) {
+      console.log('RequireAuth - Admin access required, but user is not Clerk-admin. Redirecting to /login');
       return <Navigate to="/login" state={{ from: location }} replace />;
     }
-    // Optional: Additional check if needed, though isAdminAuthenticated should be primary
-    // if (user?.role !== 'admin') {
-    //   console.log('RequireAuth - Admin access required, but user role is not admin. Redirecting to /profile');
-    //   return <Navigate to="/profile" state={{ from: location }} replace />;
-    // }
   } else {
-    if (!isAuthenticated) {
+    if (!isSignedIn) {
       console.log('RequireAuth - Not authenticated as user, redirecting to /login');
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+      return <Navigate to="/login" state={{ from: location }} replace />;
+    }
   }
   console.log('RequireAuth - Authenticated and authorized. Rendering children.');
   return <Outlet />;

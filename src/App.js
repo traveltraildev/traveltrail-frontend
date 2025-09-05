@@ -1,11 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { AuthProvider } from './context/AuthContext';
-import { AdminAuthProvider } from './context/AdminAuthContext';
 import theme from './theme';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { SignedIn, Protect, useUser } from '@clerk/clerk-react';
 
 // Pages
 import Home from './pages/Home';
@@ -20,7 +19,6 @@ import TermsAndConditionsPage from './pages/TermsAndConditionsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import CookiePolicyPage from './pages/CookiePolicyPage';
 import AccessibilityStatementPage from './pages/AccessibilityStatementPage';
-import AdminLoginPage from './pages/AdminLoginPage';
 import Dashboard from './pages/Dashboard';
 import AdminTripsPage from './pages/AdminTripsPage';
 import CMSAdminPanel from './pages/CMSAdminPanel';
@@ -39,18 +37,45 @@ import BookingConfirmation from './components/BookingConfirmation';
 import UserProfilePage from './pages/UserProfilePage';
 import EditProfilePage from './pages/EditProfilePage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
-import RegisterPage from './pages/RegisterPage';
-import LoginPage from './pages/LoginPage';
-import Logout from './pages/Logout';
 import ManageBookingsPage from './pages/ManageBookingsPage';
 import NewsletterSubscribers from './pages/admin/NewsletterSubscribers';
 import ManageUsersPage from './pages/admin/ManageUsersPage';
+import SignInPage from './pages/SignInPage';
+import SignUpPage from './pages/SignUpPage';
+import NotAuthorized from './pages/NotAuthorized';
 
 // Components
 import BottomNavBar from './components/common/BottomNavBar';
 
-// Context
-import RequireAuth from './components/common/RequireAuth';
+const AdminRoutes = () => {
+  const { isLoaded, user } = useUser();
+  if (!isLoaded) return null; // wait for Clerk to load
+  const hasAdminRole = user?.publicMetadata?.role === 'admin';
+
+  const guard = (component) => hasAdminRole ? component : <NotAuthorized />;
+
+  return (
+    <Routes>
+      <Route path="dashboard" element={guard(<Dashboard />)} />
+      <Route path="manage-bookings" element={guard(<ManageBookingsPage />)} />
+      <Route path="cms" element={guard(<CMSAdminPanel />)} />
+      <Route path="cms/trips-list" element={guard(<AdminTripsPage />)} />
+      <Route path="cms/edit/about-us" element={guard(<EditAboutUsPage />)} />
+      <Route path="cms/edit/contact-us" element={guard(<EditContactUsPage />)} />
+      <Route path="cms/edit/terms-and-conditions" element={guard(<EditTermsAndConditionsPage />)} />
+      <Route path="cms/edit/privacy-policy" element={guard(<EditPrivacyPolicyPage />)} />
+      <Route path="cms/edit/cookie-policy" element={guard(<EditCookiePolicyPage />)} />
+      <Route path="cms/edit/accessibility-statement" element={guard(<EditAccessibilityStatementPage />)} />
+      <Route path="add-accommodation" element={guard(<AddAccommodation />)} />
+      <Route path="edit-accommodation/:id" element={guard(<EditAccommodation />)} />
+      <Route path="accommodations" element={guard(<AccommodationsList />)} />
+      <Route path="cms/add-trip" element={guard(<AddTripPage />)} />
+      <Route path="edit-trip/:tripId" element={guard(<EditTripPage />)} />
+      <Route path="newsletter-subscribers" element={guard(<NewsletterSubscribers />)} />
+      <Route path="users" element={guard(<ManageUsersPage />)} />
+    </Routes>
+  );
+};
 
 function App() {
   const appTheme = useTheme();
@@ -59,62 +84,46 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AdminAuthProvider>
-        <AuthProvider>
-          <Router>
-            <div className="App">
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/trips" element={<Trips />} />
-                <Route path="/accommodations" element={<Accommodations />} />
-                <Route path="/trips/:id" element={<TripDetails />} />
-                <Route path="/trips/theme/:themeName" element={<ThemeTripsPage />} />
-                <Route path="/accommodations/:id" element={<AccommodationDetailsPage />} />
-                <Route path="/about-us" element={<AboutUsPage />} />
-                <Route path="/contact-us" element={<ContactUsPage />} />
-                <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-                <Route path="/cookie-policy" element={<CookiePolicyPage />} />
-                <Route path="/accessibility-statement" element={<AccessibilityStatementPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/logout" element={<Logout />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/booking-confirmation" element={<BookingConfirmation />} />
-                <Route path="/admin/login" element={<AdminLoginPage />} />
+      <div className="App">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/trips" element={<Trips />} />
+          <Route path="/accommodations" element={<Accommodations />} />
+          <Route path="/trips/:id" element={<TripDetails />} />
+          <Route path="/trips/theme/:themeName" element={<ThemeTripsPage />} />
+          <Route path="/accommodations/:id" element={<AccommodationDetailsPage />} />
+          <Route path="/about-us" element={<AboutUsPage />} />
+          <Route path="/contact-us" element={<ContactUsPage />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+          <Route path="/accessibility-statement" element={<AccessibilityStatementPage />} />
+          <Route path="/booking-confirmation" element={<BookingConfirmation />} />
 
-                <Route element={<RequireAuth />}>
-                  <Route path="/profile" element={<UserProfilePage />} />
-                  <Route path="/edit-profile" element={<EditProfilePage />} />
-                  <Route path="/change-password" element={<ChangePasswordPage />} />
-                </Route>
+          {/* Sign In / Sign Up Routes */}
+          <Route path="/sign-in/*" element={<SignInPage />} />
+          <Route path="/sign-up/*" element={<SignUpPage />} />
 
-                {/* Admin Protected Routes */}
-                <Route element={<RequireAuth isAdmin />}>
-                  <Route path="/admin/dashboard" element={<Dashboard />} />
-                  <Route path="/admin/manage-bookings" element={<ManageBookingsPage />} />
-                  <Route path="/admin/cms" element={<CMSAdminPanel />} />
-                  <Route path="/admin/cms/trips-list" element={<AdminTripsPage />} />
-                  <Route path="/admin/cms/edit/about-us" element={<EditAboutUsPage />} />
-                  <Route path="/admin/cms/edit/contact-us" element={<EditContactUsPage />} />
-                  <Route path="/admin/cms/edit/terms-and-conditions" element={<EditTermsAndConditionsPage />} />
-                  <Route path="/admin/cms/edit/privacy-policy" element={<EditPrivacyPolicyPage />} />
-                  <Route path="/admin/cms/edit/cookie-policy" element={<EditCookiePolicyPage />} />
-                  <Route path="/admin/cms/edit/accessibility-statement" element={<EditAccessibilityStatementPage />} />
-                  <Route path="/admin/add-accommodation" element={<AddAccommodation />} />
-                  <Route path="/admin/edit-accommodation/:id" element={<EditAccommodation />} />
-                  <Route path="/admin/accommodations" element={<AccommodationsList />} />
-                  <Route path="/admin/cms/add-trip" element={<AddTripPage />} />
-                  <Route path="/admin/edit-trip/:tripId" element={<EditTripPage />} />
-                  <Route path="/admin/newsletter-subscribers" element={<NewsletterSubscribers />} />
-                  <Route path="/admin/users" element={<ManageUsersPage />} />
-                </Route>
-              </Routes>
-              {isMobile && <BottomNavBar />}
-            </div>
-          </Router>
-        </AuthProvider>
-      </AdminAuthProvider>
+          {/* Protected Routes */}
+          <Route
+            path="/profile"
+            element={<SignedIn><UserProfilePage /></SignedIn>}
+          />
+          <Route
+            path="/edit-profile"
+            element={<SignedIn><EditProfilePage /></SignedIn>}
+          />
+          <Route
+            path="/change-password"
+            element={<SignedIn><ChangePasswordPage /></SignedIn>}
+          />
+
+          {/* Admin Protected Routes */}
+          <Route path="/admin/*" element={<AdminRoutes />} />
+        </Routes>
+        {isMobile && <BottomNavBar />}
+      </div>
     </ThemeProvider>
   );
 }

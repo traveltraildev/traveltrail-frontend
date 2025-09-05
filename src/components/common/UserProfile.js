@@ -1,14 +1,14 @@
 // src/components/common/UserProfile.js
 import React from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useUser } from '@clerk/clerk-react';
 import UserProfileInfo from './UserProfileInfo';
 import UserBookingHistory from './UserBookingHistory';
 import { Box, Container, Typography, Paper, Grid } from '@mui/material';
 
 const UserProfile = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isSignedIn } = useUser();
 
-  if (!isAuthenticated) {
+  if (!isSignedIn) {
     return (
       <Box
         sx={{

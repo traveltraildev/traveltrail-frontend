@@ -12,37 +12,21 @@ import {
   CircularProgress
 } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useEffect } from 'react';
+
+// Use Clerk sign-in page instead of the old local login form
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  useEffect(() => {
+    // Redirect to Clerk sign-in route
+    navigate('/sign-in');
+  }, [navigate]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const success = await login(formData.username, formData.password);
-      if (success) {
-        navigate('/profile');
-      } else {
-        setError('Invalid username or password.');
-      }
-    } catch (err) {
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message);
-      } else {
-        setError('Login failed. Please try again later.');
-      }
-      console.error('Login error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Login is handled by Clerk; this page redirects to Clerk's sign-in flow.
 
   return (
     <Container component="main" maxWidth="xs" sx={{ display: 'flex', alignItems: 'center', minHeight: '100vh' }}>
@@ -52,44 +36,8 @@ const LoginPage = () => {
             <img src="/images/mainLogo.svg" alt="Trishelta Logo" style={{ height: 60 }} />
           </Box>
           <Typography component="h1" variant="h5" fontWeight="600">
-            Welcome Back
+            Redirecting to sign-in...
           </Typography>
-
-          {error && <Alert severity="error" sx={{ width: '100%' }}>{error}</Alert>}
-
-          <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
-            <Stack spacing={2}>
-              <TextField
-                fullWidth
-                label="Username"
-                name="username"
-                autoComplete="username"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                required
-              />
-              <TextField
-                fullWidth
-                label="Password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                size="large"
-                disabled={loading}
-                sx={{ py: 1.5 }}
-              >
-                {loading ? <CircularProgress size={26} color="inherit" /> : 'Sign In'}
-              </Button>
-            </Stack>
-          </Box>
 
           <Stack spacing={1} sx={{ textAlign: 'center', width: '100%' }}>
             <Typography variant="body2">

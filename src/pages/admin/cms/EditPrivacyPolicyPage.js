@@ -13,12 +13,13 @@ import {
 } from "@mui/material";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { getAdminAuthHeader } from "../../../utils";
+import { useAuth } from '@clerk/clerk-react';
 import { BASE_URL } from "../../../endpoints";
 import Navbar from "../../../components/common/Navbar";
 import Footer from "../../../components/common/Footer";
 
 const EditPrivacyPolicyPage = () => {
+  const { getToken } = useAuth();
   const pageKey = "privacy-policy";
   const [pageContent, setPageContent] = useState({ title: "", content: "" });
   const [loading, setLoading] = useState(true);
@@ -53,7 +54,12 @@ const EditPrivacyPolicyPage = () => {
   useEffect(() => {
     const fetchPageContent = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/cms/pages/${pageKey}`);
+        const token = await getToken();
+        const response = await fetch(`${BASE_URL}/api/cms/pages/${pageKey}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         if (!response.ok) {
            if (response.status === 404) {
             setPageContent({ title: "Privacy Policy", content: "" });
@@ -72,7 +78,7 @@ const EditPrivacyPolicyPage = () => {
     };
 
     fetchPageContent();
-  }, [pageKey]);
+  }, [pageKey, getToken]);
 
   const handleChange = (e) => {
     setPageContent((prevData) => ({
@@ -93,11 +99,12 @@ const EditPrivacyPolicyPage = () => {
     setLoading(true);
     setNotification({ type: "", message: "" });
     try {
+      const token = await getToken();
       const response = await fetch(`${BASE_URL}/api/cms/pages/${pageKey}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...getAdminAuthHeader(),
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(pageContent),
       });
@@ -106,9 +113,11 @@ const EditPrivacyPolicyPage = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      setNotification({ type: "success", message: "Privacy Policy updated successfully!" });
+  setNotification({ type: "success", message: "Privacy Policy updated successfully!" });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
-      setNotification({ type: "error", message: `Failed to update content: ${error.message}` });
+  setNotification({ type: "error", message: `Failed to update content: ${error.message}` });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setLoading(false);
     }

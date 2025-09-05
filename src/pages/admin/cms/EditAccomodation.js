@@ -17,22 +17,30 @@ import {
   useTheme,
 } from "@mui/material";
 import { getAllAccommodations } from "../../../endpoints";
+import { useAuth } from '@clerk/clerk-react';
 import Navbar from "../../../components/common/Navbar";
 import Footer from "../../../components/common/Footer";
 
 const EditAccommodation = () => {
+  const { getToken } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ type: '', message: '' });
   const [formData, setFormData] = useState(null);
+  const [lastSavedAccommodationId, setLastSavedAccommodationId] = useState(null);
   const theme = useTheme();
 
   useEffect(() => {
     const fetchAccommodation = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${getAllAccommodations}/${id}`);
+        const token = await getToken();
+        const response = await fetch(`${getAllAccommodations}/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch accommodation data.");
         }
@@ -45,7 +53,7 @@ const EditAccommodation = () => {
       }
     };
     fetchAccommodation();
-  }, [id]);
+  }, [id, getToken]);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -57,7 +65,7 @@ const EditAccommodation = () => {
     setNotification({ type: '', message: '' });
 
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = await getToken();
       if (!token) throw new Error("Authentication required");
 
       const payload = {
@@ -84,8 +92,7 @@ const EditAccommodation = () => {
       });
 
       if (response.status === 401) {
-        localStorage.removeItem("adminToken");
-        navigate("/admin/login");
+        navigate("/sign-in");
         return;
       }
 
@@ -95,8 +102,11 @@ const EditAccommodation = () => {
         throw new Error(responseData.message || "Submission failed");
       }
 
-      setNotification({ type: 'success', message: 'Accommodation updated successfully!' });
-      setTimeout(() => navigate("/admin/accommodations"), 2000);
+      const updatedId = responseData.accommodationId || responseData._id || responseData.id || id;
+  setLastSavedAccommodationId(updatedId || id);
+  setNotification({ type: 'success', message: 'Accommodation updated successfully!' });
+  // Scroll to top so admin can see notifications on long forms
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
     } catch (error) {
       setNotification({ type: 'error', message: error.message });
@@ -193,6 +203,11 @@ const EditAccommodation = () => {
                     <Button variant="outlined" onClick={() => navigate(-1)}>
                       Cancel
                     </Button>
+                    {lastSavedAccommodationId && (
+                      <Button variant="contained" color="secondary" onClick={() => window.open(`/accommodations/${lastSavedAccommodationId}`, '_blank')}>
+                        View Accommodation
+                      </Button>
+                    )}
                     <Button type="submit" variant="contained" size="large" disabled={loading} sx={{ py: 1.5, px: 5 }}>
                       {loading ? <CircularProgress size={26} color="inherit" /> : "Save Changes"}
                     </Button>

@@ -13,35 +13,41 @@ import {
 } from "@mui/material";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { getAdminAuthHeader } from "../../../utils";
+import { useAuth } from '@clerk/clerk-react';
 import { tacPage } from "../../../endpoints";
 import Navbar from "../../../components/common/Navbar";
 import Footer from "../../../components/common/Footer";
 
 const EditTermsAndConditionsPage = () => {
+  const { getToken } = useAuth();
   const [pageContent, setPageContent] = useState({ title: "", content: "" });
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState({ type: "", message: "" });
   const theme = useTheme();
 
   useEffect(() => {
-    fetch(tacPage)
-      .then((response) => {
+    const fetchContent = async () => {
+      try {
+        const token = await getToken();
+        const response = await fetch(tacPage, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response.json();
-      })
-      .then((data) => {
+        const data = await response.json();
         setPageContent(data);
-      })
-      .catch((error) => {
+      } catch (error) {
         setNotification({ type: "error", message: `Error fetching content: ${error.message}` });
-      })
-      .finally(() => {
+      }
+      finally {
         setLoading(false);
-      });
-  }, []);
+      }
+    };
+    fetchContent();
+  }, [getToken]);
 
   const handleChange = (e) => {
     setPageContent({ ...pageContent, [e.target.name]: e.target.value });
@@ -56,20 +62,23 @@ const EditTermsAndConditionsPage = () => {
     setLoading(true);
     setNotification({ type: "", message: "" });
     try {
+      const token = await getToken();
       const response = await fetch(tacPage, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...getAdminAuthHeader(),
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(pageContent),
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      setNotification({ type: "success", message: "Terms & Conditions page updated successfully!" });
+  setNotification({ type: "success", message: "Terms & Conditions page updated successfully!" });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
-      setNotification({ type: "error", message: `Error updating content: ${error.message}` });
+  setNotification({ type: "error", message: `Error updating content: ${error.message}` });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setLoading(false);
     }

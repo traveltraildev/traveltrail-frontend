@@ -33,7 +33,7 @@ import {
 } from '@mui/material';
 import { Search, AddComment, Notes, Person as PersonIcon } from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { getAdminAuthHeader } from '../utils';
+import { useAuth } from '@clerk/clerk-react';
 import { BASE_URL } from '../endpoints';
 import useDebounce from '../hooks/useDebounce';
 
@@ -61,6 +61,7 @@ const statusColors = {
 };
 
 const ManageBookingsPage = () => {
+  const { getToken } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -77,8 +78,10 @@ const ManageBookingsPage = () => {
   const fetchBookings = useCallback(async () => {
     setLoading(true);
     try {
-      const headers = getAdminAuthHeader();
-      if (!headers.Authorization) throw new Error('Admin token not found. Please log in.');
+      const token = await getToken();
+      if (!token) throw new Error('Admin token not found. Please log in.');
+
+      const headers = { 'Authorization': `Bearer ${token}` };
 
       const params = new URLSearchParams({
         page: page + 1,
@@ -103,7 +106,7 @@ const ManageBookingsPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, sort, debouncedSearchTerm]);
+  }, [page, rowsPerPage, sort, debouncedSearchTerm, getToken]);
 
   useEffect(() => {
     fetchBookings();
@@ -115,7 +118,8 @@ const ManageBookingsPage = () => {
     setBookings(updatedBookings);
 
     try {
-      const headers = { ...getAdminAuthHeader(), 'Content-Type': 'application/json' };
+      const token = await getToken();
+      const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
       const response = await fetch(`${BASE_URL}/api/admin/bookings/${bookingId}/status`, {
         method: 'PUT',
         headers,
@@ -131,7 +135,8 @@ const ManageBookingsPage = () => {
   const handleAddAnnotation = async () => {
     if (!annotationText.trim() || !selectedBooking) return;
     try {
-      const headers = { ...getAdminAuthHeader(), 'Content-Type': 'application/json' };
+      const token = await getToken();
+      const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
       const response = await fetch(`${BASE_URL}/api/admin/bookings/${selectedBooking._id}/annotations`, {
         method: 'POST',
         headers,

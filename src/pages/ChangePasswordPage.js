@@ -10,12 +10,13 @@ import {
   Alert,
   Stack
 } from '@mui/material';
-import { useAuth } from '../context/AuthContext';
+import { useUser, useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { changeUserPassword } from '../api/userAPI';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 
 const ChangePasswordPage = () => {
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { user, isSignedIn, isLoaded } = useUser();
+  const { getToken } = useClerkAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -37,7 +38,7 @@ const ChangePasswordPage = () => {
     
     setLoading(true);
     try {
-      await changeUserPassword(user._id, formData);
+      await changeUserPassword(user.id, formData, getToken);
       setNotification({ type: 'success', message: 'Password changed successfully!' });
       setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (error) {
@@ -48,15 +49,15 @@ const ChangePasswordPage = () => {
     }
   };
 
-  if (authLoading) {
+  if (!isLoaded) {
     return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}><CircularProgress /></Box>;
   }
 
-  if (!isAuthenticated) {
+  if (!isSignedIn) {
     return (
       <Container sx={{textAlign: 'center', py: 12}}>
         <Typography variant="h5">Please log in to change your password.</Typography>
-        <Button component={RouterLink} to="/login" variant="contained" sx={{mt: 2}}>Login</Button>
+        <Button component={RouterLink} to="/sign-in" variant="contained" sx={{mt: 2}}>Login</Button>
       </Container>
     );
   }

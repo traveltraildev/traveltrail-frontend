@@ -10,9 +10,11 @@ import {
   ListItemIcon,
   Stack,
   Divider,
-  Grid
+  Grid,
+  Avatar
 } from '@mui/material';
 import { Email, Phone, Person, Edit, Lock } from '@mui/icons-material';
+import { useUser } from '@clerk/clerk-react';
 
 const InfoItem = ({icon, label, value}) => (
     <ListItem>
@@ -27,16 +29,33 @@ const InfoItem = ({icon, label, value}) => (
 )
 
 const UserProfileInfo = ({ user }) => {
+  // user = server-side profile object
+  const { user: clerkUser, isLoaded: clerkLoaded } = useUser();
+
+  // Prefer Clerk-managed fields, fall back to server-side profile
+  const name = (clerkLoaded && clerkUser?.fullName) || user?.name || '';
+  const email = (clerkLoaded && clerkUser?.primaryEmailAddress?.emailAddress) || user?.email || '';
+  const phone = (clerkLoaded && clerkUser?.phoneNumbers && clerkUser.phoneNumbers.length > 0 && clerkUser.phoneNumbers[0]) || user?.phone || 'Not provided';
+  const username = user?.username || (clerkLoaded && clerkUser?.username) || '';
+  const avatarUrl = (clerkLoaded && clerkUser?.profileImageUrl) || user?.avatarUrl || '';
+
   const profileItems = [
-    { label: 'Name', value: user.name, icon: <Person /> },
-    { label: 'Email', value: user.email, icon: <Email /> },
-    { label: 'Phone', value: user.phone || 'Not provided', icon: <Phone /> },
-    { label: 'Username', value: user.username, icon: <Person /> },
+    { label: 'Name', value: name, icon: <Person /> },
+    { label: 'Email', value: email, icon: <Email /> },
+    { label: 'Phone', value: phone, icon: <Phone /> },
+    { label: 'Username', value: username, icon: <Person /> },
   ];
 
   return (
     <Box>
-        <Typography variant="h5" fontWeight="600" sx={{mb: 2}}>Account Details</Typography>
+        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+          <Avatar src={avatarUrl} alt={name} sx={{ width: 64, height: 64 }} />
+          <Box>
+            <Typography variant="h5" fontWeight="600">Account Details</Typography>
+            {name && <Typography variant="body2" color="text.secondary">{name}</Typography>}
+            {email && <Typography variant="body2" color="text.secondary">{email}</Typography>}
+          </Box>
+        </Stack>
         <List dense>
             <Grid container spacing={1}>
                 {profileItems.map((item) => (
@@ -49,7 +68,7 @@ const UserProfileInfo = ({ user }) => {
 
       <Divider sx={{my: 3}}/>
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 2 }}>
+  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 2 }}>
         <Button
           component={RouterLink}
           to="/change-password"

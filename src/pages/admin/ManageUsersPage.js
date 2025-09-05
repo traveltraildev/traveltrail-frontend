@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, TableSortLabel, TablePagination, TextField, Button, Chip } from '@mui/material';
 import { BASE_URL } from '../../endpoints';
+import { useAuth } from '@clerk/clerk-react';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
 
 const ManageUsersPage = () => {
+  const { getToken } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,7 +18,7 @@ const ManageUsersPage = () => {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = await getToken();
       if (!token) {
         setError('Authentication required');
         setLoading(false);
@@ -44,7 +46,7 @@ const ManageUsersPage = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [getToken]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -67,7 +69,7 @@ const ManageUsersPage = () => {
 
   const handleBlockUser = async (userId) => {
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = await getToken();
       await fetch(`${BASE_URL}/api/admin/users/${userId}/block`, {
         method: 'PUT',
         headers: {
@@ -82,7 +84,7 @@ const ManageUsersPage = () => {
 
   const handleUnblockUser = async (userId) => {
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = await getToken();
       await fetch(`${BASE_URL}/api/admin/users/${userId}/unblock`, {
         method: 'PUT',
         headers: {

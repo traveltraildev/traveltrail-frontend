@@ -16,11 +16,11 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import Navbar from './common/Navbar';
 import Footer from './common/Footer';
-import { useAuth } from '../context/AuthContext';
+import { useUser } from '@clerk/clerk-react';
 
 const BookingConfirmation = () => {
   const { state } = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isSignedIn } = useUser();
   const success = state?.success;
   const bookingData = state?.bookingData || {};
 
@@ -75,11 +75,11 @@ I'd like to confirm the availability and get a quote for this trip.`;
               One of our travel experts will contact you via email or phone within the next **24 hours** with a detailed quote and confirmation of availability. 
             </Alert>
 
-            {!isAuthenticated && (
+            {!isSignedIn && (
               <Box sx={{ width: '100%', textAlign: 'center', mt: 4, p: 3, backgroundColor: 'background.default', borderRadius: 2 }}>
                 <Typography variant="h6" fontWeight="600" gutterBottom>Save Your Details for Next Time!</Typography>
                 <Typography color="text.secondary" sx={{ mb: 2 }}>Create an account to track your bookings, save your details, and get access to exclusive deals.</Typography>
-                <Button component={Link} to="/register" variant="contained">Create Account</Button>
+                <Button component={Link} to="/sign-up" variant="contained">Create Account</Button>
               </Box>
             )}
 

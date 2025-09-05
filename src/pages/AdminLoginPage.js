@@ -12,33 +12,19 @@ import {
   CircularProgress
 } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '../context/AdminAuthContext';
+import { useEffect } from 'react';
+
+// Admin login is handled by Clerk sign-in and role assignment in Clerk dashboard.
 
 const AdminLoginPage = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { adminLogin } = useAdminAuth();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const success = await adminLogin(formData.username, formData.password);
-      if (success) {
-        navigate('/admin/dashboard');
-      } else {
-        setError('Invalid credentials or login failed.');
-      }
-    } catch (err) {
-      setError('Login failed. Please try again later.');
-      console.error('Admin login error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    navigate('/sign-in');
+  }, [navigate]);
 
   return (
     <Container component="main" maxWidth="xs" sx={{ display: 'flex', alignItems: 'center', minHeight: '100vh' }}>

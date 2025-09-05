@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { getNewsletterSubscribers } from '../../endpoints';
+import { useAuth } from '@clerk/clerk-react';
 
 const NewsletterSubscribers = () => {
+  const { getToken } = useAuth();
   const [subscribers, setSubscribers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSubscribers = async () => {
       try {
+        const token = await getToken();
         const response = await fetch(getNewsletterSubscribers, {
           headers: {
-            'Authorization': `AdminToken ${localStorage.getItem('adminToken')}`
+            'Authorization': `Bearer ${token}`
           }
         });
         const data = await response.json();
@@ -23,7 +26,7 @@ const NewsletterSubscribers = () => {
     };
 
     fetchSubscribers();
-  }, []);
+  }, [getToken]);
 
   if (loading) {
     return <div>Loading...</div>;

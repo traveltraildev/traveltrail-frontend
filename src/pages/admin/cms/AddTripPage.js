@@ -20,6 +20,7 @@ import { AddCircleOutline } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import ItineraryDayForm from "./ItineraryDayForm";
 import { getAllTrips } from "../../../endpoints";
+import { useAuth } from '@clerk/clerk-react';
 import Navbar from "../../../components/common/Navbar";
 import Footer from "../../../components/common/Footer";
 
@@ -38,6 +39,7 @@ const exclusionOptions = [
 ];
 
 const AddTripPage = () => {
+  const { getToken } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     destination: "",
@@ -56,6 +58,7 @@ const AddTripPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ type: '', message: '' });
+  const [lastCreatedTripId, setLastCreatedTripId] = useState(null);
   const navigate = useNavigate();
   const theme = useTheme();
 
@@ -111,11 +114,12 @@ const AddTripPage = () => {
     setNotification({ type: '', message: '' });
 
     try {
+      const token = await getToken();
       const response = await fetch(getAllTrips, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           ...formData,
@@ -131,16 +135,27 @@ const AddTripPage = () => {
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      setNotification({ type: 'success', message: 'Trip added successfully!' });
+      const responseData = await response.json();
+      const newTripId = responseData.tripId || responseData.insertedId || responseData._id;
+
+  setNotification({ type: 'success', message: 'Trip added successfully!' });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
       setFormData({
         name: "", destination: "", desc: "", price: "", daysCount: "", nightsCount: "",
         themes: [], inclusions: [], exclusions: [], images: [],
         itineraries: [{ dayTitle: "", shortDescription: "", description: "", highlights: [] }],
         availability: true, isInternational: false,
       });
-      setTimeout(() => navigate(`/admin/trips`), 2000);
+      // Offer to open the newly created trip in a new tab
+      if (newTripId) {
+        setNotification({ type: 'success', message: 'Trip added successfully! Click "View Trip" to open it.' });
+        // store newTripId locally to allow viewing without leaving page
+        setLastCreatedTripId(newTripId);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } catch (error) {
       setNotification({ type: 'error', message: `Error adding trip: ${error.message}` });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       console.error("Error adding new trip package:", error);
     } finally {
       setLoading(false);
@@ -240,7 +255,16 @@ const AddTripPage = () => {
               </Box>
 
               {/* Submit Button */}
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                {lastCreatedTripId && (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => window.open(`/trips/${lastCreatedTripId}`, '_blank')}
+                  >
+                    View Trip
+                  </Button>
+                )}
                 <Button type="submit" variant="contained" size="large" disabled={loading} sx={{ py: 1.5, px: 5 }}>
                   {loading ? <CircularProgress size={26} color="inherit" /> : "Publish Trip"}
                 </Button>
