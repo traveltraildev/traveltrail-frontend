@@ -2,9 +2,9 @@
 import { BASE_URL } from '../endpoints';
 import { getUserAuthHeader } from '../utils';
 
-export const getUserBookingHistory = async (getToken) => {
+export const getUserBookingHistory = async (token) => {
   try {
-    const token = await getToken();
+    
     const response = await fetch(`${BASE_URL}/api/bookings/history`, {
       headers: {
         'Content-Type': 'application/json',

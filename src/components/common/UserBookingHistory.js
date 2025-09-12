@@ -14,6 +14,7 @@ import {
   Alert,
   useTheme
 } from '@mui/material';
+import { useAuth } from '@clerk/clerk-react';
 import { getUserBookingHistory } from '../../api/bookingAPI';
 import { format } from 'date-fns';
 
@@ -22,6 +23,7 @@ const UserBookingHistory = ({ userId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const theme = useTheme();
+  const { getToken } = useAuth();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -31,7 +33,8 @@ const UserBookingHistory = ({ userId }) => {
         return;
       }
       try {
-        const data = await getUserBookingHistory(userId);
+        const token = await getToken();
+        const data = await getUserBookingHistory(token);
         setBookings(data);
       } catch (err) {
         setError("Failed to fetch booking history.");
@@ -42,7 +45,7 @@ const UserBookingHistory = ({ userId }) => {
     };
 
     fetchBookings();
-  }, [userId]);
+  }, [userId, getToken]);
 
   if (loading) {
     return (

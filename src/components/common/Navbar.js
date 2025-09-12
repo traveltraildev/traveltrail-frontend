@@ -10,8 +10,9 @@ import {
   useTheme,
 } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react';
 import HamburgerMenu from './HamburgerMenu';
+import ProfileMenu from './ProfileMenu';
 
 const NavLink = ({ to, children, isTransparent }) => {
   const theme = useTheme();
@@ -107,7 +108,7 @@ export default function Navbar() {
               <NavLink to="/contact-us" isTransparent={isTransparent}>Contact</NavLink>
 
               <SignedIn>
-                <UserButton afterSignOutUrl="/" />
+                <ProfileMenu />
               </SignedIn>
               <SignedOut>
                 <SignInButton mode="modal">

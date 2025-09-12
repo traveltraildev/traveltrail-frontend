@@ -8,6 +8,7 @@ import { useUser, SignOutButton } from '@clerk/clerk-react';
 import { useTheme } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
+import { Box, Typography, Divider, Avatar } from '@mui/material';
 
 export default function HamburgerMenu() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -33,11 +34,6 @@ export default function HamburgerMenu() {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
-    handleMenuClose();
-    navigate('/'); // Redirect to home after logout
-  };
-
   return (
     <div>
       <IconButton
@@ -53,8 +49,36 @@ export default function HamburgerMenu() {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
-        PaperProps={{ sx: { mt: 1.5, borderRadius: 2 } }}
+        PaperProps={{
+          sx: {
+            mt: 1.5,
+            borderRadius: 2,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            minWidth: 250,
+            backgroundColor: theme.palette.background.paper,
+          },
+        }}
       >
+        {user && (
+          <Box sx={{ p: 2, textAlign: 'center' }}>
+            <Avatar 
+              src={user?.imageUrl} 
+              alt={user?.fullName} 
+              sx={{ 
+                width: 60, 
+                height: 60, 
+                mx: 'auto', 
+                mb: 1,
+                border: `3px solid ${theme.palette.primary.main}`
+              }} 
+            />
+            <Typography variant="h6" sx={{ color: theme.palette.text.primary }}>{user?.fullName}</Typography>
+            <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+              {user?.primaryEmailAddress?.emailAddress}
+            </Typography>
+          </Box>
+        )}
+        <Divider sx={{ my: 1 }} />
         <MenuItem onClick={handleMenuClose} component={Link} to="/">
           Home
         </MenuItem>
@@ -71,11 +95,21 @@ export default function HamburgerMenu() {
           Contact
         </MenuItem>
 
+        <Divider sx={{ my: 1 }} />
+
         {user ? (
           <>
-            <MenuItem onClick={handleMenuClose} component={Link} to={user.publicMetadata.role === 'admin' ? '/admin/dashboard' : '/profile'}>
-              Dashboard
+            <MenuItem onClick={handleMenuClose} component={Link} to="/profile">
+              Ur Bookings
             </MenuItem>
+            <MenuItem onClick={handleMenuClose} component={Link} to="/profile-settings">
+              Your Profile
+            </MenuItem>
+            {user.publicMetadata.role === 'admin' && (
+              <MenuItem onClick={handleMenuClose} component={Link} to="/admin/dashboard">
+                Admin Dashboard
+              </MenuItem>
+            )}
             <MenuItem>
               <SignOutButton />
             </MenuItem>

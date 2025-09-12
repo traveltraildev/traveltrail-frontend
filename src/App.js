@@ -35,8 +35,8 @@ import EditAccommodation from './pages/admin/cms/EditAccomodation';
 import AccommodationsList from './pages/AccommodationsList';
 import BookingConfirmation from './components/BookingConfirmation';
 import UserProfilePage from './pages/UserProfilePage';
-import EditProfilePage from './pages/EditProfilePage';
-import ChangePasswordPage from './pages/ChangePasswordPage';
+import ProfileSettingsPage from './pages/ProfileSettingsPage';
+
 import ManageBookingsPage from './pages/ManageBookingsPage';
 import NewsletterSubscribers from './pages/admin/NewsletterSubscribers';
 import ManageUsersPage from './pages/admin/ManageUsersPage';
@@ -111,13 +111,10 @@ function App() {
             element={<SignedIn><UserProfilePage /></SignedIn>}
           />
           <Route
-            path="/edit-profile"
-            element={<SignedIn><EditProfilePage /></SignedIn>}
+            path="/profile-settings"
+            element={<SignedIn><ProfileSettingsPage /></SignedIn>}
           />
-          <Route
-            path="/change-password"
-            element={<SignedIn><ChangePasswordPage /></SignedIn>}
-          />
+          
 
           {/* Admin Protected Routes */}
           <Route path="/admin/*" element={<AdminRoutes />} />
