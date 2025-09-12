@@ -70,7 +70,6 @@ const UserBookingHistory = ({ userId }) => {
 
   return (
     <Box>
-      <Typography variant="h5" fontWeight="600" sx={{mb: 2}}>Booking History</Typography>
       {bookings.length === 0 ? (
         <Box sx={{ textAlign: 'center', p: 6, border: `2px dashed ${theme.palette.divider}`, borderRadius: 2 }}>
           <Typography variant="h6" color="text.secondary">

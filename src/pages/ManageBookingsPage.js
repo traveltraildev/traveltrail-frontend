@@ -29,7 +29,8 @@ import {
   ListItemText,
   Divider,
   TableSortLabel,
-  ListItemIcon
+  ListItemIcon,
+  Snackbar
 } from '@mui/material';
 import { Search, AddComment, Notes, Person as PersonIcon } from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -72,6 +73,8 @@ const ManageBookingsPage = () => {
   const [sort, setSort] = useState({ field: 'createdAt', direction: 'desc' });
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [annotationText, setAnnotationText] = useState('');
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [lastStatusChange, setLastStatusChange] = useState(null);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -112,10 +115,19 @@ const ManageBookingsPage = () => {
     fetchBookings();
   }, [fetchBookings]);
 
+  useEffect(() => {
+    return () => {
+      setLastStatusChange(null);
+    };
+  }, []);
+
   const handleStatusChange = async (bookingId, newStatus) => {
     const originalBookings = [...bookings];
+    const bookingToUpdate = bookings.find(b => b._id === bookingId);
+    const oldStatus = bookingToUpdate.status;
     const updatedBookings = bookings.map(b => b._id === bookingId ? { ...b, status: newStatus } : b);
     setBookings(updatedBookings);
+    setLastStatusChange({ bookingId, oldStatus, newStatus });
 
     try {
       const token = await getToken();
@@ -125,11 +137,50 @@ const ManageBookingsPage = () => {
         headers,
         body: JSON.stringify({ status: newStatus })
       });
-      if (!response.ok) throw new Error('Failed to update status');
+      if (!response.ok) {
+        if (response.status === 403) {
+          throw new Error('You are not authorized to perform this action.');
+        }
+        throw new Error('Failed to update status');
+      }
+      setSnackbar({ open: true, message: 'Status updated successfully!', severity: 'success' });
     } catch (err) {
-      setError('Failed to update status. Reverting changes.');
+      setError(err.message);
       setBookings(originalBookings);
+      setSnackbar({ open: true, message: err.message, severity: 'error' });
     }
+  };
+
+  const handleUndoStatusChange = async () => {
+    if (!lastStatusChange) return;
+    const { bookingId, oldStatus } = lastStatusChange;
+    const originalBookings = [...bookings];
+    const updatedBookings = bookings.map(b => b._id === bookingId ? { ...b, status: oldStatus } : b);
+    setBookings(updatedBookings);
+
+    try {
+      const token = await getToken();
+      const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+      await fetch(`${BASE_URL}/api/admin/bookings/${bookingId}/status`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ status: oldStatus })
+      });
+      setSnackbar({ open: true, message: 'Status change reverted.', severity: 'info' });
+    } catch (err) {
+      setError('Failed to revert status change.');
+      setBookings(originalBookings);
+      setSnackbar({ open: true, message: 'Failed to revert status change.', severity: 'error' });
+    }
+    setLastStatusChange(null);
+    handleCloseSnackbar();
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
   };
 
   const handleAddAnnotation = async () => {
@@ -206,11 +257,13 @@ const ManageBookingsPage = () => {
             <Table stickyHeader>
               <TableHead>
                 <TableRow sx={{ '& .MuiTableCell-head': { fontWeight: 'bold', backgroundColor: 'primary.main', color: 'white' } }}>
-                  <TableCell><TableSortLabel active={sort.field === 'user.name'} direction={sort.direction} onClick={() => handleSort('user.name')}>Customer</TableSortLabel></TableCell>
-                  <TableCell><TableSortLabel active={sort.field === 'trip.name'} direction={sort.direction} onClick={() => handleSort('trip.name')}>Trip</TableSortLabel></TableCell>
-                  <TableCell>Attendees</TableCell>
+                  <TableCell><TableSortLabel active={sort.field === 'userName'} direction={sort.direction} onClick={() => handleSort('userName')}>Customer</TableSortLabel></TableCell>
+                  <TableCell><TableSortLabel active={sort.field === 'tripName'} direction={sort.direction} onClick={() => handleSort('tripName')}>Trip</TableSortLabel></TableCell>
+                  <TableCell><TableSortLabel active={sort.field === 'userPhone'} direction={sort.direction} onClick={() => handleSort('userPhone')}>Phone</TableSortLabel></TableCell>
+                  <TableCell><TableSortLabel active={sort.field === 'attendees'} direction={sort.direction} onClick={() => handleSort('attendees')}>Attendees</TableSortLabel></TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Annotations</TableCell>
+                  <TableCell><TableSortLabel active={sort.field === 'value'} direction={sort.direction} onClick={() => handleSort('value')}>Value</TableSortLabel></TableCell>
                   <TableCell align="right"><TableSortLabel active={sort.field === 'createdAt'} direction={sort.direction} onClick={() => handleSort('createdAt')}>Booked On</TableSortLabel></TableCell>
                 </TableRow>
               </TableHead>
@@ -218,23 +271,25 @@ const ManageBookingsPage = () => {
                 {bookings.map((booking) => (
                     <TableRow hover key={booking._id}>
                         <TableCell>
-                        <Typography variant="body2" fontWeight="500">{booking.user.name}</Typography>
-                        <Typography variant="caption" color="text.secondary">{booking.user.email}</Typography>
+                        <Typography variant="body2" fontWeight="500">{booking.userName}</Typography>
+                        <Typography variant="caption" color="text.secondary">{booking.userEmail}</Typography>
+                        {booking.userPhone && <Typography variant="caption" color="text.secondary"><br />{booking.userPhone}</Typography>}
                         </TableCell>
-                        <TableCell>{booking.trip?.name || 'N/A'}</TableCell>
+                        <TableCell>{booking.tripName || 'N/A'}</TableCell>
+                        <TableCell>{booking.userPhone}</TableCell>
                         <TableCell align="center">{((booking.attendees?.adults || 0) + (booking.attendees?.children || 0)) || 1}</TableCell>
                         <TableCell sx={{ minWidth: 180 }}>
-                        <Select
-                            value={booking.status || 'New'}
-                            onChange={(e) => handleStatusChange(booking._id, e.target.value)}
-                            size="small"
-                            fullWidth
-                            renderValue={(selected) => (
-                                <Chip label={selected} color={statusColors[selected]} size="small" />
-                            )}
-                        >
-                            {bookingStatusOptions.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
-                        </Select>
+                          <Select
+                              value={booking.status || 'New'}
+                              onChange={(e) => handleStatusChange(booking._id, e.target.value)}
+                              size="small"
+                              fullWidth
+                              renderValue={(selected) => (
+                                  <Chip label={selected} color={statusColors[selected]} size="small" />
+                              )}
+                          >
+                              {bookingStatusOptions.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
+                          </Select>
                         </TableCell>
                         <TableCell>
                         <Tooltip title="View/Add Annotations">
@@ -243,6 +298,7 @@ const ManageBookingsPage = () => {
                             </IconButton>
                         </Tooltip>
                         </TableCell>
+                        <TableCell>{booking.value}</TableCell>
                         <TableCell align="right">{new Date(booking.createdAt).toLocaleDateString()}</TableCell>
                     </TableRow>
                 ))}
@@ -263,7 +319,7 @@ const ManageBookingsPage = () => {
       </Box>
 
       <Dialog open={!!selectedBooking} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-        <DialogTitle>Annotations for {selectedBooking?.trip?.name}</DialogTitle>
+        <DialogTitle>Annotations for {selectedBooking?.tripName}</DialogTitle>
         <DialogContent dividers>
           <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
             <TextField
@@ -295,6 +351,16 @@ const ManageBookingsPage = () => {
           <Button onClick={handleCloseDialog}>Close</Button>
         </DialogActions>
       </Dialog>
+      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+          {lastStatusChange && snackbar.severity === 'success' && (
+            <Button color="inherit" size="small" onClick={handleUndoStatusChange}>
+              UNDO
+            </Button>
+          )}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 };

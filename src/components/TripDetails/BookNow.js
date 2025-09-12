@@ -95,6 +95,7 @@ const BookNow = ({ item }) => {
               adults: Number(formData.adults) || 1,
               children: Number(formData.children) || 0,
             },
+            price: totalPrice,
             firstName: isSignedIn ? user.firstName : formData.firstName,
             lastName: isSignedIn ? user.lastName : formData.lastName,
             email: isSignedIn ? user.emailAddresses[0]?.emailAddress : formData.email,

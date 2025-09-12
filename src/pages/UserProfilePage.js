@@ -7,14 +7,14 @@ import {
   CircularProgress,
   useTheme,
   Button,
-  Avatar
+  Stack
 } from '@mui/material';
 import { useUser } from '@clerk/clerk-react';
 import UserBookingHistory from '../components/common/UserBookingHistory';
-import { Edit } from '@mui/icons-material';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import { Link } from 'react-router-dom';
+import ProfileHeader from '../components/Profile/ProfileHeader';
 
 const UserProfilePage = () => {
   const { user, isSignedIn, isLoaded } = useUser();
@@ -46,20 +46,25 @@ const UserProfilePage = () => {
     <Box sx={{ bgcolor: theme.palette.background.default, minHeight: '100vh' }}>
       <Navbar />
       <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
-        <Paper elevation={0} sx={{ p: {xs:2, sm:4}, mb: 4, display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, alignItems: 'center', gap: 3, borderRadius: 3, border: `1px solid ${theme.palette.divider}` }}>
-            <Avatar src={user.imageUrl} sx={{ width: 90, height: 90, fontSize: '3rem', bgcolor: 'primary.main' }}>
-                {user.fullName?.charAt(0).toUpperCase()}
-            </Avatar>
-            <Box sx={{flexGrow: 1, textAlign: {xs: 'center', sm: 'left'}}}>
-                <Typography variant="h4" component="h1" fontWeight="600">{user.fullName}</Typography>
-                <Typography variant="body1" color="text.secondary">{user.emailAddresses[0]?.emailAddress}</Typography>
-            </Box>
-            <Button component={Link} to="/profile-settings" variant="outlined" startIcon={<Edit />}>Edit Profile</Button>
-        </Paper>
+        <Stack spacing={4}>
+          <ProfileHeader user={user} />
 
-        <Paper elevation={0} sx={{ borderRadius: 3, overflow: 'hidden', border: `1px solid ${theme.palette.divider}` }}>
+          {/* --- Improved Booking History Section --- */}
+          <Paper 
+            elevation={0} 
+            sx={{ 
+              borderRadius: 3, 
+              overflow: 'hidden', 
+              border: `1px solid ${theme.palette.divider}` 
+            }}
+          >
+            <Box sx={{ p: 3, bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider' }}>
+              <Typography variant="h5" fontWeight="600">Booking History</Typography>
+              <Typography variant="body2" color="text.secondary">A list of your past and upcoming trips.</Typography>
+            </Box>
             <UserBookingHistory userId={user.id} />
-        </Paper>
+          </Paper>
+        </Stack>
       </Container>
       <Footer />
     </Box>
