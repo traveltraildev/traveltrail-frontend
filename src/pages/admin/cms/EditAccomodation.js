@@ -14,6 +14,8 @@ import {
   Divider,
   Alert,
   Autocomplete,
+  FormControlLabel,
+  Checkbox,
   useTheme,
 } from "@mui/material";
 import { getAllAccommodations } from "../../../endpoints";
@@ -195,6 +197,9 @@ const EditAccommodation = () => {
                       </Grid>
                       <Grid item xs={12} md={6}>
                         <Autocomplete multiple freeSolo options={[]} value={formData.exclusions} onChange={(event, newValue) => handleChange("exclusions", newValue)} renderInput={(params) => <TextField {...params} label="Exclusions" placeholder="Enter exclusions and press Enter" />} />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <FormControlLabel control={<Checkbox checked={formData.isFeatured || false} onChange={(e) => handleChange("isFeatured", e.target.checked)} />} label="Feature this accommodation on homepage?" />
                       </Grid>
                     </Grid>
                   </Box>

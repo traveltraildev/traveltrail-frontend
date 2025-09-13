@@ -42,9 +42,27 @@ const HorizontalScrollContainer = ({ children }) => (
   <Stack direction="row" spacing={4} sx={{
     overflowX: 'auto',
     py: 2,
-    '::-webkit-scrollbar': { height: 8 },
-    '::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 4 },
-    '::-webkit-scrollbar-track': { bgcolor: 'transparent' },
+    position: 'relative',
+    '&::-webkit-scrollbar': { height: 8 },
+    '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 4 },
+    '&::-webkit-scrollbar-track': { bgcolor: 'transparent' },
+    '&::before, &::after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      width: '50px',
+      pointerEvents: 'none',
+      zIndex: 1,
+    },
+    '&::before': {
+      left: 0,
+      background: 'linear-gradient(to right, white, rgba(255,255,255,0))',
+    },
+    '&::after': {
+      right: 0,
+      background: 'linear-gradient(to left, white, rgba(255,255,255,0))',
+    },
   }}>
     {children}
   </Stack>
@@ -53,15 +71,15 @@ const HorizontalScrollContainer = ({ children }) => (
 const TripCard = ({ trip }) => {
   const theme = useTheme();
   return (
-    <Card sx={{ minWidth: 340, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] } }}>
+    <Card sx={{ minWidth: 340, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, boxShadow: theme.shadows[3] }}>
       <CardMedia
         component="img"
         height="220"
         image={trip?.images[0] || "/images/placeholder.jpg"}
         alt={trip?.name}
       />
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Typography variant="h6" component="h3" fontWeight="600">{trip.name}</Typography>
+      <CardContent sx={{ flexGrow: 1, p: 3 }}>
+        <Typography variant="h6" component="h3" fontWeight="600" gutterBottom>{trip.name}</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{trip.destination}</Typography>
         <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
           <Chip label={`${trip.daysCount} Days`} size="small" variant="outlined" />
@@ -79,15 +97,15 @@ const TripCard = ({ trip }) => {
 const AccommodationCard = ({ accommodation }) => {
   const theme = useTheme();
   return (
-    <Card sx={{ minWidth: 340, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] } }}>
+    <Card sx={{ minWidth: 340, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, boxShadow: theme.shadows[3] }}>
         <CardMedia
             component="img"
             height="220"
             image={accommodation?.images[0] || "/images/placeholder.jpg"}
             alt={accommodation?.name}
         />
-        <CardContent sx={{ flexGrow: 1 }}>
-            <Typography variant="h6" component="h3" fontWeight="600">{accommodation.name}</Typography>
+        <CardContent sx={{ flexGrow: 1, p: 3 }}>
+            <Typography variant="h6" component="h3" fontWeight="600" gutterBottom>{accommodation.name}</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{accommodation.destination}</Typography>
             <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
                 <Chip label={accommodation.roomType} size="small" variant="outlined" />
@@ -111,6 +129,96 @@ const CardSkeleton = () => (
   </Box>
 );
 
+// ThemeCard component for the new "Explore Travel by Theme" section
+const ThemeCard = ({ themeData }) => {
+  const theme = useTheme();
+  return (
+    <Grid item xs={12} sm={6} md={4}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        whileHover={{ scale: 1.03, boxShadow: theme.shadows[8] }}
+      >
+        <Card
+          component={RouterLink}
+          to={themeData.link}
+          sx={{
+            borderRadius: 3,
+            overflow: 'hidden',
+            textAlign: 'center',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            cursor: 'pointer',
+            boxShadow: theme.shadows[2],
+            transition: 'all 0.3s ease',
+          }}
+        >
+          {/* Using Box for SVG to allow more flexible styling if needed */}
+          <Box sx={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: theme.palette.grey[100], p: 2 }}>
+            <Box 
+              component="img"
+              src={themeData.image}
+              alt={themeData.name}
+              sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+            />
+          </Box>
+          <CardContent sx={{ flexGrow: 1, p: 3 }}>
+            <Typography variant="h5" component="h3" fontWeight="700" gutterBottom>
+              {themeData.name}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {themeData.description}
+            </Typography>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </Grid>
+  );
+};
+
+// Data for the new "Explore Travel by Theme" section
+const themesData = [
+  {
+    name: "Adventure",
+    image: "/images/theme_icons/adventure.svg", // Placeholder SVG
+    description: "Thrill-seeking journeys and outdoor explorations.",
+    link: "/trips?theme=Adventure",
+  },
+  {
+    name: "Romantic Getaways",
+    image: "/images/theme_icons/romantic.svg", // Placeholder SVG
+    description: "Perfect escapes for couples and honeymoons.",
+    link: "/trips?theme=Romantic",
+  },
+  {
+    name: "Family Fun",
+    image: "/images/theme_icons/family.svg", // Placeholder SVG
+    description: "Memorable vacations for all ages.",
+    link: "/trips?theme=Family",
+  },
+  {
+    name: "Cultural Immersion",
+    image: "/images/theme_icons/culture.svg", // Placeholder SVG
+    description: "Dive deep into local traditions and history.",
+    link: "/trips?theme=Cultural",
+  },
+  {
+    name: "Luxury Escapes",
+    image: "/images/theme_icons/luxury.svg", // Placeholder SVG
+    description: "Indulge in opulent travel experiences.",
+    link: "/trips?theme=Luxury",
+  },
+  {
+    name: "Wildlife & Nature",
+    image: "/images/theme_icons/wildlife.svg", // Placeholder SVG
+    description: "Explore the wild and natural wonders.",
+    link: "/trips?theme=Wildlife",
+  },
+];
+
 const Home = () => {
   const [trips, setTrips] = useState([]);
   const [accommodations, setAccommodations] = useState([]);
@@ -124,8 +232,8 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const [tripsResponse, accommodationsResponse] = await Promise.all([
-          fetch(getAllTrips),
-          fetch(getAllAccommodations),
+          fetch(`${getAllTrips}?isFeatured=true`),
+          fetch(`${getAllAccommodations}?isFeatured=true`),
         ]);
         const tripsData = await tripsResponse.json();
         const accommodationsData = await accommodationsResponse.json();
@@ -200,6 +308,18 @@ const Home = () => {
             accommodations.map((acc) => <AccommodationCard key={acc._id} accommodation={acc} />)
           )}
         </HorizontalScrollContainer>
+      </SectionWrapper>
+
+      {/* New Themed Collections Section */}
+      <SectionWrapper
+        title="Explore Travel by Theme"
+        subtitle="Find your perfect adventure by exploring our handpicked travel themes. Each theme offers unique experiences tailored to your interests."
+      >
+        <Grid container spacing={4} justifyContent="center">
+          {themesData.map((themeItem, index) => (
+            <ThemeCard key={index} themeData={themeItem} />
+          ))}
+        </Grid>
       </SectionWrapper>
 
       {/* Why Choose Us Section */}

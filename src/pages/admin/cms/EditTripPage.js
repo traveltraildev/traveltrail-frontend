@@ -232,6 +232,9 @@ const EditTripPage = () => {
                     <Grid item xs={12}>
                       <FormControlLabel control={<Checkbox checked={formData.isInternational} onChange={(e) => handleChange("isInternational", e.target.checked)} />} label="Is this an international trip?" />
                     </Grid>
+                    <Grid item xs={12}>
+                      <FormControlLabel control={<Checkbox checked={formData.isFeatured || false} onChange={(e) => handleChange("isFeatured", e.target.checked)} />} label="Feature this trip on homepage?" />
+                    </Grid>
                   </Grid>
                 </Box>
 

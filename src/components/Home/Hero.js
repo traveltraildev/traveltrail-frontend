@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -13,14 +13,29 @@ import {
 import { Search, Flight, Hotel, Groups, Explore } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
+const heroImages = [
+  '/images/hero1.jpg',
+  '/images/hero2.jpg',
+  '/images/hero3.jpg',
+  '/images/hero4.jpg',
+];
+
 const Hero = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTab, setCurrentTab] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const theme = useTheme();
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+    }, 5000); // Change image every 5 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   const handleSearch = () => {
-    const { path, category, theme } = searchTabs[currentTab];
+    const { path, category, theme: tabTheme } = searchTabs[currentTab];
     const state = {};
     if (searchQuery) {
       state.search = searchQuery;
@@ -28,16 +43,16 @@ const Hero = () => {
     if (category) {
       state.category = category;
     }
-    if (theme) {
-      state.theme = theme;
+    if (tabTheme) {
+      state.theme = tabTheme;
     }
     navigate(path, { state });
   };
 
   const searchTabs = [
-    { label: 'Trips', icon: <Explore />, path: '/trips' },
-    { label: 'Stays', icon: <Hotel />, path: '/accommodations' },
-    { label: 'Groups', icon: <Groups />, path: '/trips', theme: 'group' },
+    { label: 'Group Trips', icon: <Groups />, path: '/trips', theme: 'group', tagline: "Pocket-friendly adventures for everyone." },
+    { label: 'Trips', icon: <Explore />, path: '/trips', tagline: "Tailored, fully inclusive journeys." },
+    { label: 'Stays', icon: <Hotel />, path: '/accommodations', tagline: "Your perfect home away from home." },
   ];
 
   return (
@@ -46,13 +61,14 @@ const Hero = () => {
         position: 'relative',
         height: { xs: '80vh', md: '90vh' },
         maxHeight: '950px',
-        backgroundImage: `url('/images/hero1.jpg')`,
+        backgroundImage: `url(${heroImages[currentImageIndex]})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         color: 'white',
+        transition: 'background-image 1s ease-in-out',
       }}
     >
       <Box
@@ -84,7 +100,7 @@ const Hero = () => {
           component="p"
           sx={{ mt: 2, mb: 5, maxWidth: '700px', mx: 'auto', opacity: 0.9, fontWeight: 300 }}
         >
-          Discover unique destinations and unforgettable experiences. Travel with us and create memories that last a lifetime.
+          {searchTabs[currentTab].tagline}
         </Typography>
 
         <Paper
@@ -95,6 +111,8 @@ const Hero = () => {
             bgcolor: 'rgba(255,255,255,0.15)',
             backdropFilter: 'blur(12px)',
             border: '1px solid rgba(255,255,255,0.2)',
+            maxWidth: '700px',
+            mx: 'auto',
           }}
         >
           <Tabs
@@ -133,7 +151,7 @@ const Hero = () => {
             <TextField
               fullWidth
               variant="filled"
-              placeholder={`Search for ${searchTabs[currentTab].label}...`}
+              placeholder={`Search for ${searchTabs[currentTab].label.toLowerCase()}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
