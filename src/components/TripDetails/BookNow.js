@@ -169,15 +169,21 @@ const BookNow = ({ item }) => {
     const isAccommodation = !!item.basePrice;
     if (isAccommodation) {
       const { basePrice, baseOccupancy, extraAdultFee, extraChildFee } = item;
-      const { adults, children } = formData;
+      const adults = Number(formData.adults) || 0;
+      const children = Number(formData.children) || 0;
 
       let total = basePrice;
       const totalGuests = adults + children;
 
       if (totalGuests > baseOccupancy) {
-        const extraAdults = Math.max(0, adults - baseOccupancy);
+        const adultsInBase = Math.min(adults, baseOccupancy);
+        const childrenInBase = Math.max(0, baseOccupancy - adultsInBase);
+
+        const extraAdults = Math.max(0, adults - adultsInBase);
+        const extraChildren = Math.max(0, children - childrenInBase);
+
         total += extraAdults * extraAdultFee;
-        total += children * extraChildFee;
+        total += extraChildren * extraChildFee;
       }
 
       return total;

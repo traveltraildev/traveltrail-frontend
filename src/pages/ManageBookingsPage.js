@@ -271,9 +271,18 @@ const ManageBookingsPage = () => {
                 {bookings.map((booking) => (
                     <TableRow hover key={booking._id}>
                         <TableCell>
-                        <Typography variant="body2" fontWeight="500">{booking.userName}</Typography>
-                        <Typography variant="caption" color="text.secondary">{booking.userEmail}</Typography>
-                        {booking.userPhone && <Typography variant="caption" color="text.secondary"><br />{booking.userPhone}</Typography>}
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            {booking.isGuest && (
+                              <Tooltip title="Guest User">
+                                <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                              </Tooltip>
+                            )}
+                            <div>
+                              <Typography variant="body2" fontWeight="500">{booking.userName}</Typography>
+                              <Typography variant="caption" color="text.secondary">{booking.userEmail}</Typography>
+                              {booking.userPhone && <Typography variant="caption" color="text.secondary"><br />{booking.userPhone}</Typography>}
+                            </div>
+                          </Box>
                         </TableCell>
                         <TableCell>{booking.tripName || 'N/A'}</TableCell>
                         <TableCell>{booking.userPhone}</TableCell>
