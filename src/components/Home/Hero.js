@@ -12,6 +12,8 @@ import {
 } from '@mui/material';
 import { Search, Flight, Hotel, Groups, Explore } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { Parallax } from 'react-scroll-parallax';
+import { motion } from 'framer-motion';
 
 const heroImages = [
   '/images/hero1.jpg',
@@ -59,18 +61,22 @@ const Hero = () => {
     <Box
       sx={{
         position: 'relative',
-        height: { xs: '80vh', md: '90vh' },
-        maxHeight: '950px',
-        backgroundImage: `url(${heroImages[currentImageIndex]})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        transition: 'background-image 1s ease-in-out',
+        height: { xs: '100vh', md: '100vh' },
+        maxHeight: '100vh',
       }}
     >
+      <Parallax speed={-20}>
+        <Box
+          sx={{
+            height: { xs: '100vh', md: '100vh' },
+            maxHeight: '100vh',
+            backgroundImage: `url(${heroImages[currentImageIndex]})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            transition: 'background-image 1s ease-in-out',
+          }}
+        />
+      </Parallax>
       <Box
         sx={{
           position: 'absolute',
@@ -79,102 +85,124 @@ const Hero = () => {
           width: '100%',
           height: '100%',
           background: 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0.1) 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
         }}
-      />
-
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
-        <Typography
-          variant="h1"
-          component="h1"
-          sx={{
-            fontWeight: 800,
-            fontSize: { xs: '3rem', sm: '4.5rem', md: '5.5rem' },
-            textShadow: '2px 4px 10px rgba(0,0,0,0.6)',
-            letterSpacing: '-1px',
-          }}
-        >
-          Book Nahi, Belong Karo
-        </Typography>
-        <Typography
-          variant="h5"
-          component="p"
-          sx={{ mt: 2, mb: 5, maxWidth: '700px', mx: 'auto', opacity: 0.9, fontWeight: 300 }}
-        >
-          {searchTabs[currentTab].tagline}
-        </Typography>
-
-        <Paper
-          elevation={12}
-          sx={{
-            p: 1.5,
-            borderRadius: '24px',
-            bgcolor: 'rgba(255,255,255,0.15)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            maxWidth: '700px',
-            mx: 'auto',
-          }}
-        >
-          <Tabs
-            value={currentTab}
-            onChange={(e, newValue) => setCurrentTab(newValue)}
-            centered
-            sx={{
-              mb: 2,
-              minHeight: 'auto',
-              '& .MuiTabs-indicator': {
-                backgroundColor: theme.palette.secondary.main,
-                height: 4,
-                borderRadius: 4
-              },
-              '& .MuiTab-root': {
-                color: 'white',
-                minHeight: 'auto',
-                pt: 1.5,
-                pb: 1.5,
-                fontSize: '1rem',
-                opacity: 0.8,
-                '&.Mui-selected': {
-                  opacity: 1,
-                  color: 'white',
-                  fontWeight: 'bold'
-                }
-              }
-            }}
+      >
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
           >
-            {searchTabs.map((tab, index) => (
-              <Tab key={index} label={tab.label} icon={tab.icon} iconPosition="start" />
-            ))}
-          </Tabs>
-
-          <Box sx={{ display: 'flex', gap: 1.5, p: 1 }}>
-            <TextField
-              fullWidth
-              variant="filled"
-              placeholder={`Search for ${searchTabs[currentTab].label.toLowerCase()}...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              sx={{ 
-                bgcolor: 'rgba(255,255,255,0.9)', 
-                borderRadius: 2, 
-                '& .MuiFilledInput-underline:before': { borderBottom: 0 },
-                '& .MuiFilledInput-root': { bgcolor: 'transparent' },
-                '&:hover': { bgcolor: 'rgba(255,255,255,1)' }
+            <Typography
+              variant="h1"
+              component="h1"
+              sx={{
+                fontWeight: 800,
+                fontSize: { xs: '3rem', sm: '4.5rem', md: '5.5rem' },
+                textShadow: '2px 4px 10px rgba(0,0,0,0.6)',
+                letterSpacing: '-1px',
               }}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              onClick={handleSearch}
-              sx={{ px: {xs: 3, sm: 5}, borderRadius: 2, boxShadow: theme.shadows[6] }}
             >
-              <Search />
-            </Button>
-          </Box>
-        </Paper>
-      </Container>
+              Book Nahi, Belong Karo
+            </Typography>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <Typography
+              variant="h5"
+              component="p"
+              sx={{ mt: 2, mb: 5, maxWidth: '700px', mx: 'auto', opacity: 0.9, fontWeight: 300 }}
+            >
+              {searchTabs[currentTab].tagline}
+            </Typography>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            <Paper
+              elevation={12}
+              sx={{
+                p: 1.5,
+                borderRadius: '24px',
+                bgcolor: 'rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                maxWidth: '700px',
+                mx: 'auto',
+              }}
+            >
+              <Tabs
+                value={currentTab}
+                onChange={(e, newValue) => setCurrentTab(newValue)}
+                centered
+                sx={{
+                  mb: 2,
+                  minHeight: 'auto',
+                  '& .MuiTabs-indicator': {
+                    backgroundColor: theme.palette.secondary.main,
+                    height: 4,
+                    borderRadius: 4
+                  },
+                  '& .MuiTab-root': {
+                    color: 'white',
+                    minHeight: 'auto',
+                    pt: 1.5,
+                    pb: 1.5,
+                    fontSize: '1rem',
+                    opacity: 0.8,
+                    '&.Mui-selected': {
+                      opacity: 1,
+                      color: 'white',
+                      fontWeight: 'bold'
+                    }
+                  }
+                }}
+              >
+                {searchTabs.map((tab, index) => (
+                  <Tab key={index} label={tab.label} icon={tab.icon} iconPosition="start" />
+                ))}
+              </Tabs>
+
+              <Box sx={{ display: 'flex', gap: 1.5, p: 1 }}>
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  placeholder={`Search for ${searchTabs[currentTab].label.toLowerCase()}...`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  sx={{ 
+                    bgcolor: 'rgba(255,255,255,0.9)', 
+                    borderRadius: 2, 
+                    '& .MuiFilledInput-underline:before': { borderBottom: 0 },
+                    '& .MuiFilledInput-root': { bgcolor: 'transparent' },
+                    '&:hover': { bgcolor: 'rgba(255,255,255,1)' }
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  onClick={handleSearch}
+                  sx={{ px: {xs: 3, sm: 5}, borderRadius: 2, boxShadow: theme.shadows[6] }}
+                >
+                  <Search />
+                </Button>
+              </Box>
+            </Paper>
+          </motion.div>
+        </Container>
+      </Box>
     </Box>
   );
 };

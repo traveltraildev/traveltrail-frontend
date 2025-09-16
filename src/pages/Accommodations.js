@@ -28,27 +28,48 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { getAllAccommodations } from "../endpoints";
 import { useTheme } from "@mui/material/styles";
-import { Tune, ExpandMore, Search, KingBed, People } from "@mui/icons-material";
+import { Tune, ExpandMore, Search, KingBed, People, FavoriteBorder } from "@mui/icons-material";
+import { Rating } from "@mui/material";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import FilterSidebarSkeleton from '../components/common/FilterSidebarSkeleton';
+import EmptyState from '../components/common/EmptyState';
 
 const AccommodationCard = ({ accommodation }) => {
   const theme = useTheme();
   return (
     <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, width: '100%' }}>
-      <CardMedia
-        component="img"
-        height="220"
-        image={accommodation?.images[0] || "/images/placeholder.jpg"}
-        alt={accommodation?.name}
-      />
+      <Box sx={{ position: 'relative' }}>
+        <CardMedia
+          component="img"
+          height="220"
+          image={accommodation?.images[0] || "/images/placeholder.jpg"}
+          alt={accommodation?.name}
+        />
+        <IconButton
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+            },
+          }}
+        >
+          <FavoriteBorder />
+        </IconButton>
+      </Box>
       <CardContent sx={{ flexGrow: 1 }}>
         <Typography variant="h6" component="h3" fontWeight="600" noWrap>{accommodation.name}</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{accommodation.destination}</Typography>
         <Stack direction="row" spacing={1} sx={{ mb: 2 }} flexWrap="wrap">
           <Chip icon={<KingBed />} label={accommodation.roomType} size="small" variant="outlined" />
           <Chip icon={<People />} label={`${accommodation.maxOccupancy} Guests`} size="small" variant="outlined" />
+        </Stack>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+          <Rating name="read-only" value={accommodation.rating || 4.5} readOnly precision={0.5} />
+          <Typography variant="body2" color="text.secondary">({accommodation.reviews || 0} reviews)</Typography>
         </Stack>
         <Typography variant="h5" fontWeight="700" color="primary">₹{accommodation.basePrice?.toLocaleString()}/night</Typography>
       </CardContent>
@@ -78,6 +99,7 @@ const FilterSidebar = ({
   options,
   sortBy,
   onSortChange,
+  resultsCount
 }) => {
   const [localFilters, setLocalFilters] = useState(initialFilters);
 
@@ -117,6 +139,10 @@ const FilterSidebar = ({
 
   return (
     <Stack spacing={2} sx={{ p: 2.5 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h6" fontWeight="600">Filters</Typography>
+        <Button onClick={handleReset} size="small">Clear all</Button>
+      </Box>
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Typography fontWeight="600">Sort By</Typography>
@@ -246,15 +272,13 @@ const FilterSidebar = ({
       </Accordion>
       <Stack direction="row" spacing={2} sx={{ p: 2.5 }}>
         <Button variant="contained" onClick={() => onApply(localFilters)} fullWidth>
-          Apply
-        </Button>
-        <Button variant="outlined" onClick={handleReset} fullWidth>
-          Reset
+          Apply ({resultsCount} results)
         </Button>
       </Stack>
     </Stack>
   );
 };
+
 
 const AccommodationsPage = () => {
   const theme = useTheme();
@@ -473,12 +497,6 @@ const AccommodationsPage = () => {
                   borderRadius: 3,
                 }}
               >
-                <Typography
-                  variant="h6"
-                  sx={{ p: 2.5, pb: 1, fontWeight: 600 }}
-                >
-                  Filters
-                </Typography>
                 {loading ? (
                   <FilterSidebarSkeleton />
                 ) : (
@@ -489,6 +507,7 @@ const AccommodationsPage = () => {
                     options={filterOptions}
                     sortBy={sortBy}
                     onSortChange={handleSortChange}
+                    resultsCount={filteredAccommodations.length}
                   />
                 )}
               </Paper>
@@ -608,12 +627,13 @@ const AccommodationsPage = () => {
                       </Grid>
                     ))
                   ) : (
-                    <Grid item xs={12} sx={{ textAlign: "center", py: 10 }}>
-                      <Typography variant="h5">No Stays Found</Typography>
-                      <Typography color="text.secondary" sx={{ mt: 1 }}>
-                        Try adjusting your search or filters to find what you're
-                        looking for.
-                      </Typography>
+                    <Grid item xs={12}>
+                      <EmptyState
+                        title="No Stays Found"
+                        message="Try adjusting your search or filters to find what you're looking for."
+                        buttonText="Clear Filters"
+                        buttonLink="/accommodations"
+                      />
                     </Grid>
                   )}
                 </Grid>
@@ -640,6 +660,7 @@ const AccommodationsPage = () => {
               sortBy={sortBy}
               onSortChange={handleSortChange}
               isMobile
+              resultsCount={filteredAccommodations.length}
             />
           </Box>
         </Drawer>

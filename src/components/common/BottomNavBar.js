@@ -12,11 +12,13 @@ import {
   Person as PersonIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useUser } from '@clerk/clerk-react';
 
 const BottomNavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
+  const { isSignedIn } = useUser();
 
   const [value, setValue] = useState(location.pathname);
 
@@ -30,8 +32,12 @@ const BottomNavBar = () => {
         showLabels
         value={value}
         onChange={(event, newValue) => {
-          setValue(newValue);
-          navigate(newValue);
+          if (newValue === '/profile' && !isSignedIn) {
+            navigate('/sign-in');
+          } else {
+            setValue(newValue);
+            navigate(newValue);
+          }
         }}
         sx={{
           bgcolor: theme.palette.background.paper,

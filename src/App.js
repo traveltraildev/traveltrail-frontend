@@ -6,6 +6,8 @@ import theme from './theme';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { SignedIn, Protect, useUser } from '@clerk/clerk-react';
 
+import { ParallaxProvider } from 'react-scroll-parallax';
+
 // Pages
 import Home from './pages/Home';
 import Trips from './pages/Trips';
@@ -82,46 +84,48 @@ function App() {
   const isMobile = useMediaQuery(appTheme.breakpoints.down('md'));
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <div className="App">
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/trips" element={<Trips />} />
-          <Route path="/accommodations" element={<Accommodations />} />
-          <Route path="/trips/:id" element={<TripDetails />} />
-          <Route path="/trips/theme/:themeName" element={<ThemeTripsPage />} />
-          <Route path="/accommodations/:id" element={<AccommodationDetailsPage />} />
-          <Route path="/about-us" element={<AboutUsPage />} />
-          <Route path="/contact-us" element={<ContactUsPage />} />
-          <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-          <Route path="/cookie-policy" element={<CookiePolicyPage />} />
-          <Route path="/accessibility-statement" element={<AccessibilityStatementPage />} />
-          <Route path="/booking-confirmation" element={<BookingConfirmation />} />
+    <ParallaxProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div className="App">
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/trips" element={<Trips />} />
+            <Route path="/accommodations" element={<Accommodations />} />
+            <Route path="/trips/:id" element={<TripDetails />} />
+            <Route path="/trips/theme/:themeName" element={<ThemeTripsPage />} />
+            <Route path="/accommodations/:id" element={<AccommodationDetailsPage />} />
+            <Route path="/about-us" element={<AboutUsPage />} />
+            <Route path="/contact-us" element={<ContactUsPage />} />
+            <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+            <Route path="/accessibility-statement" element={<AccessibilityStatementPage />} />
+            <Route path="/booking-confirmation" element={<BookingConfirmation />} />
 
-          {/* Sign In / Sign Up Routes */}
-          <Route path="/sign-in/*" element={<SignInPage />} />
-          <Route path="/sign-up/*" element={<SignUpPage />} />
+            {/* Sign In / Sign Up Routes */}
+            <Route path="/sign-in/*" element={<SignInPage />} />
+            <Route path="/sign-up/*" element={<SignUpPage />} />
 
-          {/* Protected Routes */}
-          <Route
-            path="/profile"
-            element={<SignedIn><UserProfilePage /></SignedIn>}
-          />
-          <Route
-            path="/profile-settings"
-            element={<SignedIn><ProfileSettingsPage /></SignedIn>}
-          />
-          
+            {/* Protected Routes */}
+            <Route
+              path="/profile"
+              element={<SignedIn><UserProfilePage /></SignedIn>}
+            />
+            <Route
+              path="/profile-settings"
+              element={<SignedIn><ProfileSettingsPage /></SignedIn>}
+            />
+            
 
-          {/* Admin Protected Routes */}
-          <Route path="/admin/*" element={<AdminRoutes />} />
-        </Routes>
-        {isMobile && <BottomNavBar />}
-      </div>
-    </ThemeProvider>
+            {/* Admin Protected Routes */}
+            <Route path="/admin/*" element={<AdminRoutes />} />
+          </Routes>
+          {isMobile && <BottomNavBar />}
+        </div>
+      </ThemeProvider>
+    </ParallaxProvider>
   );
 }
 

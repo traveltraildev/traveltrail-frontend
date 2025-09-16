@@ -14,6 +14,8 @@ import {
   Paper,
   TextField,
   useTheme,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { Link as RouterLink } from 'react-router-dom';
 import Navbar from "../components/common/Navbar";
@@ -21,9 +23,10 @@ import Footer from "../components/common/Footer";
 import Hero from "../components/Home/Hero";
 import { motion } from "framer-motion";
 import { getAllTrips, getAllAccommodations, newsletterSubscription } from "../endpoints";
+import Testimonials from "../components/Home/Testimonials";
 
 const SectionWrapper = ({ title, subtitle, children, ...props }) => (
-  <Box component="section" sx={{ py: { xs: 6, md: 10 } }} {...props}>
+  <Box component="section" {...props}>
     <Container maxWidth="xl">
       <Typography variant="h2" component="h2" sx={{ textAlign: 'center', mb: 2, fontWeight: 700 }}>
         {title}
@@ -38,7 +41,7 @@ const SectionWrapper = ({ title, subtitle, children, ...props }) => (
   </Box>
 );
 
-const HorizontalScrollContainer = ({ children }) => (
+const HorizontalScrollContainer = ({ children, sx }) => (
   <Stack direction="row" spacing={4} sx={{
     overflowX: 'auto',
     py: 2,
@@ -46,23 +49,7 @@ const HorizontalScrollContainer = ({ children }) => (
     '&::-webkit-scrollbar': { height: 8 },
     '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 4 },
     '&::-webkit-scrollbar-track': { bgcolor: 'transparent' },
-    '&::before, &::after': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      bottom: 0,
-      width: '50px',
-      pointerEvents: 'none',
-      zIndex: 1,
-    },
-    '&::before': {
-      left: 0,
-      background: 'linear-gradient(to right, white, rgba(255,255,255,0))',
-    },
-    '&::after': {
-      right: 0,
-      background: 'linear-gradient(to left, white, rgba(255,255,255,0))',
-    },
+    ...sx,
   }}>
     {children}
   </Stack>
@@ -110,7 +97,7 @@ const AccommodationCard = ({ accommodation }) => {
             <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
                 <Chip label={accommodation.roomType} size="small" variant="outlined" />
             </Stack>
-            <Typography variant="h5" fontWeight="700" color="primary">₹{accommodation.price?.toLocaleString()}/night</Typography>
+            <Typography variant="h5" fontWeight="700" color="primary">₹{accommodation.basePrice?.toLocaleString()}/night</Typography>
         </CardContent>
         <Box sx={{ p: 2, pt: 0 }}>
             <Button component={RouterLink} to={`/accommodations/${accommodation._id}`} variant="contained" fullWidth>View Details</Button>
@@ -226,6 +213,7 @@ const Home = () => {
   const [email, setEmail] = useState("");
   const [showNewsletterAnim, setShowNewsletterAnim] = useState(false);
   const [newsletterError, setNewsletterError] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const theme = useTheme();
 
   useEffect(() => {
@@ -266,6 +254,7 @@ const Home = () => {
       if (response.ok) {
         setShowNewsletterAnim(true);
         setEmail("");
+        setOpenSnackbar(true);
         setTimeout(() => setShowNewsletterAnim(false), 2500);
       } else {
         const errorData = await response.json().catch(() => ({}));
@@ -278,6 +267,13 @@ const Home = () => {
     }
   };
 
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
+
   return (
     <Box>
       <Navbar />
@@ -286,6 +282,7 @@ const Home = () => {
       <SectionWrapper
         title="Discover Our Top Travel Packages"
         subtitle="Explore our handpicked selection of unforgettable journeys and vacation packages to breathtaking destinations worldwide. Find your next adventure with Trishelta Travels."
+        sx={{ py: { xs: 6, md: 10 } }}
       >
         <HorizontalScrollContainer>
           {loading ? (
@@ -299,7 +296,6 @@ const Home = () => {
       <SectionWrapper
         title="Featured Accommodations & Stays"
         subtitle="From luxurious resorts to cozy boutique hotels, discover our curated collection of accommodations designed for comfort and an exceptional travel experience."
-        sx={{ bgcolor: 'background.paper' }}
       >
         <HorizontalScrollContainer>
           {loading ? (
@@ -426,7 +422,7 @@ const Home = () => {
   </Grid>
 </SectionWrapper>
 
-
+      <Testimonials />
 
       <SectionWrapper
         title="Stay Connected: Join Our Travel Community"
@@ -495,6 +491,11 @@ const Home = () => {
           </Paper>
         </Container>
       </SectionWrapper>
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+          You have been successfully subscribed to our newsletter!
+        </Alert>
+      </Snackbar>
       <Footer />
     </Box>
   );

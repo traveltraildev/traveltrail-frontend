@@ -8,7 +8,8 @@ import { useUser, SignOutButton } from '@clerk/clerk-react';
 import { useTheme } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
-import { Box, Typography, Divider, Avatar } from '@mui/material';
+import { Box, Typography, Divider, Avatar, ListItemIcon } from '@mui/material';
+import { Logout } from '@mui/icons-material';
 
 export default function HamburgerMenu() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -102,17 +103,22 @@ export default function HamburgerMenu() {
             <MenuItem onClick={handleMenuClose} component={Link} to="/profile">
               Ur Bookings
             </MenuItem>
-            <MenuItem onClick={handleMenuClose} component={Link} to="/profile-settings">
+            <MenuItem onClick={() => { handleMenuClose(); navigate("/profile-settings"); }}>
               Your Profile
             </MenuItem>
             {user.publicMetadata.role === 'admin' && (
-              <MenuItem onClick={handleMenuClose} component={Link} to="/admin/dashboard">
+              <MenuItem onClick={() => { handleMenuClose(); navigate("/admin/dashboard"); }}>
                 Admin Dashboard
               </MenuItem>
             )}
-            <MenuItem>
-              <SignOutButton />
-            </MenuItem>
+            <SignOutButton>
+              <MenuItem onClick={handleMenuClose}>
+                <ListItemIcon>
+                  <Logout fontSize="small" />
+                </ListItemIcon>
+                Logout
+              </MenuItem>
+            </SignOutButton>
           </>
         ) : (
           <MenuItem onClick={handleMenuClose} component={Link} to="/sign-in">

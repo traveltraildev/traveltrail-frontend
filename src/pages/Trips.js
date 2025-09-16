@@ -27,27 +27,48 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { getAllTrips } from "../endpoints";
 import { useTheme } from "@mui/material/styles";
-import { Tune, ExpandMore, Search } from "@mui/icons-material";
+import { Tune, ExpandMore, Search, FavoriteBorder } from "@mui/icons-material";
+import { Rating } from "@mui/material";
 import TripCardSkeleton from "../components/common/TripCardSkeleton"; // Corrected import
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import FilterSidebarSkeleton from '../components/common/FilterSidebarSkeleton';
+import EmptyState from "../components/common/EmptyState";
 
 const TripCard = ({ trip }) => {
   const theme = useTheme();
   return (
     <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, width: '100%' }}>
-      <CardMedia
-        component="img"
-        height="220"
-        image={trip?.images[0] || "/images/placeholder.jpg"}
-        alt={trip?.name}
-      />
+      <Box sx={{ position: 'relative' }}>
+        <CardMedia
+          component="img"
+          height="220"
+          image={trip?.images[0] || "/images/placeholder.jpg"}
+          alt={trip?.name}
+        />
+        <IconButton
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+            },
+          }}
+        >
+          <FavoriteBorder />
+        </IconButton>
+      </Box>
       <CardContent sx={{ flexGrow: 1 }}>
         <Typography variant="h6" component="h3" fontWeight="600" noWrap>{trip.name}</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{trip.destination}</Typography>
         <Stack direction="row" spacing={1} sx={{ mb: 2 }} flexWrap="wrap">
           {trip.themes?.slice(0, 2).map(theme => <Chip key={theme} label={theme} size="small" variant="outlined" />)}
+        </Stack>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+          <Rating name="read-only" value={trip.rating || 4.5} readOnly precision={0.5} />
+          <Typography variant="body2" color="text.secondary">({trip.reviews || 0} reviews)</Typography>
         </Stack>
         <Typography variant="h5" fontWeight="700" color="primary">₹{trip.price?.toLocaleString()}</Typography>
       </CardContent>
@@ -65,6 +86,7 @@ const FilterSidebar = ({
   options,
   sortBy,
   onSortChange,
+  resultsCount
 }) => {
   const [localFilters, setLocalFilters] = useState(initialFilters);
 
@@ -102,6 +124,10 @@ const FilterSidebar = ({
 
   return (
     <Stack spacing={2} sx={{ p: 2.5 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h6" fontWeight="600">Filters</Typography>
+        <Button onClick={handleReset} size="small">Clear all</Button>
+      </Box>
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Typography fontWeight="600">Sort By</Typography>
@@ -230,15 +256,13 @@ const FilterSidebar = ({
       </Accordion>
       <Stack direction="row" spacing={2} sx={{ p: 2.5 }}>
         <Button variant="contained" onClick={() => onApply(localFilters)} fullWidth>
-          Apply
-        </Button>
-        <Button variant="outlined" onClick={handleReset} fullWidth>
-          Reset
+          Apply ({resultsCount} results)
         </Button>
       </Stack>
     </Stack>
   );
 };
+
 
 
 const TripsPage = () => {
@@ -471,12 +495,6 @@ const TripsPage = () => {
                   borderRadius: 3,
                 }}
               >
-                <Typography
-                  variant="h6"
-                  sx={{ p: 2.5, pb: 1, fontWeight: 600 }}
-                >
-                  Filters
-                </Typography>
                 {loading ? (
                   <FilterSidebarSkeleton />
                 ) : (
@@ -487,6 +505,7 @@ const TripsPage = () => {
                     options={filterOptions}
                     sortBy={sortBy}
                     onSortChange={handleSortChange}
+                    resultsCount={filteredTrips.length}
                   />
                 )}
               </Paper>
@@ -605,12 +624,13 @@ const TripsPage = () => {
                       </Grid>
                     ))
                   ) : (
-                    <Grid item xs={12} sx={{ textAlign: "center", py: 10 }}>
-                      <Typography variant="h5">No Trips Found</Typography>
-                      <Typography color="text.secondary" sx={{ mt: 1 }}>
-                        Try adjusting your search or filters to find what you're
-                        looking for.
-                      </Typography>
+                    <Grid item xs={12}>
+                      <EmptyState
+                        title="No Trips Found"
+                        message="Try adjusting your search or filters to find what you're looking for."
+                        buttonText="Clear Filters"
+                        buttonLink="/trips"
+                      />
                     </Grid>
                   )}
                 </Grid>
@@ -637,6 +657,7 @@ const TripsPage = () => {
               sortBy={sortBy}
               onSortChange={handleSortChange}
               isMobile
+              resultsCount={filteredTrips.length}
             />
           </Box>
         </Drawer>
