@@ -38,6 +38,7 @@ import AccommodationsList from './pages/AccommodationsList';
 import BookingConfirmation from './components/BookingConfirmation';
 import UserProfilePage from './pages/UserProfilePage';
 import ProfileSettingsPage from './pages/ProfileSettingsPage';
+import WishlistPage from './pages/WishlistPage';
 
 import ManageBookingsPage from './pages/ManageBookingsPage';
 import NewsletterSubscribers from './pages/admin/NewsletterSubscribers';
@@ -116,6 +117,10 @@ function App() {
             <Route
               path="/profile-settings"
               element={<SignedIn><ProfileSettingsPage /></SignedIn>}
+            />
+            <Route
+              path="/wishlist"
+              element={<SignedIn><WishlistPage /></SignedIn>}
             />
             
 

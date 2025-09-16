@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ClerkProvider } from '@clerk/clerk-react';
 import { BrowserRouter as Router, useNavigate } from 'react-router-dom';
+import { WishlistProvider } from './context/WishlistContext'; // Import WishlistProvider
 
 const PUBLISHABLE_KEY = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 
@@ -45,7 +46,9 @@ root.render(
   <React.StrictMode>
     <Router>
       <ClerkProviderWithRoutes>
-        <App />
+        <WishlistProvider>
+          <App />
+        </WishlistProvider>
       </ClerkProviderWithRoutes>
     </Router>
   </React.StrictMode>

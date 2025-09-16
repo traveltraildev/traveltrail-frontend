@@ -34,51 +34,7 @@ import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import FilterSidebarSkeleton from '../components/common/FilterSidebarSkeleton';
 import EmptyState from '../components/common/EmptyState';
-
-const AccommodationCard = ({ accommodation }) => {
-  const theme = useTheme();
-  return (
-    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, width: '100%' }}>
-      <Box sx={{ position: 'relative' }}>
-        <CardMedia
-          component="img"
-          height="220"
-          image={accommodation?.images[0] || "/images/placeholder.jpg"}
-          alt={accommodation?.name}
-        />
-        <IconButton
-          sx={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            backgroundColor: 'rgba(255, 255, 255, 0.7)',
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 1)',
-            },
-          }}
-        >
-          <FavoriteBorder />
-        </IconButton>
-      </Box>
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Typography variant="h6" component="h3" fontWeight="600" noWrap>{accommodation.name}</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{accommodation.destination}</Typography>
-        <Stack direction="row" spacing={1} sx={{ mb: 2 }} flexWrap="wrap">
-          <Chip icon={<KingBed />} label={accommodation.roomType} size="small" variant="outlined" />
-          <Chip icon={<People />} label={`${accommodation.maxOccupancy} Guests`} size="small" variant="outlined" />
-        </Stack>
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-          <Rating name="read-only" value={accommodation.rating || 4.5} readOnly precision={0.5} />
-          <Typography variant="body2" color="text.secondary">({accommodation.reviews || 0} reviews)</Typography>
-        </Stack>
-        <Typography variant="h5" fontWeight="700" color="primary">₹{accommodation.basePrice?.toLocaleString()}/night</Typography>
-      </CardContent>
-      <Box sx={{ p: 2, pt: 0 }}>
-        <Button component={Link} to={`/accommodations/${accommodation._id}`} variant="contained" fullWidth>View Details</Button>
-      </Box>
-    </Card>
-  )
-};
+import AccommodationCard from "../components/common/AccommodationCard"; // Import the shared AccommodationCard component
 
 const AccommodationCardSkeleton = () => (
     <Card sx={{ borderRadius: 3 }}>

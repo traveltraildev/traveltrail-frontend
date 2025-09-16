@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Container,
@@ -12,29 +12,13 @@ import {
 } from '@mui/material';
 import { Search, Flight, Hotel, Groups, Explore } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
-
-const heroImages = [
-  '/images/hero1.jpg',
-  '/images/hero2.jpg',
-  '/images/hero3.jpg',
-  '/images/hero4.jpg',
-];
 
 const Hero = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTab, setCurrentTab] = useState(0);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const theme = useTheme();
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-    }, 5000); // Change image every 5 seconds
-    return () => clearInterval(interval);
-  }, []);
 
   const handleSearch = () => {
     const { path, category, theme: tabTheme } = searchTabs[currentTab];
@@ -63,20 +47,12 @@ const Hero = () => {
         position: 'relative',
         height: { xs: '100vh', md: '100vh' },
         maxHeight: '100vh',
+        backgroundImage: `url(/images/hero.jpg)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        transition: 'background-image 1s ease-in-out',
       }}
     >
-      <Parallax speed={-20}>
-        <Box
-          sx={{
-            height: { xs: '100vh', md: '100vh' },
-            maxHeight: '100vh',
-            backgroundImage: `url(${heroImages[currentImageIndex]})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            transition: 'background-image 1s ease-in-out',
-          }}
-        />
-      </Parallax>
       <Box
         sx={{
           position: 'absolute',

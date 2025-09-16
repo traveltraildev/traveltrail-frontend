@@ -34,50 +34,7 @@ import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import FilterSidebarSkeleton from '../components/common/FilterSidebarSkeleton';
 import EmptyState from "../components/common/EmptyState";
-
-const TripCard = ({ trip }) => {
-  const theme = useTheme();
-  return (
-    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, width: '100%' }}>
-      <Box sx={{ position: 'relative' }}>
-        <CardMedia
-          component="img"
-          height="220"
-          image={trip?.images[0] || "/images/placeholder.jpg"}
-          alt={trip?.name}
-        />
-        <IconButton
-          sx={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            backgroundColor: 'rgba(255, 255, 255, 0.7)',
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 1)',
-            },
-          }}
-        >
-          <FavoriteBorder />
-        </IconButton>
-      </Box>
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Typography variant="h6" component="h3" fontWeight="600" noWrap>{trip.name}</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{trip.destination}</Typography>
-        <Stack direction="row" spacing={1} sx={{ mb: 2 }} flexWrap="wrap">
-          {trip.themes?.slice(0, 2).map(theme => <Chip key={theme} label={theme} size="small" variant="outlined" />)}
-        </Stack>
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-          <Rating name="read-only" value={trip.rating || 4.5} readOnly precision={0.5} />
-          <Typography variant="body2" color="text.secondary">({trip.reviews || 0} reviews)</Typography>
-        </Stack>
-        <Typography variant="h5" fontWeight="700" color="primary">₹{trip.price?.toLocaleString()}</Typography>
-      </CardContent>
-      <Box sx={{ p: 2, pt: 0 }}>
-        <Button component={Link} to={`/trips/${trip._id}`} variant="contained" fullWidth>View Details</Button>
-      </Box>
-    </Card>
-  );
-};
+import TripCard from "../components/common/TripCard"; // Import the shared TripCard component
 
 const FilterSidebar = ({
   initialFilters,

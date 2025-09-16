@@ -24,18 +24,27 @@ import Hero from "../components/Home/Hero";
 import { motion } from "framer-motion";
 import { getAllTrips, getAllAccommodations, newsletterSubscription } from "../endpoints";
 import Testimonials from "../components/Home/Testimonials";
+import TripCard from '../components/common/TripCard';
+import AccommodationCard from '../components/common/AccommodationCard';
 
-const SectionWrapper = ({ title, subtitle, children, ...props }) => (
-  <Box component="section" {...props}>
+const SectionWrapper = ({ title, subtitle, children, background, ...props }) => (
+  <Box component="section" sx={{ background: background, py: { xs: 8, md: 12 } }} {...props}>
     <Container maxWidth="xl">
-      <Typography variant="h2" component="h2" sx={{ textAlign: 'center', mb: 2, fontWeight: 700 }}>
-        {title}
-      </Typography>
-      {subtitle && (
-        <Typography variant="h6" component="p" color="text.secondary" sx={{ textAlign: 'center', mb: 8, maxWidth: 700, mx: 'auto' }}>
-          {subtitle}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.8 }}
+      >
+        <Typography variant="h2" component="h2" sx={{ textAlign: 'center', mb: 2, fontWeight: 700 }}>
+          {title}
         </Typography>
-      )}
+        {subtitle && (
+          <Typography variant="h6" component="p" color="text.secondary" sx={{ textAlign: 'center', mb: 8, maxWidth: 700, mx: 'auto' }}>
+            {subtitle}
+          </Typography>
+        )}
+      </motion.div>
       {children}
     </Container>
   </Box>
@@ -54,57 +63,6 @@ const HorizontalScrollContainer = ({ children, sx }) => (
     {children}
   </Stack>
 );
-
-const TripCard = ({ trip }) => {
-  const theme = useTheme();
-  return (
-    <Card sx={{ minWidth: 340, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, boxShadow: theme.shadows[3] }}>
-      <CardMedia
-        component="img"
-        height="220"
-        image={trip?.images[0] || "/images/placeholder.jpg"}
-        alt={trip?.name}
-      />
-      <CardContent sx={{ flexGrow: 1, p: 3 }}>
-        <Typography variant="h6" component="h3" fontWeight="600" gutterBottom>{trip.name}</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{trip.destination}</Typography>
-        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-          <Chip label={`${trip.daysCount} Days`} size="small" variant="outlined" />
-          <Chip label={`${trip.nightsCount} Nights`} size="small" variant="outlined" />
-        </Stack>
-        <Typography variant="h5" fontWeight="700" color="primary">₹{trip.price?.toLocaleString()}</Typography>
-      </CardContent>
-      <Box sx={{ p: 2, pt: 0 }}>
-        <Button component={RouterLink} to={`/trips/${trip._id}`} variant="contained" fullWidth>View Details</Button>
-      </Box>
-    </Card>
-  );
-};
-
-const AccommodationCard = ({ accommodation }) => {
-  const theme = useTheme();
-  return (
-    <Card sx={{ minWidth: 340, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 3, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, boxShadow: theme.shadows[3] }}>
-        <CardMedia
-            component="img"
-            height="220"
-            image={accommodation?.images[0] || "/images/placeholder.jpg"}
-            alt={accommodation?.name}
-        />
-        <CardContent sx={{ flexGrow: 1, p: 3 }}>
-            <Typography variant="h6" component="h3" fontWeight="600" gutterBottom>{accommodation.name}</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{accommodation.destination}</Typography>
-            <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-                <Chip label={accommodation.roomType} size="small" variant="outlined" />
-            </Stack>
-            <Typography variant="h5" fontWeight="700" color="primary">₹{accommodation.basePrice?.toLocaleString()}/night</Typography>
-        </CardContent>
-        <Box sx={{ p: 2, pt: 0 }}>
-            <Button component={RouterLink} to={`/accommodations/${accommodation._id}`} variant="contained" fullWidth>View Details</Button>
-        </Box>
-    </Card>
-  )
-};
 
 const CardSkeleton = () => (
   <Box sx={{ minWidth: 340, flexShrink: 0 }}>
@@ -133,33 +91,22 @@ const ThemeCard = ({ themeData }) => {
           sx={{
             borderRadius: 3,
             overflow: 'hidden',
-            textAlign: 'center',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
+            height: 300, // Set a fixed height for the card
             cursor: 'pointer',
             boxShadow: theme.shadows[2],
-            transition: 'all 0.3s ease',
+            transition: 'all 0.3s ease-in-out',
+            '&:hover': {
+              transform: 'translateY(-5px)',
+              boxShadow: theme.shadows[4],
+            }
           }}
         >
-          {/* Using Box for SVG to allow more flexible styling if needed */}
-          <Box sx={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: theme.palette.grey[100], p: 2 }}>
-            <Box 
-              component="img"
-              src={themeData.image}
-              alt={themeData.name}
-              sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-            />
-          </Box>
-          <CardContent sx={{ flexGrow: 1, p: 3 }}>
-            <Typography variant="h5" component="h3" fontWeight="700" gutterBottom>
-              {themeData.name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {themeData.description}
-            </Typography>
-          </CardContent>
+          <CardMedia
+            component="img"
+            image={themeData.image}
+            alt={themeData.name}
+            sx={{ height: '100%', width: '100%', objectFit: 'cover' }}
+          />
         </Card>
       </motion.div>
     </Grid>
@@ -170,37 +117,37 @@ const ThemeCard = ({ themeData }) => {
 const themesData = [
   {
     name: "Adventure",
-    image: "/images/theme_icons/adventure.svg", // Placeholder SVG
+    image: "/images/theme_icons/adventure.png", // Placeholder SVG
     description: "Thrill-seeking journeys and outdoor explorations.",
     link: "/trips?theme=Adventure",
   },
   {
     name: "Romantic Getaways",
-    image: "/images/theme_icons/romantic.svg", // Placeholder SVG
+    image: "/images/theme_icons/romantic.png", // Placeholder SVG
     description: "Perfect escapes for couples and honeymoons.",
     link: "/trips?theme=Romantic",
   },
   {
     name: "Family Fun",
-    image: "/images/theme_icons/family.svg", // Placeholder SVG
+    image: "/images/theme_icons/family.png", // Placeholder SVG
     description: "Memorable vacations for all ages.",
     link: "/trips?theme=Family",
   },
   {
     name: "Cultural Immersion",
-    image: "/images/theme_icons/culture.svg", // Placeholder SVG
+    image: "/images/theme_icons/culture.png", // Placeholder SVG
     description: "Dive deep into local traditions and history.",
     link: "/trips?theme=Cultural",
   },
   {
     name: "Luxury Escapes",
-    image: "/images/theme_icons/luxury.svg", // Placeholder SVG
+    image: "/images/theme_icons/luxury.png", // Placeholder SVG
     description: "Indulge in opulent travel experiences.",
     link: "/trips?theme=Luxury",
   },
   {
     name: "Wildlife & Nature",
-    image: "/images/theme_icons/wildlife.svg", // Placeholder SVG
+    image: "/images/theme_icons/wildlife.png", // Placeholder SVG
     description: "Explore the wild and natural wonders.",
     link: "/trips?theme=Wildlife",
   },
@@ -282,7 +229,7 @@ const Home = () => {
       <SectionWrapper
         title="Discover Our Top Travel Packages"
         subtitle="Explore our handpicked selection of unforgettable journeys and vacation packages to breathtaking destinations worldwide. Find your next adventure with Trishelta Travels."
-        sx={{ py: { xs: 6, md: 10 } }}
+        sx={{ pt: { xs: 6, md: 10 }, pb: { xs: 8, md: 12 } }}
       >
         <HorizontalScrollContainer>
           {loading ? (
@@ -296,6 +243,7 @@ const Home = () => {
       <SectionWrapper
         title="Featured Accommodations & Stays"
         subtitle="From luxurious resorts to cozy boutique hotels, discover our curated collection of accommodations designed for comfort and an exceptional travel experience."
+        background={theme.palette.grey[50]}
       >
         <HorizontalScrollContainer>
           {loading ? (
@@ -322,6 +270,7 @@ const Home = () => {
       <SectionWrapper
         title="Why Choose Trishelta Travels for Your Next Adventure?"
         subtitle="Experience the difference with Trishelta Travels. We are committed to providing seamless travel planning, exceptional value, and unparalleled support for every journey."
+        background={theme.palette.grey[50]}
       >
         <Grid container spacing={4} justifyContent="center">
     {[{
@@ -426,10 +375,11 @@ const Home = () => {
 
       <SectionWrapper
         title="Stay Connected: Join Our Travel Community"
-        subtitle="Don't miss out on exclusive travel deals, insider tips, and inspiring destination guides. Subscribe to the Trishelta Travels newsletter today!"
+        subtitle="Don't miss out on exclusive travel deals, insider tips, and inspiring destination guides."
+        background={theme.palette.grey[50]}
       >
         <Container maxWidth="md">
-          <Paper sx={{ p: {xs: 3, sm: 5}, borderRadius: 3, textAlign: 'center', background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`, color: 'white', minHeight: 220, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <Paper sx={{ p: {xs: 3, sm: 5}, borderRadius: 3, textAlign: 'center', background: `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.main} 90%)`, color: 'white', minHeight: 220, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <Typography variant="h4" component="h3" sx={{mb: 2, fontWeight: 'bold'}}>
                 Join Our Newsletter
             </Typography>

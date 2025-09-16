@@ -11,7 +11,7 @@ import {
   Typography,
   Divider,
 } from '@mui/material';
-import { AccountCircle, Logout, Settings } from '@mui/icons-material';
+import { AccountCircle, Logout, Settings, Favorite } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { useUser, useClerk } from '@clerk/clerk-react';
 import { useTheme } from '@mui/material/styles';
@@ -88,6 +88,12 @@ export default function ProfileMenu() {
             <AccountCircle fontSize="small" sx={{ color: theme.palette.primary.main }} />
           </ListItemIcon>
           <ListItemText primary="Ur Bookings" />
+        </MenuItem>
+        <MenuItem component={Link} to="/wishlist" onClick={handleMenuClose}>
+          <ListItemIcon>
+            <Favorite fontSize="small" sx={{ color: theme.palette.primary.main }} />
+          </ListItemIcon>
+          <ListItemText primary="My Wishlist" />
         </MenuItem>
         <MenuItem component={Link} to="/profile-settings" onClick={handleMenuClose}>
           <ListItemIcon>
