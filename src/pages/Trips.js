@@ -47,6 +47,7 @@ const FilterSidebar = ({
   onSortChange,
   resultsCount
 }) => {
+  const theme = useTheme();
   const [localFilters, setLocalFilters] = useState(initialFilters);
 
   // Sync localFilters with initialFilters and navigation state

@@ -59,6 +59,7 @@ const FilterSidebar = ({
   onSortChange,
   resultsCount
 }) => {
+  const theme = useTheme();
   const [localFilters, setLocalFilters] = useState(initialFilters);
 
   useEffect(() => {
@@ -96,14 +97,15 @@ const FilterSidebar = ({
   };
 
   return (
-    <Stack spacing={2} sx={{ p: 2.5 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Stack spacing={2} sx={{ p: 2.5, height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
         <Typography variant="h6" fontWeight="600">Filters</Typography>
         <Button onClick={handleReset} size="small">Clear all</Button>
       </Box>
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Typography fontWeight="600">Sort By</Typography>
+      <Box sx={{ overflowY: 'auto', flexGrow: 1, pr: 1 }}>
+        <Accordion defaultExpanded>
+          <AccordionSummary expandIcon={<ExpandMore />}>
+            <Typography fontWeight="600">Sort By</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <TextField
@@ -228,11 +230,12 @@ const FilterSidebar = ({
           </Stack>
         </AccordionDetails>
       </Accordion>
-      <Stack direction="row" spacing={2} sx={{ p: 2.5 }}>
+      </Box>
+      <Box sx={{ pt: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
         <Button variant="contained" onClick={() => onApply(localFilters)} fullWidth>
           Apply ({resultsCount} results)
         </Button>
-      </Stack>
+      </Box>
     </Stack>
   );
 };
