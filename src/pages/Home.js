@@ -57,6 +57,7 @@ const HorizontalScrollContainer = ({ children, sx }) => (
     '&::-webkit-scrollbar': { height: 8 },
     '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 4 },
     '&::-webkit-scrollbar-track': { bgcolor: 'transparent' },
+    flexWrap: 'nowrap', // Prevent items from wrapping to the next line
     ...sx,
   }}>
     {children}
