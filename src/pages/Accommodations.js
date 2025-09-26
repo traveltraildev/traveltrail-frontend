@@ -23,18 +23,20 @@ import {
   CardContent,
   Skeleton,
   InputAdornment,
-  MenuItem
+  MenuItem,
+  Slide
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { getAllAccommodations } from "../endpoints";
 import { useTheme } from "@mui/material/styles";
 import { Tune, ExpandMore, Search, KingBed, People, FavoriteBorder } from "@mui/icons-material";
 import { Rating } from "@mui/material";
+import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import FilterSidebarSkeleton from '../components/common/FilterSidebarSkeleton';
 import EmptyState from '../components/common/EmptyState';
-import AccommodationCard from "../components/common/AccommodationCard"; // Import the shared AccommodationCard component
+import StandardCard from "../components/common/StandardCard"; // Import the shared StandardCard component
 
 const AccommodationCardSkeleton = () => (
     <Card sx={{ borderRadius: 3 }}>
@@ -472,22 +474,23 @@ const AccommodationsPage = () => {
 
           <Grid item xs={12} md={9}>
             <Stack spacing={3}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  display: "flex",
-                  gap: 2,
-                  position: "sticky",
-                  top: isMobile ? 60 : 80, // Adjust for mobile header
-                  bgcolor: "background.paper",
-                  zIndex: 10,
-                  border: isMobile ? `1px solid ${theme.palette.divider}` : "none",
-                  borderRadius: isMobile ? 2 : 0,
-                }}
-              >
-                <TextField
-                  fullWidth
+              <Slide appear={false} direction="down" in={!useScrollTrigger()}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    gap: 2,
+                    position: "sticky",
+                    top: isMobile ? 60 : 80, // Adjust for mobile header
+                    bgcolor: "background.paper",
+                    zIndex: 10,
+                    border: isMobile ? `1px solid ${theme.palette.divider}` : "none",
+                    borderRadius: isMobile ? 2 : 0,
+                  }}
+                >
+                  <TextField
+                    fullWidth
                   variant="outlined"
                   placeholder="Search by stay name or destination..."
                   value={filters.searchTerm}
@@ -515,7 +518,8 @@ const AccommodationsPage = () => {
                     <Tune />
                   </IconButton>
                 )}
-              </Paper>
+                </Paper>
+              </Slide>
 
               {activeFilters().length > 0 && (
                 <Stack
@@ -579,7 +583,16 @@ const AccommodationsPage = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <AccommodationCard accommodation={acc} />
+                          <StandardCard
+                            item={acc}
+                            itemType="Accommodation"
+                            title={acc.name}
+                            subtitle={acc.destination}
+                            imageUrl={acc.images?.[0]}
+                            tags={[acc.roomType]}
+                            price={`₹${acc.basePrice?.toLocaleString()}/night`}
+                            linkTo={`/accommodations/${acc._id}`}
+                          />
                       </Grid>
                     ))
                   ) : (

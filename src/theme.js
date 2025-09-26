@@ -32,7 +32,7 @@ let theme = createTheme({
   palette: palette,
   spacing: 8,
   shape: {
-    borderRadius: 12,
+    borderRadius: 16, // Increased for a softer, more modern look
   },
   typography: {
     fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -50,16 +50,16 @@ let theme = createTheme({
   components: {
     MuiButton: {
       styleOverrides: {
-        root: {
-          borderRadius: 8,
-          padding: '12px 28px',
+        root: ({ theme }) => ({
+          borderRadius: theme.shape.borderRadius,
+          padding: '10px 24px', // Adjusted padding
           boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
           transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
           '&:hover': {
             boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)',
             transform: 'translateY(-2px)',
           },
-        },
+        }),
         containedPrimary: {
           '&:hover': {
             backgroundColor: '#C05640', // A darker shade of the primary color
@@ -69,10 +69,10 @@ let theme = createTheme({
     },
     MuiCard: {
       styleOverrides: {
-        root: {
-          borderRadius: 16,
+        root: ({ theme }) => ({
+          borderRadius: theme.shape.borderRadius,
           boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-        },
+        }),
       },
     },
     MuiAppBar: {
