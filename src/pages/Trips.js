@@ -31,7 +31,7 @@ import { useTheme } from "@mui/material/styles";
 import { Tune, ExpandMore, Search, FavoriteBorder } from "@mui/icons-material";
 import { Rating } from "@mui/material";
 import useScrollTrigger from '@mui/material/useScrollTrigger';
-import TripCardSkeleton from "../components/common/TripCardSkeleton"; // Corrected import
+import StandardCardSkeleton from "../components/common/StandardCardSkeleton"; // Corrected import
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import FilterSidebarSkeleton from '../components/common/FilterSidebarSkeleton';
@@ -562,7 +562,7 @@ const TripsPage = () => {
                         justifyContent: "center",
                       }}
                     >
-                      <TripCardSkeleton />
+                      <StandardCardSkeleton />
                     </Grid>
                   ))}
                 </Grid>

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Container, Typography, Grid, Box, CircularProgress } from '@mui/material';
 import { useWishlist } from '../context/WishlistContext';
-import TripCard from '../components/common/TripCard';
-import AccommodationCard from '../components/common/AccommodationCard';
+import StandardCard from '../components/common/StandardCard';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import EmptyState from '../components/common/EmptyState';
@@ -36,12 +35,30 @@ const WishlistPage = () => {
               <Grid container spacing={4}>
                 {tripItems.map(item => (
                   <Grid item key={item._id} xs={12} sm={6} md={4}>
-                    <TripCard trip={item.item} />
+                    <StandardCard
+                      item={item.item}
+                      itemType="Trip"
+                      title={item.item.name}
+                      subtitle={item.item.destination}
+                      imageUrl={item.item.images?.[0]}
+                      tags={[`${item.item.daysCount} Days`, `${item.item.nightsCount} Nights`]}
+                      price={`₹${item.item.price?.toLocaleString()}`}
+                      linkTo={`/trips/${item.item._id}`}
+                    />
                   </Grid>
                 ))}
                 {accommodationItems.map(item => (
                   <Grid item key={item._id} xs={12} sm={6} md={4}>
-                    <AccommodationCard accommodation={item.item} />
+                    <StandardCard
+                      item={item.item}
+                      itemType="Accommodation"
+                      title={item.item.name}
+                      subtitle={item.item.destination}
+                      imageUrl={item.item.images?.[0]}
+                      tags={[item.item.roomType]}
+                      price={`₹${item.item.basePrice?.toLocaleString()}/night`}
+                      linkTo={`/accommodations/${item.item._id}`}
+                    />
                   </Grid>
                 ))}
               </Grid>
