@@ -30,13 +30,13 @@ import { getAllTrips } from "../endpoints";
 import { useTheme } from "@mui/material/styles";
 import { Tune, ExpandMore, Search, FavoriteBorder } from "@mui/icons-material";
 import { Rating } from "@mui/material";
-import useScrollTrigger from '@mui/material/useScrollTrigger';
-import StandardCardSkeleton from "../components/common/StandardCardSkeleton"; // Corrected import
+import useScrollTrigger from "@mui/material/useScrollTrigger";
+import StandardCardSkeleton from "../components/common/StandardCardSkeleton";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import FilterSidebarSkeleton from '../components/common/FilterSidebarSkeleton';
 import EmptyState from "../components/common/EmptyState";
-import StandardCard from "../components/common/StandardCard";
+import StandardCard from "../components/common/StandardCard"; // Import the shared TripCard component
 
 const FilterSidebar = ({
   initialFilters,
@@ -47,7 +47,6 @@ const FilterSidebar = ({
   onSortChange,
   resultsCount
 }) => {
-  const theme = useTheme();
   const [localFilters, setLocalFilters] = useState(initialFilters);
 
   // Sync localFilters with initialFilters and navigation state
@@ -69,6 +68,7 @@ const FilterSidebar = ({
   };
 
   const handleReset = () => {
+    // Always reset to default filters (no themes selected)
     const resetFilters = {
       searchTerm: "",
       priceRange: [0, 100000],
@@ -81,6 +81,7 @@ const FilterSidebar = ({
     onReset(resetFilters);
   };
 
+  const theme = useTheme();
   return (
     <Stack spacing={2} sx={{ p: 2.5, height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>

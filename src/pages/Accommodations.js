@@ -31,23 +31,13 @@ import { getAllAccommodations } from "../endpoints";
 import { useTheme } from "@mui/material/styles";
 import { Tune, ExpandMore, Search, KingBed, People, FavoriteBorder } from "@mui/icons-material";
 import { Rating } from "@mui/material";
-import useScrollTrigger from '@mui/material/useScrollTrigger';
+import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import FilterSidebarSkeleton from '../components/common/FilterSidebarSkeleton';
 import EmptyState from '../components/common/EmptyState';
-import StandardCard from "../components/common/StandardCard"; // Import the shared StandardCard component
-
-const AccommodationCardSkeleton = () => (
-    <Card sx={{ borderRadius: 3 }}>
-        <Skeleton variant="rectangular" height={220} />
-        <CardContent>
-            <Skeleton height={30} width="80%" />
-            <Skeleton height={20} width="40%" sx={{mt: 1}}/>
-            <Skeleton height={45} sx={{mt: 2}}/>
-        </CardContent>
-    </Card>
-);
+import StandardCard from "../components/common/StandardCard";
+import StandardCardSkeleton from "../components/common/StandardCardSkeleton";
 
 
 const FilterSidebar = ({
@@ -566,7 +556,7 @@ const AccommodationsPage = () => {
                         justifyContent: "center",
                       }}
                     >
-                      <AccommodationCardSkeleton />
+                      <StandardCardSkeleton />
                     </Grid>
                   ))}
                 </Grid>
