@@ -51,7 +51,6 @@ import Footer from './components/common/Footer';
 
 // Context
 import RequireAuth from './components/common/RequireAuth';
-import { useAuth } from './context/AuthContext';
 
 function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
