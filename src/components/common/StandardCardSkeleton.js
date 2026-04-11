@@ -3,7 +3,7 @@ import React from 'react';
 import { Skeleton, Box } from '@mui/material';
 
 const StandardCardSkeleton = () => (
-  <Box sx={{ minWidth: 340, flexShrink: 0, width: '100%' }}>
+  <Box sx={{ width: '100%' }}>
     <Skeleton variant="rectangular" height={220} sx={{ borderRadius: 3 }} />
     <Box sx={{ pt: 1.5 }}>
       <Skeleton height={30} />
