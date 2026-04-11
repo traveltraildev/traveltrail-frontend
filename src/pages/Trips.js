@@ -22,19 +22,21 @@ import {
   CardMedia,
   CardContent,
   InputAdornment,
-  MenuItem
+  MenuItem,
+  Slide
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { getAllTrips } from "../endpoints";
 import { useTheme } from "@mui/material/styles";
 import { Tune, ExpandMore, Search, FavoriteBorder } from "@mui/icons-material";
 import { Rating } from "@mui/material";
-import TripCardSkeleton from "../components/common/TripCardSkeleton"; // Corrected import
+import useScrollTrigger from "@mui/material/useScrollTrigger";
+import StandardCardSkeleton from "../components/common/StandardCardSkeleton";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import FilterSidebarSkeleton from '../components/common/FilterSidebarSkeleton';
 import EmptyState from "../components/common/EmptyState";
-import TripCard from "../components/common/TripCard"; // Import the shared TripCard component
+import StandardCard from "../components/common/StandardCard"; // Import the shared TripCard component
 
 const FilterSidebar = ({
   initialFilters,
@@ -79,15 +81,17 @@ const FilterSidebar = ({
     onReset(resetFilters);
   };
 
+  const theme = useTheme();
   return (
-    <Stack spacing={2} sx={{ p: 2.5 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Stack spacing={2} sx={{ p: 2.5, height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
         <Typography variant="h6" fontWeight="600">Filters</Typography>
         <Button onClick={handleReset} size="small">Clear all</Button>
       </Box>
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Typography fontWeight="600">Sort By</Typography>
+      <Box sx={{ overflowY: 'auto', flexGrow: 1, pr: 1 }}>
+        <Accordion defaultExpanded>
+          <AccordionSummary expandIcon={<ExpandMore />}>
+            <Typography fontWeight="600">Sort By</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <TextField
@@ -211,11 +215,12 @@ const FilterSidebar = ({
           </Stack>
         </AccordionDetails>
       </Accordion>
-      <Stack direction="row" spacing={2} sx={{ p: 2.5 }}>
+      </Box>
+      <Box sx={{ pt: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
         <Button variant="contained" onClick={() => onApply(localFilters)} fullWidth>
           Apply ({resultsCount} results)
         </Button>
-      </Stack>
+      </Box>
     </Stack>
   );
 };
@@ -471,21 +476,22 @@ const TripsPage = () => {
 
           <Grid item xs={12} md={9}>
             <Stack spacing={3}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  display: "flex",
-                  gap: 2,
-                  position: "sticky",
-                  top: isMobile ? 60 : 80,
-                  bgcolor: "background.paper",
-                  zIndex: 10,
-                  border: isMobile ? `1px solid ${theme.palette.divider}` : "none",
-                  borderRadius: isMobile ? 2 : 0,
-                }}
-              >
-                <TextField
+              <Slide appear={false} direction="down" in={!useScrollTrigger()}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    gap: 2,
+                    position: "sticky",
+                    top: isMobile ? 60 : 80,
+                    bgcolor: "background.paper",
+                    zIndex: 10,
+                    border: isMobile ? `1px solid ${theme.palette.divider}` : "none",
+                    borderRadius: isMobile ? 2 : 0,
+                  }}
+                >
+                  <TextField
                   fullWidth
                   variant="outlined"
                   placeholder="Search by trip name or destination..."
@@ -513,7 +519,8 @@ const TripsPage = () => {
                     <Tune />
                   </IconButton>
                 )}
-              </Paper>
+                </Paper>
+              </Slide>
 
               {activeFilters().length > 0 && (
                 <Stack
@@ -557,7 +564,7 @@ const TripsPage = () => {
                         justifyContent: "center",
                       }}
                     >
-                      <TripCardSkeleton />
+                      <StandardCardSkeleton />
                     </Grid>
                   ))}
                 </Grid>
@@ -577,7 +584,16 @@ const TripsPage = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <TripCard trip={trip} />
+                        <StandardCard
+                          item={trip}
+                          itemType="Trip"
+                          title={trip.name}
+                          subtitle={trip.destination}
+                          imageUrl={trip.images?.[0]}
+                          tags={[`${trip.daysCount} Days`, `${trip.nightsCount} Nights`]}
+                          price={`₹${trip.price?.toLocaleString()}`}
+                          linkTo={`/trips/${trip._id}`}
+                        />
                       </Grid>
                     ))
                   ) : (

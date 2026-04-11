@@ -23,29 +23,21 @@ import {
   CardContent,
   Skeleton,
   InputAdornment,
-  MenuItem
+  MenuItem,
+  Slide
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { getAllAccommodations } from "../endpoints";
 import { useTheme } from "@mui/material/styles";
 import { Tune, ExpandMore, Search, KingBed, People, FavoriteBorder } from "@mui/icons-material";
 import { Rating } from "@mui/material";
+import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import FilterSidebarSkeleton from '../components/common/FilterSidebarSkeleton';
 import EmptyState from '../components/common/EmptyState';
-import AccommodationCard from "../components/common/AccommodationCard"; // Import the shared AccommodationCard component
-
-const AccommodationCardSkeleton = () => (
-    <Card sx={{ borderRadius: 3 }}>
-        <Skeleton variant="rectangular" height={220} />
-        <CardContent>
-            <Skeleton height={30} width="80%" />
-            <Skeleton height={20} width="40%" sx={{mt: 1}}/>
-            <Skeleton height={45} sx={{mt: 2}}/>
-        </CardContent>
-    </Card>
-);
+import StandardCard from "../components/common/StandardCard";
+import StandardCardSkeleton from "../components/common/StandardCardSkeleton";
 
 
 const FilterSidebar = ({
@@ -57,6 +49,7 @@ const FilterSidebar = ({
   onSortChange,
   resultsCount
 }) => {
+  const theme = useTheme();
   const [localFilters, setLocalFilters] = useState(initialFilters);
 
   useEffect(() => {
@@ -94,14 +87,15 @@ const FilterSidebar = ({
   };
 
   return (
-    <Stack spacing={2} sx={{ p: 2.5 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Stack spacing={2} sx={{ p: 2.5, height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
         <Typography variant="h6" fontWeight="600">Filters</Typography>
         <Button onClick={handleReset} size="small">Clear all</Button>
       </Box>
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Typography fontWeight="600">Sort By</Typography>
+      <Box sx={{ overflowY: 'auto', flexGrow: 1, pr: 1 }}>
+        <Accordion defaultExpanded>
+          <AccordionSummary expandIcon={<ExpandMore />}>
+            <Typography fontWeight="600">Sort By</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <TextField
@@ -226,11 +220,12 @@ const FilterSidebar = ({
           </Stack>
         </AccordionDetails>
       </Accordion>
-      <Stack direction="row" spacing={2} sx={{ p: 2.5 }}>
+      </Box>
+      <Box sx={{ pt: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
         <Button variant="contained" onClick={() => onApply(localFilters)} fullWidth>
           Apply ({resultsCount} results)
         </Button>
-      </Stack>
+      </Box>
     </Stack>
   );
 };
@@ -472,22 +467,23 @@ const AccommodationsPage = () => {
 
           <Grid item xs={12} md={9}>
             <Stack spacing={3}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  display: "flex",
-                  gap: 2,
-                  position: "sticky",
-                  top: isMobile ? 60 : 80, // Adjust for mobile header
-                  bgcolor: "background.paper",
-                  zIndex: 10,
-                  border: isMobile ? `1px solid ${theme.palette.divider}` : "none",
-                  borderRadius: isMobile ? 2 : 0,
-                }}
-              >
-                <TextField
-                  fullWidth
+              <Slide appear={false} direction="down" in={!useScrollTrigger()}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    gap: 2,
+                    position: "sticky",
+                    top: isMobile ? 60 : 80, // Adjust for mobile header
+                    bgcolor: "background.paper",
+                    zIndex: 10,
+                    border: isMobile ? `1px solid ${theme.palette.divider}` : "none",
+                    borderRadius: isMobile ? 2 : 0,
+                  }}
+                >
+                  <TextField
+                    fullWidth
                   variant="outlined"
                   placeholder="Search by stay name or destination..."
                   value={filters.searchTerm}
@@ -515,7 +511,8 @@ const AccommodationsPage = () => {
                     <Tune />
                   </IconButton>
                 )}
-              </Paper>
+                </Paper>
+              </Slide>
 
               {activeFilters().length > 0 && (
                 <Stack
@@ -559,7 +556,7 @@ const AccommodationsPage = () => {
                         justifyContent: "center",
                       }}
                     >
-                      <AccommodationCardSkeleton />
+                      <StandardCardSkeleton />
                     </Grid>
                   ))}
                 </Grid>
@@ -579,7 +576,16 @@ const AccommodationsPage = () => {
                           justifyContent: "center",
                         }}
                       >
-                        <AccommodationCard accommodation={acc} />
+                          <StandardCard
+                            item={acc}
+                            itemType="Accommodation"
+                            title={acc.name}
+                            subtitle={acc.destination}
+                            imageUrl={acc.images?.[0]}
+                            tags={[acc.roomType]}
+                            price={`₹${acc.basePrice?.toLocaleString()}/night`}
+                            linkTo={`/accommodations/${acc._id}`}
+                          />
                       </Grid>
                     ))
                   ) : (
