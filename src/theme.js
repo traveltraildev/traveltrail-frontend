@@ -248,7 +248,7 @@ const theme = createTheme({
     MuiCard: { // For cards, if they are made focusable (e.g. for selection)
       styleOverrides: {
         root: {
-          borderRadius: '12px',
+          borderRadius: '0px',
           // If cards can be focusable (e.g., if they are links or part of a selection)
           // This is less common for a whole card to be focusable unless it acts as a single large button.
           // '&:focus-visible': {
