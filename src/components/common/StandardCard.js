@@ -61,7 +61,7 @@ const StandardCard = ({
   }
 
   return (
-    <Card sx={{ minWidth: 340, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: theme.shape.borderRadius, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, boxShadow: theme.shadows[3], position: 'relative' }}>
+    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: theme.shape.borderRadius, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, boxShadow: theme.shadows[3], position: 'relative' }}>
       {showWishlistButton && (
         <IconButton
           aria-label="add to wishlist"
@@ -85,6 +85,7 @@ const StandardCard = ({
         height="220"
         image={imageUrl || "/images/placeholder.jpg"}
         alt={title}
+        sx={{ objectFit: 'cover' }}
       />
       <CardContent sx={{ flexGrow: 1, p: 3 }}>
         <Typography variant="h6" component="h3" fontWeight="600" gutterBottom>{title}</Typography>
