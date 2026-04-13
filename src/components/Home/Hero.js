@@ -1,5 +1,5 @@
 // src/components/Home/Hero.js
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Box, Grid, Typography, TextField, Button, Paper } from "@mui/material";
 import ModeOfTravelIcon from "@mui/icons-material/ModeOfTravel";
 import HotelIcon from "@mui/icons-material/Hotel";

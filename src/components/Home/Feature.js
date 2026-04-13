@@ -46,7 +46,7 @@ const Feature = ({ title, data, type }) => {
                 sx={{
                   minWidth: "220px",
                   marginRight: "20px",
-                  borderRadius: "12px",
+                  borderRadius: "0px",
                   position: "relative",
                   overflow: "hidden",
                 }}

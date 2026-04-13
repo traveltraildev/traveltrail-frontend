@@ -13,7 +13,7 @@ const TripCardSkeleton = () => {
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: '12px', // Consistent with theme card styles
+        borderRadius: '0px', // Consistent with theme card styles
         overflow: 'hidden',
         bgcolor: theme.palette.background.paper,
         // Using a very light tint of secondary color for the skeleton background
