@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Container, Typography, Box, Card } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { tacPage } from "../endpoints";
+import { useNotification } from "../context/NotificationContext";
 
 const TermsAndConditionsPage = () => {
   const [pageContent, setPageContent] = useState(null);
   const isMobile = useMediaQuery("(max-width:600px)");
+  const { notify } = useNotification();
 
   useEffect(() => {
     fetch(tacPage)
@@ -20,10 +22,10 @@ const TermsAndConditionsPage = () => {
       })
       .catch((error) => {
         console.error("Error fetching Terms & Conditions content:", error);
-        alert("Error loading content from API. Check console.");
+        notify("Couldn't load page content. Please try again later.", "error");
       });
     window.scrollTo(0, 0);
-  }, []);
+  }, [notify]);
 
   if (!pageContent) {
     return <Typography>Loading Terms & Conditions content...</Typography>;

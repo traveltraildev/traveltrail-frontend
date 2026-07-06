@@ -15,7 +15,6 @@ const PrivacyPolicyPage = () => {
         const response = await fetch(`${BASE_URL}/api/cms/pages/${pageKey}`);
         if (!response.ok) {
            if (response.status === 404) {
-            console.log(`Content for ${pageKey} not found.`);
              setPageContent({ title: "Content Not Found", content: "<p>The content for this page is not available yet.</p>" });
            } else {
             throw new Error(`HTTP error! status: ${response.status}`);

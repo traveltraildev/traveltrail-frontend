@@ -6,7 +6,6 @@ const simulatedAPI = {
       setTimeout(() => {
         const content = cmsData[pageKey];
         if (content) {
-          console.log(`[Simulated API] Fetched content for page: ${pageKey}`, content);
           resolve({ data: content }); // Simulate successful API response with data
         } else {
           console.error(`[Simulated API] Page content not found for key: ${pageKey}`);
@@ -23,7 +22,6 @@ const simulatedAPI = {
         // For simulation, we'll just update the cmsData object in memory.
         if (cmsData[pageKey]) {
           cmsData[pageKey] = updatedContent;
-          console.log(`[Simulated API] Updated content for page: ${pageKey}`, cmsData[pageKey]);
           resolve({ message: "Content updated successfully." }); // Simulate successful API response
         } else {
           console.error(`[Simulated API] Page content not found for key: ${pageKey} (cannot update)`);

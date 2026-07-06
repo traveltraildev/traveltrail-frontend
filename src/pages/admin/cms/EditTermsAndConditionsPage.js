@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Container, Typography, TextField, Button, Box } from "@mui/material";
 import Navbar from "../../../components/common/Navbar";
-import Navbar2 from "../../../components/common/Navbar2";
 import Footer from "../../../components/common/Footer";
 import ReactQuill from "react-quill"; // Import ReactQuill
 import "react-quill/dist/quill.snow.css"; // Import Quill styles
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { getAdminAuthHeader } from "../../../utils";
 import { tacPage } from "../../../endpoints";
+import { useNotification } from "../../../context/NotificationContext";
 
 const EditTermsAndConditionsPage = () => {
   const [pageContent, setPageContent] = useState({ title: "", content: "" });
   const isMobile = useMediaQuery("(max-width:600px)");
+  const { notify } = useNotification();
 
   useEffect(() => {
     fetch(tacPage)
@@ -26,10 +27,10 @@ const EditTermsAndConditionsPage = () => {
       })
       .catch((error) => {
         console.error("Error fetching Terms & Conditions content:", error);
-        alert("Error loading content from API. Check console.");
+        notify("Couldn't load page content. Please try again later.", "error");
       });
     window.scrollTo(0, 0);
-  }, []);
+  }, [notify]);
 
   const handleChange = (e) => {
     setPageContent({ ...pageContent, [e.target.name]: e.target.value });
@@ -53,13 +54,13 @@ const EditTermsAndConditionsPage = () => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      alert("Terms & Conditions page content updated successfully via API!");
+      notify("Terms & Conditions page updated successfully!", "success");
     } catch (error) {
       console.error(
         "Error updating Terms & Conditions content via API:",
         error
       );
-      alert("Error updating content via API. Check console.");
+      notify("Couldn't save changes. Please try again.", "error");
     }
   };
 
@@ -98,7 +99,6 @@ const EditTermsAndConditionsPage = () => {
         </Box>
       </Container>
       <Footer />
-      {isMobile && <Navbar2 />}
     </>
   );
 };

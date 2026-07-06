@@ -18,6 +18,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import { getAllTrips } from "../endpoints";
+import { useNotification } from "../context/NotificationContext";
 
 const AdminTripsPage = () => {
   const [data, setData] = useState([]);
@@ -25,6 +26,7 @@ const AdminTripsPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const theme = useTheme();
+  const { notify } = useNotification();
 
   const columns = [
     {
@@ -50,6 +52,7 @@ const AdminTripsPage = () => {
             color="info"
             size="small"
             onClick={() => navigate(`/trips/${params.row.id}`)}
+            aria-label="View trip details"
           >
             <Tooltip title="View Details">
               <ViewIcon />
@@ -59,6 +62,7 @@ const AdminTripsPage = () => {
             color="primary"
             size="small"
             onClick={() => navigate(`/admin/edit-trip/${params.row.id}`)}
+            aria-label="Edit trip"
           >
             <Tooltip title="Edit Trip">
               <EditIcon />
@@ -68,6 +72,7 @@ const AdminTripsPage = () => {
             color="error"
             size="small"
             onClick={() => handleDelete(params.row.id)}
+            aria-label="Delete trip"
           >
             <Tooltip title="Delete Trip">
               <DeleteIcon />
@@ -92,7 +97,7 @@ const AdminTripsPage = () => {
         setData(prev => prev.filter(item => item.id !== id));
       } catch (error) {
         console.error("Error:", error);
-        alert("Failed to delete trip");
+        notify("Couldn't delete the trip. Please try again.", "error");
       }
     }
   };
@@ -210,13 +215,4 @@ const AdminTripsPage = () => {
                   },
                 }}
               />
-            </Box>
-          )}
-        </Paper>
-      </Container>
-      <Footer />
-    </>
-  );
-};
-
-export default AdminTripsPage;
+ 

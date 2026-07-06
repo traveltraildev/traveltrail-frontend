@@ -1,12 +1,13 @@
-// Replace the existing ContactUsPage component with this
 import React, { useEffect, useState } from "react";
 import { Container, Typography, Box, Card, CardContent } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { contactUsPage } from "../endpoints";
+import { useNotification } from "../context/NotificationContext";
 
 const ContactUsPage = () => {
   const [pageContent, setPageContent] = useState(null);
   const isMobile = useMediaQuery("(max-width:600px)");
+  const { notify } = useNotification();
 
   useEffect(() => {
     fetch(contactUsPage)
@@ -21,10 +22,10 @@ const ContactUsPage = () => {
       })
       .catch((error) => {
         console.error("Error fetching Contact Us content:", error);
-        alert("Error loading content from API. Check console.");
+        notify("Couldn't load page content. Please try again later.", "error");
       });
     window.scrollTo(0, 0);
-  }, []);
+  }, [notify]);
 
   if (!pageContent) {
     return <Typography>Loading Contact Us content...</Typography>;

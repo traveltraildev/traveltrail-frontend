@@ -1,26 +1,29 @@
 // src/components/common/Navbar.js
+// Single responsive navigation: top app bar (all screens) + bottom navigation on mobile.
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import { Link as RouterLink } from 'react-router-dom';
-import HamburgerMenu from './HamburgerMenu';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { styled, useTheme } from '@mui/material/styles';
-import { useAuth } from '../../context/AuthContext';
-import { useAdminAuth } from '../../context/AdminAuthContext';
+import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Button from '@mui/material/Button';
+import BottomNavigation from '@mui/material/BottomNavigation';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { styled, useTheme, alpha } from '@mui/material/styles';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
+import HomeIcon from '@mui/icons-material/Home';
+import ModeOfTravelIcon from '@mui/icons-material/ModeOfTravel';
+import HotelIcon from '@mui/icons-material/Hotel';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { useAuth } from '../../context/AuthContext';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'light' 
-    ? 'rgba(253, 216, 53, 0.7)' 
-    : 'rgba(0, 0, 0, 0.75)',
+  backgroundColor: alpha(theme.palette.secondary.main, 0.85),
   backdropFilter: 'blur(8px)',
   borderBottom: `1px solid ${theme.palette.divider}`,
-  color: theme.palette.getContrastText('#fdd835b3'),
+  color: theme.palette.secondary.contrastText,
   boxShadow: 'none',
   transition: 'all 0.3s ease',
 }));
@@ -29,168 +32,224 @@ const Logo = styled(Box)(({ theme }) => ({
   width: '140px',
   minWidth: '140px',
   height: '44px',
-  marginLeft: 0,
-  marginRight: theme.spacing(2),
-  paddingLeft: 0,
-  position: 'absolute', // Force logo to left edge
-  left: 0,
-  top: '50%',
-  transform: 'translateY(-50%)',
+  display: 'flex',
+  alignItems: 'center',
   transition: 'transform 0.3s ease',
   '&:hover': {
-    transform: 'scale(1.02)'
-  }
+    transform: 'scale(1.02)',
+  },
 }));
 
-export default function Navbar() {
-  const isSmallScreen = useMediaQuery('(max-width:768px)');
-  const { isAuthenticated: isUserAuthenticated } = useAuth();
-  const { isAdminAuthenticated } = useAdminAuth();
-  const theme = useTheme();
-  const [tripMenuAnchorEl, setTripMenuAnchorEl] = React.useState(null);
+// Shared underline-on-hover style for top nav links
+const navLinkSx = (theme) => ({
+  fontWeight: 600,
+  position: 'relative',
+  paddingBottom: '4px',
+  overflow: 'hidden',
+  '&:hover': {
+    backgroundColor: 'transparent',
+    transform: 'none',
+    color: theme.palette.text.primary,
+    '&::after': {
+      transform: 'scaleX(1)',
+      transformOrigin: 'bottom left',
+    },
+  },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    left: '8px',
+    right: '8px',
+    bottom: '2px',
+    height: '2px',
+    backgroundColor: theme.palette.accent.main,
+    transform: 'scaleX(0)',
+    transformOrigin: 'bottom left',
+    transition: 'transform 0.25s ease-out',
+  },
+});
 
-  const handleTripMenuOpen = (event) => {
-    setTripMenuAnchorEl(event.currentTarget);
+const StyledBottomNavigation = styled(BottomNavigation)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: theme.shadows[4],
+  borderTop: `1px solid ${theme.palette.divider}`,
+  borderTopLeftRadius: '10px',
+  borderTopRightRadius: '10px',
+  height: '60px',
+  display: 'flex',
+  justifyContent: 'space-around',
+  position: 'fixed',
+  bottom: 0,
+  width: '100%',
+  zIndex: theme.zIndex.appBar,
+}));
+
+function MobileBottomNav() {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const [value, setValue] = React.useState('home');
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
+
+  React.useEffect(() => {
+    const path = location.pathname;
+    if (path === '/') {
+      setValue('home');
+    } else if (path.startsWith('/trips')) {
+      setValue('trips');
+    } else if (path.startsWith('/accommodations')) {
+      setValue('stays');
+    } else if (
+      ['/about-us', '/contact-us', '/terms-and-conditions', '/login', '/profile', '/logout'].includes(path)
+    ) {
+      setValue('more');
+    }
+  }, [location.pathname]);
+
+  const handleMoreClick = (event) => {
+    setAnchorEl(event.currentTarget);
+    setValue('more');
   };
 
-  const handleTripMenuClose = () => {
-    setTripMenuAnchorEl(null);
-  };
+  const handleMoreClose = () => setAnchorEl(null);
 
   return (
-    <Box
-      sx={{
-        flexGrow: 1,
-        position: 'fixed',
-        zIndex: (theme) => theme.zIndex.drawer + 2,
-        width: '100%',
-        top: 0,
-      }}
+    <StyledBottomNavigation
+      component="nav"
+      aria-label="Primary mobile navigation"
+      showLabels
+      value={value}
+      onChange={(event, newValue) => setValue(newValue)}
     >
-      <StyledAppBar position="static">
-        <Toolbar sx={{ 
-          px: 0,
-          pl: 0,
-          minHeight: '68px',
-          position: 'relative', // Allow absolute positioning of logo
-        }}>
-          <RouterLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <Logo>
-              <img
-                src="/images/mainLogo.svg"
-                alt="Travel Trail"
-                style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  objectFit: 'contain',
-                  filter: theme.palette.mode === 'dark' ? 'invert(1)' : 'none'
-                }}
-              />
-            </Logo>
-          </RouterLink>
+      <BottomNavigationAction
+        label="Home"
+        value="home"
+        icon={<HomeIcon />}
+        component={RouterLink}
+        to="/"
+        sx={{ '& .MuiBottomNavigationAction-label': { mt: 1 } }}
+      />
+      <BottomNavigationAction
+        label="Trips"
+        value="trips"
+        icon={<ModeOfTravelIcon />}
+        component={RouterLink}
+        to="/trips"
+        sx={{ '& .MuiBottomNavigationAction-label': { mt: 1 } }}
+      />
+      <BottomNavigationAction
+        label="Stays"
+        value="stays"
+        icon={<HotelIcon />}
+        component={RouterLink}
+        to="/accommodations"
+        sx={{ '& .MuiBottomNavigationAction-label': { mt: 1 } }}
+      />
+      <BottomNavigationAction
+        label="More"
+        value="more"
+        icon={<MoreHorizIcon />}
+        onClick={handleMoreClick}
+        id="more-button"
+        aria-haspopup="true"
+        aria-expanded={open}
+        aria-controls={open ? 'more-menu' : undefined}
+        sx={{ '& .MuiBottomNavigationAction-label': { mt: 1 } }}
+      />
+      <Menu
+        id="more-menu"
+        aria-labelledby="more-button"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleMoreClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: '8px',
+              border: (theme) => `1px solid ${theme.palette.divider}`,
+              minWidth: '160px',
+            },
+          },
+        }}
+      >
+        <MenuItem onClick={handleMoreClose} component={RouterLink} to="/about-us">About Us</MenuItem>
+        <MenuItem onClick={handleMoreClose} component={RouterLink} to="/contact-us">Contact Us</MenuItem>
+        <MenuItem onClick={handleMoreClose} component={RouterLink} to="/terms-and-conditions">Terms & Conditions</MenuItem>
+        {isAuthenticated ? (
+          [
+            <MenuItem key="profile" onClick={handleMoreClose} component={RouterLink} to="/profile">Profile</MenuItem>,
+            <MenuItem key="logout" onClick={handleMoreClose} component={RouterLink} to="/logout">Logout</MenuItem>,
+          ]
+        ) : (
+          <MenuItem onClick={handleMoreClose} component={RouterLink} to="/login">Login</MenuItem>
+        )}
+      </Menu>
+    </StyledBottomNavigation>
+  );
+}
 
-          <Box sx={{ flexGrow: 1 }} />
+export default function Navbar() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isAuthenticated: isUserAuthenticated } = useAuth();
+  const { isAdminAuthenticated } = useAdminAuth();
 
-          <Box sx={{ 
-            display: { xs: 'none', md: 'flex' }, 
-            gap: theme.spacing(3),
-            alignItems: 'center'
-          }}>
-            <Button
-              variant="text"
-              color="inherit"
-              component={RouterLink}
-              to="/trips"
+  return (
+    <>
+      <Box
+        component="header"
+        sx={{
+          position: 'fixed',
+          zIndex: theme.zIndex.drawer + 2,
+          width: '100%',
+          top: 0,
+        }}
+      >
+        <StyledAppBar position="static">
+          <Toolbar sx={{ minHeight: '68px', px: 2 }}>
+            <RouterLink to="/" style={{ textDecoration: 'none', color: 'inherit' }} aria-label="Travel Trail home">
+              <Logo>
+                <img
+                  src="/images/mainLogo.svg"
+                  alt="Travel Trail"
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                />
+              </Logo>
+            </RouterLink>
+
+            <Box sx={{ flexGrow: 1 }} />
+
+            <Box
+              component="nav"
+              aria-label="Primary navigation"
               sx={{
-                fontWeight: 600,
-                position: 'relative', // Required for the pseudo-element
-                paddingBottom: '4px', // Space for the underline
-                overflow: 'hidden', // Prevent issues with scaling if any text overflows
-                '&:hover': {
-                  backgroundColor: 'transparent', // Assuming no background color change on hover for these links
-                  transform: 'none', // Override the global button theme's hover scale effect
-                  color: (theme) => theme.palette.text.primary, // Ensure text color remains consistent or as desired
-                  '&::after': {
-                    transform: 'scaleX(1)', // Show underline on hover
-                    transformOrigin: 'bottom left',
-                  }
-                },
-                '&::after': {
-                  content: '""',
-                  position: 'absolute',
-                  left: '8px', // Adjust to align with button padding
-                  right: '8px', // Adjust to align with button padding
-                  bottom: '2px', // Adjust vertical position of underline
-                  height: '2px', // Thickness of the underline
-                  backgroundColor: (theme) => theme.palette.accent.main, // Use accent color from theme
-                  transform: 'scaleX(0)', // Initially hidden
-                  transformOrigin: 'bottom left',
-                  transition: 'transform 0.25s ease-out', // Animation for the underline
-                }
+                display: { xs: 'none', md: 'flex' },
+                gap: theme.spacing(3),
+                alignItems: 'center',
               }}
             >
-              Trips
-            </Button>
-            
-            <RouterLink to="/accommodations" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <Button 
-                variant="text" 
-                color="inherit" 
-                sx={{
-                  fontWeight: 600,
-                  position: 'relative', // Required for the pseudo-element
-                  paddingBottom: '4px', // Space for the underline
-                  overflow: 'hidden', // Prevent issues with scaling if any text overflows
-                  '&:hover': {
-                    backgroundColor: 'transparent', // Assuming no background color change on hover for these links
-                    transform: 'none', // Override the global button theme's hover scale effect
-                    color: (theme) => theme.palette.text.primary, // Ensure text color remains consistent or as desired
-                    '&::after': {
-                      transform: 'scaleX(1)', // Show underline on hover
-                      transformOrigin: 'bottom left',
-                    }
-                  },
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    left: '8px', // Adjust to align with button padding
-                    right: '8px', // Adjust to align with button padding
-                    bottom: '2px', // Adjust vertical position of underline
-                    height: '2px', // Thickness of the underline
-                    backgroundColor: (theme) => theme.palette.accent.main, // Use accent color from theme
-                    transform: 'scaleX(0)', // Initially hidden
-                    transformOrigin: 'bottom left',
-                    transition: 'transform 0.25s ease-out', // Animation for the underline
-                  }
-                }}
-              >
+              <Button variant="text" color="inherit" component={RouterLink} to="/trips" sx={navLinkSx(theme)}>
+                Trips
+              </Button>
+              <Button variant="text" color="inherit" component={RouterLink} to="/accommodations" sx={navLinkSx(theme)}>
                 Accommodations
               </Button>
-            </RouterLink>
-            {(isUserAuthenticated || isAdminAuthenticated) ? (
-              <RouterLink to="/logout" style={{ textDecoration: 'none' }}>
-                <Button 
-                  variant="contained" // Changed
-                  color="primary" // Changed
-                  // Removed sx props
-                >
+              {isUserAuthenticated || isAdminAuthenticated ? (
+                <Button variant="contained" color="primary" component={RouterLink} to="/logout">
                   Logout
                 </Button>
-              </RouterLink>
-            ) : (
-              <RouterLink to="/login" style={{ textDecoration: 'none' }}>
-                <Button 
-                  variant="outlined" // Changed
-                  color="primary" // Changed
-                  // Removed sx props
-                >
+              ) : (
+                <Button variant="outlined" color="primary" component={RouterLink} to="/login">
                   Login
                 </Button>
-              </RouterLink>
-            )}
-          </Box>
-        </Toolbar>
-      </StyledAppBar>
-    </Box>
+              )}
+            </Box>
+          </Toolbar>
+        </StyledAppBar>
+      </Box>
+      {isMobile && <MobileBottomNav />}
+    </>
   );
 }

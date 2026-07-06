@@ -11,11 +11,13 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { getAllAccommodations } from "../../../endpoints";
+import { useNotification } from "../../../context/NotificationContext";
 
 const EditAccomodation = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
+  const { notify } = useNotification();
 
   // Fetch Accommodation
 
@@ -39,10 +41,10 @@ const EditAccomodation = () => {
       })
       .catch((error) => {
         console.error("Error fetching trip details:", error);
-        alert("Error loading trip details. Check console.");
+        notify("Couldn't load accommodation details. Please try again later.", "error");
       });
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [id, notify]);
 
   const [formData, setFormData] = useState({
     name: accommodation?.name || "",
@@ -165,7 +167,7 @@ const EditAccomodation = () => {
 
       navigate("/admin/accommodations");
     } catch (error) {
-      alert(error.message);
+      notify(error.message || "Couldn't update the accommodation. Please try again.", "error");
     } finally {
       setLoading(false);
     }

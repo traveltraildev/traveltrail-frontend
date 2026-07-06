@@ -15,7 +15,6 @@ const AdminLoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Executing AdminLoginPage handleSubmit'); // Add this
     setError(null);
 
     try {

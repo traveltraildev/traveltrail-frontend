@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { adminLoginPath, BASE_URL } from "../endpoints";
+import { adminLoginPath, adminCheckout } from "../endpoints";
 
 const checkAdminAuth = async (setAdminAuthState) => {
   const token = localStorage.getItem("adminToken");
@@ -10,8 +10,7 @@ const checkAdminAuth = async (setAdminAuthState) => {
   }
 
   try {
-    const response = await fetch("/api/admin/check-auth", {
-      // Adjust endpoint as needed
+    const response = await fetch(adminCheckout, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",

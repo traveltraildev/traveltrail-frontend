@@ -69,7 +69,7 @@ const TripInfo = ({ trip }) => {
                 label={theme}
                 size="small"
                 sx={{
-                  bgcolor: "#94eff7",
+                  bgcolor: "accent.light",
                   color: "primary.main",
                   fontWeight: 500,
                   fontSize: "0.9rem",
@@ -112,7 +112,7 @@ const TripInfo = ({ trip }) => {
                 label={inclusion}
                 size="small"
                 sx={{
-                  bgcolor: "#94eff7",
+                  bgcolor: "accent.light",
                   color: "primary.main",
                   fontWeight: 500,
                   fontSize: "0.9rem",
@@ -143,7 +143,7 @@ const TripInfo = ({ trip }) => {
                 label={exclusion}
                 size="small"
                 sx={{
-                  bgcolor: "#fac5aa",
+                  bgcolor: "secondary.light",
                   
                   color: "error.main",
                   fontWeight: 500,

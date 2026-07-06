@@ -46,7 +46,7 @@ const ThemeTripsPage = () => {
   }, [themeName, page]);
 
   return (
-    <Box sx={{ p: "100px 7%", backgroundColor: "#f5f5f5" }}>
+    <Box sx={{ p: "100px 7%", backgroundColor: "grey.50" }}>
       <Box sx={{ textAlign: "center", mb: 4 }}>
         <Typography
           variant="h2"

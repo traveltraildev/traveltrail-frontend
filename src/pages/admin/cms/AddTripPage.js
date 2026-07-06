@@ -1,4 +1,3 @@
-// --- START OF FILE src/pages/admin/cms/AddTripPage.js ---
 import React, { useState } from "react";
 import {
   Container,
@@ -13,12 +12,12 @@ import {
   Checkbox,
 } from "@mui/material";
 import Navbar from "../../../components/common/Navbar";
-import Navbar2 from "../../../components/common/Navbar2";
 import Footer from "../../../components/common/Footer";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useNavigate } from "react-router-dom";
 import ItineraryDayForm from "./ItineraryDayForm";
 import { getAllTrips } from "../../../endpoints";
+import { useNotification } from "../../../context/NotificationContext";
 
 // Define options for Autocomplete components
 const themeOptions = [
@@ -75,6 +74,7 @@ const AddTripPage = ({ isMobile }) => {
   const [loading, setLoading] = useState(false);
   const [itenaryDays, setItenaryDays] = useState([0]);
   const navigate = useNavigate();
+  const { notify } = useNotification();
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({
@@ -108,19 +108,6 @@ const AddTripPage = ({ isMobile }) => {
       return { ...prev, itineraries: updatedItineraries };
     });
   };
-
-  // const handleRemoveHighlight = (dayIndex, highlightText) => {
-  //   setFormData((prev) => {
-  //     const updatedItineraries = [...prev.itineraries];
-  //     const day = updatedItineraries[dayIndex];
-  //     if (day) {
-  //       day.highlights =
-  //         day.highlights?.filter((highlight) => highlight !== highlightText) ||
-  //         [];
-  //     }
-  //     return { ...prev, itineraries: updatedItineraries };
-  //   });
-  // };
 
   const handleAddDay = () => {
     setItenaryDays((prev) => [...prev, prev.length]);
@@ -162,10 +149,10 @@ const AddTripPage = ({ isMobile }) => {
       }
 
       const data = await response.json();
-      alert("Trip added successfully!");
+      notify("Trip added successfully!", "success");
       navigate(`/admin/cms/trips-list`);
     } catch (error) {
-      alert(`Error adding trip: ${error.message}`);
+      notify("Couldn't add the trip. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -411,10 +398,8 @@ const AddTripPage = ({ isMobile }) => {
         </form>
       </Container>
       <Footer />
-      {isMobile && <Navbar2 />}
     </>
   );
 };
 
 export default AddTripPage;
-// --- END OF FILE src/pages/admin/cms/AddTripPage.js ---

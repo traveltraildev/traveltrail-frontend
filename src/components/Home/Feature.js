@@ -10,10 +10,6 @@ const Feature = ({ title, data, type }) => {
   const scrollRef = useRef(null);
   const scrollAmount = 150;
 
-  useEffect(() => {
-    console.log(`${title} Data:`, data); // Log the data being passed
-  }, [data]);
-
   const handleNext = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollLeft += scrollAmount;
@@ -32,7 +28,7 @@ const Feature = ({ title, data, type }) => {
         {title}
       </Typography>
       <Box sx={{ display: "flex", alignItems: "center" }}>
-        <IconButton onClick={handlePrev} disabled={!scrollRef.current?.scrollLeft}>
+        <IconButton onClick={handlePrev} disabled={!scrollRef.current?.scrollLeft} aria-label="Scroll back">
           <ArrowBackIosNewIcon />
         </IconButton>
         <Box className="imageCard" ref={scrollRef}>
@@ -52,8 +48,8 @@ const Feature = ({ title, data, type }) => {
                 }}
               >
                 <img
-                  src={item.images[0]} 
-                  alt={`img-${id}`} 
+                  src={item.images?.[0]}
+                  alt={item.name || `Featured ${type === 'trips' ? 'trip' : 'stay'}`}
                   style={{
                     height: "178px",
                     width: "100%",
@@ -78,7 +74,7 @@ const Feature = ({ title, data, type }) => {
             </Link>
           ))}
         </Box>
-        <IconButton onClick={handleNext}>
+        <IconButton onClick={handleNext} aria-label="Scroll forward">
           <ArrowForwardIosIcon />
         </IconButton>
       </Box>

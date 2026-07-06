@@ -28,9 +28,11 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import Skeleton from '@mui/material/Skeleton';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { Link } from 'react-router-dom';
 import { BASE_URL } from '../endpoints';
+import { getAdminAuthHeader } from '../utils';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -46,37 +48,32 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAdminAuthenticated) {
-      window.location.href = '/admin/login';
-      return;
-    }
+    // Route access is enforced by RequireAuth; skip fetching until authenticated.
+    if (!isAdminAuthenticated) return;
+
+    const asArray = (value) => (Array.isArray(value) ? value : value?.data || []);
 
     const fetchAdminData = async () => {
+      const headers = { ...getAdminAuthHeader() };
+      const fetchJson = async (path) => {
+        const response = await fetch(`${BASE_URL}${path}`, { headers });
+        if (!response.ok) throw new Error(`Failed to fetch ${path}`);
+        return response.json();
+      };
+
       try {
-        // Fetch bookings
-        const bookingsResponse = await fetch('/api/bookings');
-        if (!bookingsResponse.ok) throw new Error('Failed to fetch bookings');
-        const bookingsData = await bookingsResponse.json();
-        setBookings(bookingsData);
+        const [bookingsData, usersData, tripsData, accommodationsData] =
+          await Promise.allSettled([
+            fetchJson('/api/bookings'),
+            fetchJson('/api/users'),
+            fetchJson('/api/trips'),
+            fetchJson('/api/accommodations'),
+          ]);
 
-        // Fetch users
-        const usersResponse = await fetch('/api/users');
-        if (!usersResponse.ok) throw new Error('Failed to fetch users');
-        const usersData = await usersResponse.json();
-        setUsers(usersData);
-
-        // Fetch trips
-        const tripsResponse = await fetch('/api/trips');
-        if (!tripsResponse.ok) throw new Error('Failed to fetch trips');
-        const tripsData = await tripsResponse.json();
-        setTrips(tripsData);
-
-        // Fetch accommodations
-        const accommodationsResponse = await fetch(`${BASE_URL}/api/accommodations`);
-        if (!accommodationsResponse.ok) throw new Error('Failed to fetch accommodations');
-        const accommodationsData = await accommodationsResponse.json();
-        setAccommodations(accommodationsData.data);
-
+        if (bookingsData.status === 'fulfilled') setBookings(asArray(bookingsData.value));
+        if (usersData.status === 'fulfilled') setUsers(asArray(usersData.value));
+        if (tripsData.status === 'fulfilled') setTrips(asArray(tripsData.value));
+        if (accommodationsData.status === 'fulfilled') setAccommodations(asArray(accommodationsData.value));
       } catch (error) {
         console.error('Error fetching admin data:', error);
       } finally {
@@ -218,9 +215,18 @@ const Dashboard = () => {
       </Box>
 
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <Typography>Loading dashboard data...</Typography>
-        </Box>
+        <Grid container spacing={4}>
+          {[...Array(4)].map((_, i) => (
+            <Grid item xs={12} md={3} key={i}>
+              <Skeleton variant="rounded" height={100} />
+            </Grid>
+          ))}
+          {[...Array(4)].map((_, i) => (
+            <Grid item xs={12} md={6} key={`table-${i}`}>
+              <Skeleton variant="rounded" height={280} />
+            </Grid>
+          ))}
+        </Grid>
       ) : (
         <Grid container spacing={4}>
           {/* Stats Cards */}
@@ -287,8 +293,8 @@ const Dashboard = () => {
                       {bookings.slice(0, 5).map(booking => (
                         <TableRow key={booking.id}>
                           <TableCell>{booking.id}</TableCell>
-                          <TableCell>{booking.user.name}</TableCell>
-                          <TableCell>{booking.trip.name}</TableCell>
+                          <TableCell>{booking.user?.name || '—'}</TableCell>
+                          <TableCell>{booking.trip?.name || '—'}</TableCell>
                           <TableCell>{new Date(booking.bookingDate).toLocaleDateString()}</TableCell>
                           <TableCell>
                             <Chip
@@ -422,8 +428,6 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           </Grid>
-
-          // ...existing code...
         </Grid>
       )}
     </Container>

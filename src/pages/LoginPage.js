@@ -1,62 +1,90 @@
 import React, { useState } from 'react';
-import { Container, Typography, Box, TextField, Button, Link } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import {
+  Container,
+  Typography,
+  Box,
+  TextField,
+  Button,
+  Alert,
+  CircularProgress,
+  Link as MuiLink,
+} from '@mui/material';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-  });
+  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [fieldErrors, setFieldErrors] = useState({});
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth(); // Access login via useAuth
+  const location = useLocation();
+  const { login } = useAuth();
+
+  const validate = () => {
+    const errors = {};
+    if (!formData.username.trim()) errors.username = 'Username is required';
+    if (!formData.password) errors.password = 'Password is required';
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleChange = (field) => (e) => {
+    setFormData({ ...formData, [field]: e.target.value });
+    if (fieldErrors[field]) setFieldErrors({ ...fieldErrors, [field]: undefined });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    if (!validate()) return;
 
+    setSubmitting(true);
     try {
-      const success = await login(formData.username, formData.password, false);
+      const success = await login(formData.username, formData.password);
       if (success) {
-        navigate('/profile');
+        const from = location.state?.from?.pathname || '/profile';
+        navigate(from, { replace: true });
       } else {
-        setError('Invalid credentials or login failed');
+        setError('Invalid username or password. Please try again.');
       }
-    } catch (error) {
+    } catch (err) {
       setError('Login failed. Please try again.');
-      console.error('Login error:', error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 8 }}>
+    <Container component="main" maxWidth="sm" sx={{ pt: 14, pb: 8 }}>
       <Box
+        component="form"
+        onSubmit={handleSubmit}
+        noValidate
         sx={{
-          backgroundColor: 'var(--neutral-50)',
+          backgroundColor: 'background.paper',
           p: 4,
           borderRadius: '12px',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          boxShadow: 2,
           display: 'flex',
           flexDirection: 'column',
           gap: 3,
         }}
       >
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'var(--primary-500)' }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           User Login
         </Typography>
 
-        {error && (
-          <Typography color="error" sx={{ mt: 2 }}>
-            {error}
-          </Typography>
-        )}
+        {error && <Alert severity="error">{error}</Alert>}
 
         <TextField
           fullWidth
           label="Username"
+          autoComplete="username"
           value={formData.username}
-          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+          onChange={handleChange('username')}
+          error={Boolean(fieldErrors.username)}
+          helperText={fieldErrors.username}
           required
         />
 
@@ -64,36 +92,37 @@ const LoginPage = () => {
           fullWidth
           label="Password"
           type="password"
+          autoComplete="current-password"
           value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          onChange={handleChange('password')}
+          error={Boolean(fieldErrors.password)}
+          helperText={fieldErrors.password}
           required
         />
 
         <Button
           type="submit"
           variant="contained"
-          onClick={handleSubmit}
-          sx={{
-            bgcolor: 'var(--primary-500)',
-            '&:hover': { bgcolor: 'var(--primary-600)' },
-            py: 1.5,
-          }}
+          color="primary"
+          disabled={submitting}
+          startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : null}
+          sx={{ py: 1.5 }}
         >
-          Login
+          {submitting ? 'Logging in…' : 'Login'}
         </Button>
 
-        <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
-          Need to Join Trishelta?{' '}
-          <Link href="/register" sx={{ color: 'var(--primary-500)' }}>
+        <Typography variant="body2" sx={{ textAlign: 'center' }}>
+          New here?{' '}
+          <MuiLink component={RouterLink} to="/register" sx={{ color: 'primary.main', fontWeight: 500 }}>
             Sign Up
-          </Link>
+          </MuiLink>
         </Typography>
 
-        <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
+        <Typography variant="body2" sx={{ textAlign: 'center' }}>
           Need to login as an admin?{' '}
-          <Link href="/admin/login" sx={{ color: 'var(--primary-500)' }}>
+          <MuiLink component={RouterLink} to="/admin/login" sx={{ color: 'primary.main', fontWeight: 500 }}>
             Admin Login
-          </Link>
+          </MuiLink>
         </Typography>
       </Box>
     </Container>

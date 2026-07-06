@@ -40,8 +40,7 @@ const palette = {
 // Define typography
 const typography = {
   fontFamily: [
-    'Circular STD', // Primary font
-    'Inter',        // Fallback font
+    'Inter', // Primary font (loaded in public/index.html)
     '-apple-system',
     'BlinkMacSystemFont',
     '"Segoe UI"',

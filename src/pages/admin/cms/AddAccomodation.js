@@ -1,4 +1,3 @@
-// Replace the existing AddAccommodation component with this
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,10 +10,12 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { getAllAccommodations } from "../../../endpoints";
+import { useNotification } from "../../../context/NotificationContext";
 
 const AddAccommodation = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const { notify } = useNotification();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -92,7 +93,7 @@ const AddAccommodation = () => {
 
       navigate("/admin/accommodations");
     } catch (error) {
-      alert(error.message);
+      notify(error.message || "Couldn't add the accommodation. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -257,8 +258,8 @@ const AddAccommodation = () => {
               sx={{
                 mt: 2,
                 py: 1.5,
-                bgcolor: "#1976d2",
-                "&:hover": { bgcolor: "#115293" },
+                bgcolor: "primary.main",
+                "&:hover": { bgcolor: "primary.dark" },
               }}
             >
               {loading ? "Submitting..." : "Add Accommodation"}

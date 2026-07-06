@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Container, Typography, TextField, Button, Box } from "@mui/material";
 import Navbar from "../../../components/common/Navbar";
-import Navbar2 from "../../../components/common/Navbar2";
 import Footer from "../../../components/common/Footer";
 import ReactQuill from "react-quill"; // Import ReactQuill
 import "react-quill/dist/quill.snow.css"; // Import Quill styles
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { getAdminAuthHeader } from "../../../utils";
 import { aboutUsPage } from "../../../endpoints";
+import { useNotification } from "../../../context/NotificationContext";
 
 const EditAboutUsPage = () => {
   const [pageContent, setPageContent] = useState({ title: "", content: "" });
   const isMobile = useMediaQuery("(max-width:600px)");
+  const { notify } = useNotification();
 
   useEffect(() => {
     fetch(aboutUsPage)
@@ -26,10 +27,10 @@ const EditAboutUsPage = () => {
       })
       .catch((error) => {
         console.error("Error fetching About Us content:", error);
-        alert("Error loading content from API. Check console.");
+        notify("Couldn't load page content. Please try again later.", "error");
       });
     window.scrollTo(0, 0);
-  }, []);
+  }, [notify]);
 
   const handleChange = (e) => {
     setPageContent((prevData) => ({
@@ -59,10 +60,10 @@ const EditAboutUsPage = () => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      alert("About Us page content updated successfully via API!");
+      notify("About Us page updated successfully!", "success");
     } catch (error) {
       console.error("Error updating About Us content via API:", error);
-      alert("Error updating content via API. Check console.");
+      notify("Couldn't save changes. Please try again.", "error");
     }
   };
 
@@ -101,7 +102,6 @@ const EditAboutUsPage = () => {
         </Box>
       </Container>
       <Footer />
-      {isMobile && <Navbar2 />}
     </>
   );
 };

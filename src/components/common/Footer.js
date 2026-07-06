@@ -58,8 +58,8 @@ const Footer = () => {
             <Link component={RouterLink} to="/" style={{ textDecoration: "none" }}>
               <Logo>
                 <img
-                  src="../../images/mainLogo.svg"
-                  alt="Trishelta Logo"
+                  src="/images/mainLogo.svg"
+                  alt="Travel Trail"
                   style={{ width: "100%", height: "100%", objectFit: "contain" }}
                 />
               </Logo>

@@ -26,17 +26,16 @@ import {
   Star as RatingIcon,
   BusinessCenter,
 } from "@mui/icons-material";
-// Add at top with other imports
 import PlaceIcon from '@mui/icons-material/Place';
-import CheckCircle from '@mui/icons-material/CheckCircle'; 
+import CheckCircle from '@mui/icons-material/CheckCircle';
 import Cancel from '@mui/icons-material/Cancel';
-
-
+import { useNotification } from "../context/NotificationContext";
 
 const AccommodationDetailsPage = ({ isMobile }) => {
   const { id } = useParams();
   const [accommodation, setAccommodation] = useState(null);
   const theme = useTheme();
+  const { notify } = useNotification();
 
   useEffect(() => {
     fetch(`${getAllAccommodations}/${id}`)
@@ -47,10 +46,10 @@ const AccommodationDetailsPage = ({ isMobile }) => {
       .then((data) => setAccommodation(data))
       .catch((error) => {
         console.error("Error fetching accommodation details:", error);
-        alert("Error loading accommodation details. Check console.");
+        notify("Couldn't load accommodation details. Please try again later.", "error");
       });
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [id, notify]);
 
   if (!accommodation) return <Skeleton variant="rectangular" height="100vh" />;
 

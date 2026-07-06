@@ -25,7 +25,7 @@ const AccommodationCard = ({ trip }) => {
         // Removed borderRadius from here, card itself will clip if needed, or theme.shape.borderRadius can be used if image container needs specific rounding
       }}>
         <img
-          src={trip?.images[0] || '/images/defaultImg.png'} // Fallback image
+          src={trip?.images?.[0] || '/images/defaultImg.png'} // Fallback image
           alt={trip?.name}
           style={{
             position: 'absolute',

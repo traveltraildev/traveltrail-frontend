@@ -65,7 +65,7 @@ const StickyTripTitle = ({ trip }) => {
           fontWeight: 800,
           fontSize: { xs: "0.95rem", sm: "1.1rem" },
           lineHeight: 1.2,
-          background: "linear-gradient(45deg, #FB8C00 30%, #FFA726 90%)",
+          background: "linear-gradient(45deg, #D5614A 30%, #E48C7A 90%)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           textAlign: "center",
@@ -90,7 +90,7 @@ const StickyTripTitle = ({ trip }) => {
       <Typography
         variant="subtitle1"
         sx={{
-          color: "#ff6f00",
+          color: "primary.main",
           fontWeight: 700,
           fontSize: { xs: "0.875rem", sm: "0.95rem" },
           whiteSpace: "nowrap",
@@ -197,7 +197,7 @@ export default StickyTripTitle;
 //       <Typography
 //         variant="subtitle1"
 //         sx={{
-//           color: "#ff6f00",
+//           color: "primary.main",
 //           fontWeight: 700,
 //           fontSize: { xs: "0.875rem", sm: "0.95rem" },
 //           whiteSpace: "nowrap",

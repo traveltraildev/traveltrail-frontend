@@ -76,7 +76,7 @@ const StickyAccommodationTitle = ({ accommodation }) => {
           fontWeight: 800,
           fontSize: { xs: "0.85rem", sm: "1.1rem" },
           lineHeight: 1.2,
-          background: "linear-gradient(45deg, #00BFA5 30%, #00E676 90%)",
+          background: "linear-gradient(45deg, #6A8E9A 30%, #8FB0BB 90%)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           px: { xs: 0.5, sm: 1 },

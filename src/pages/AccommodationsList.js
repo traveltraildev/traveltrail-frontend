@@ -58,6 +58,7 @@ const AccommodationsList = () => {
             color="info"
             size="small"
             onClick={() => handleView(params.row._id)}
+            aria-label="View accommodation details"
           >
             <Tooltip title="View Details" arrow>
               <ViewIcon />
@@ -67,6 +68,7 @@ const AccommodationsList = () => {
             color="primary"
             size="small"
             onClick={() => handleEdit(params.row._id)}
+            aria-label="Edit accommodation"
           >
             <Tooltip title="Edit Accommodation" arrow>
               <EditIcon />
@@ -76,6 +78,7 @@ const AccommodationsList = () => {
             color="error"
             size="small"
             onClick={() => handleDelete(params.row._id)}
+            aria-label="Delete accommodation"
           >
             <Tooltip title="Delete Accommodation" arrow>
               <DeleteIcon />

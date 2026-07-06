@@ -1,26 +1,33 @@
-/* index.css */
+/* index.css — CSS variables aligned with the MUI theme (src/theme.js) */
 :root {
-  --primary-100: #fff8e1; /* Lightest orange */
-  --primary-200: #ffecb3;
-  --primary-300: #ffe082;
-  --primary-400: #ffd54f;
-  --primary-500: #ffc107; /* Main orange */
-  --primary-600: #ffb300;
-  --primary-700: #ffa000;
-  --primary-800: #ff8f00;
-  --primary-900: #ff6f00;
+  /* Primary — brand coral (#D5614A) */
+  --primary-100: #fbeae6;
+  --primary-200: #f4cdc5;
+  --primary-300: #ebab9e;
+  --primary-400: #e48c7a;
+  --primary-500: #d5614a;
+  --primary-600: #c04a34;
+  --primary-700: #a83e2b;
+  --primary-800: #8c3323;
+  --primary-900: #6e271b;
 
-  --secondary-100: #fffde7; /* Lightest yellow */
-  --secondary-200: #fff9c4;
-  --secondary-300: #fff59d;
-  --secondary-400: #fff176;
-  --secondary-500: #ffeb3b; /* Main yellow */
-  --secondary-600: #fdd835;
-  --secondary-700: #fbc02d;
-  --secondary-800: #f9a825;
-  --secondary-900: #f57f17;
+  /* Secondary — brand yellow (#F1CC5A) */
+  --secondary-100: #fdf7e3;
+  --secondary-200: #faedc0;
+  --secondary-300: #f6dea3;
+  --secondary-400: #f4d57e;
+  --secondary-500: #f1cc5a;
+  --secondary-600: #dab74f;
+  --secondary-700: #c0a143;
+  --secondary-800: #a38836;
+  --secondary-900: #866f2b;
 
-  --neutral-50: #f5f5f5;
+  /* Accent — brand teal (#6A8E9A) */
+  --accent-300: #8fb0bb;
+  --accent-500: #6a8e9a;
+  --accent-700: #50707a;
+
+  --neutral-50: #fafafa;
   --neutral-100: #f0f0f0;
   --neutral-200: #e0e0e0;
   --neutral-300: #c0c0c0;
@@ -55,16 +62,16 @@
 }
 
 body {
-  font-family: "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
-    "Helvetica Neue", sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
   background-color: var(--neutral-50);
   color: var(--neutral-900);
   line-height: 1.5;
 }
 
 a {
+  color: inherit;
   text-decoration: none;
-  color: var(--primary-600);
 }
 
 button {
@@ -76,16 +83,4 @@ button {
 img {
   max-width: 100%;
   height: auto;
-}
-
-/* Keep your existing styles below */
-
-* {
-  margin: 0px;
-  padding: 0px;
-}
-
-a {
-  color: inherit;
-  text-decoration: none !important;
 }

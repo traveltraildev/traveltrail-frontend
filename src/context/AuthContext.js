@@ -1,28 +1,36 @@
-import React from 'react';
-import { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import { BASE_URL } from '../endpoints';
 import { getUserAuthHeader } from '../utils';
 
+// Returns true if the stored token is missing, malformed, or expired.
+const isTokenExpired = (token) => {
+  try {
+    const { exp } = jwtDecode(token);
+    return !exp || exp * 1000 <= Date.now();
+  } catch {
+    return true;
+  }
+};
 
-// Function to fetch user data based on token
-// Moved outside the component to avoid redefining on each render
+// Fetch user data based on the stored token.
 const fetchUserData = async () => {
   try {
     const token = localStorage.getItem('userToken');
-    if (!token) return null;
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('userToken');
+      return null;
+    }
 
-
-    const response = await fetch(`${BASE_URL}/api/users/profile`, { // Assuming this endpoint exists
-      headers: {
-        ...getUserAuthHeader(),
-      },
+    const response = await fetch(`${BASE_URL}/api/users/profile`, {
+      headers: { ...getUserAuthHeader() },
     });
 
     if (response.ok) {
       const data = await response.json();
       return data.user;
     }
-    throw new Error('Failed to fetch user data');
+    return null;
   } catch (error) {
     console.error('Error fetching user data:', error);
     return null;
@@ -38,46 +46,51 @@ export const AuthProvider = ({ children }) => {
     user: null,
   });
 
-  // Effect to check for user token and fetch user data on initial load
+  const logout = useCallback(() => {
+    localStorage.removeItem('userToken');
+    setAuthState({ isAuthenticated: false, loading: false, user: null });
+  }, []);
+
+  // Check for a valid token and fetch user data on initial load.
   useEffect(() => {
     const checkUserAuth = async () => {
-      console.log('AuthContext useEffect: Initializing authentication...');
-      setAuthState(prevState => ({ ...prevState, loading: true }));
-      const userToken = localStorage.getItem('userToken');
- if (userToken) {
- console.log('AuthContext useEffect: User token found.');
- const user = await fetchUserData();
- console.log('AuthContext useEffect: Fetched user data:', user);
- if (user) {
- setAuthState({
- isAuthenticated: true,
- loading: false,
- user: { ...user, role: 'user' },
-        });
-      } else { // User token exists but fetching user data failed or returned null - invalid token
- console.log('AuthContext useEffect: User token invalid or user data fetch failed.');
- setAuthState({
- isAuthenticated: false,
- loading: false,
- user: null,
-        });
-      }
-    } else {
- console.log('AuthContext useEffect: No user token found. Setting auth state to unauthenticated.');
- setAuthState({
- isAuthenticated: false,
- loading: false,
- user: null,
- });
-    }
+      setAuthState((prev) => ({ ...prev, loading: true }));
+      const user = await fetchUserData();
+      setAuthState({
+        isAuthenticated: Boolean(user),
+        loading: false,
+        user: user ? { ...user, role: 'user' } : null,
+      });
     };
     checkUserAuth();
   }, []);
 
-  // Function to handle user login
+  // Auto-logout when the token expires mid-session.
+  useEffect(() => {
+    if (!authState.isAuthenticated) return undefined;
+    const token = localStorage.getItem('userToken');
+    if (!token) return undefined;
+
+    let timeoutId;
+    try {
+      const { exp } = jwtDecode(token);
+      if (exp) {
+        const msUntilExpiry = exp * 1000 - Date.now();
+        if (msUntilExpiry <= 0) {
+          logout();
+        } else {
+          timeoutId = setTimeout(logout, msUntilExpiry);
+        }
+      }
+    } catch {
+      logout();
+    }
+    return () => clearTimeout(timeoutId);
+  }, [authState.isAuthenticated, logout]);
+
   const login = async (username, password) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/users/login`, { // Assuming this is the user login endpoint
+      const response = await fetch(`${BASE_URL}/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -86,34 +99,21 @@ export const AuthProvider = ({ children }) => {
       if (!response.ok) throw new Error('Login failed');
 
       const data = await response.json();
-      console.log('Backend login response data:', data);
       localStorage.setItem('userToken', data.token);
-      console.log('Token set in localStorage:', data.token ? data.token.substring(0, 10) + '...' : 'None');
 
-      const user = await fetchUserData(); // Fetch user data after successful login
+      const user = await fetchUserData();
       if (user) {
         setAuthState({ isAuthenticated: true, loading: false, user: { ...user, role: 'user' } });
-      } else {
-        // If fetching user data fails after login, remove the token and set to unauthenticated
-        localStorage.removeItem('userToken');
-        console.error('Failed to fetch user data after successful login. Removing token.');
-        setAuthState({
-          isAuthenticated: false,
-          loading: false,
-          user: null,
-        });
-        // Consider throwing an error or returning false to indicate a partial failure
+        return true;
       }
-      return true;
+      // Token accepted but profile fetch failed — treat as failed login.
+      localStorage.removeItem('userToken');
+      setAuthState({ isAuthenticated: false, loading: false, user: null });
+      return false;
     } catch (error) {
       console.error('Login error:', error);
       return false;
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('userToken');
-    setAuthState({ isAuthenticated: false, loading: false, user: null });
   };
 
   return (

@@ -26,19 +26,19 @@ const Hero = ({ backgroundImage }) => {
       title: "trips",
       path: "trips",
       label: "Trips",
-      icon: <ModeOfTravelIcon sx={{ fontSize: "24px", color: "#ff6f00" }} />,
+      icon: <ModeOfTravelIcon sx={{ fontSize: "24px", color: "primary.main" }} />,
     },
     {
       title: "accommodations",
       path: "accommodations",
       label: "Stays",
-      icon: <HotelIcon sx={{ fontSize: "24px", color: "#ff6f00" }} />,
+      icon: <HotelIcon sx={{ fontSize: "24px", color: "primary.main" }} />,
     },
     {
       title: "groups",
       path: "trips",
       label: "Groups",
-      icon: <Diversity1Icon sx={{ fontSize: "24px", color: "#ff6f00" }} />,
+      icon: <Diversity1Icon sx={{ fontSize: "24px", color: "primary.main" }} />,
     },
   ];
 
@@ -120,12 +120,12 @@ const Hero = ({ backgroundImage }) => {
                     bgcolor: "transparent",
                     cursor: "pointer",
                     backgroundColor:
-                      currentMenu === item.title ? "#ffecb3" : "inherit",
+                      currentMenu === item.title ? "secondary.light" : "inherit",
                   }}
                   onClick={() => handleCurrentMenu(item)}
                 >
                   {item.icon}
-                  <Typography variant="body2" sx={{ mt: 0.5, color: "#333" }}>
+                  <Typography variant="body2" sx={{ mt: 0.5, color: "text.secondary" }}>
                     {item.label}
                   </Typography>
                 </Box>
@@ -159,8 +159,8 @@ const Hero = ({ backgroundImage }) => {
                   px: 5,
                   py: 1.5,
                   borderRadius: "30px",
-                  backgroundColor: "#ffa000",
-                  "&:hover": { backgroundColor: "#ff6f00" },
+                  backgroundColor: "primary.main",
+                  "&:hover": { backgroundColor: "primary.dark" },
                   fontSize: "1rem",
                   fontWeight: "bold",
                 }}
