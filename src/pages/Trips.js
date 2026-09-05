@@ -558,11 +558,7 @@ const TripsPage = () => {
                       xs={12}
                       sm={6}
                       lg={4}
-                      sx={{
-                        padding: { xs: "8px", sm: "12px", md: "16px" },
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
+                      sx={{ display: "flex" }}
                     >
                       <StandardCardSkeleton />
                     </Grid>
@@ -578,11 +574,7 @@ const TripsPage = () => {
                         xs={12}
                         sm={6}
                         lg={4}
-                        sx={{
-                          padding: { xs: "8px", sm: "12px", md: "16px" },
-                          display: "flex",
-                          justifyContent: "center",
-                        }}
+                        sx={{ display: "flex" }}
                       >
                         <StandardCard
                           item={trip}

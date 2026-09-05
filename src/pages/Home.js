@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Container,
   Typography,
@@ -16,6 +16,7 @@ import {
   useTheme,
   Snackbar,
   Alert,
+  IconButton,
 } from "@mui/material";
 import { Link as RouterLink } from 'react-router-dom';
 import Navbar from "../components/common/Navbar";
@@ -25,6 +26,8 @@ import { motion } from "framer-motion";
 import { getAllTrips, getAllAccommodations, newsletterSubscription } from "../endpoints";
 import Testimonials from "../components/Home/Testimonials";
 import StandardCard from '../components/common/StandardCard';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const SectionWrapper = ({ title, subtitle, children, background, ...props }) => (
   <Box component="section" sx={{ background: background, py: { xs: 8, md: 12 } }} {...props}>
@@ -49,27 +52,86 @@ const SectionWrapper = ({ title, subtitle, children, background, ...props }) => 
   </Box>
 );
 
-const HorizontalScrollContainer = ({ children, sx }) => (
-  <Stack direction="row" spacing={4} sx={{
-    overflowX: 'auto',
-    py: 2,
-    position: 'relative',
-    '&::-webkit-scrollbar': { height: 8 },
-    '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 4 },
-    '&::-webkit-scrollbar-track': { bgcolor: 'transparent' },
-    flexWrap: 'nowrap', // Prevent items from wrapping to the next line
-    ...sx,
-  }}>
-    {children}
-  </Stack>
-);
+const HorizontalScrollContainer = ({ children, sx }) => {
+  const scrollRef = useRef(null);
+  const [canScrollBack, setCanScrollBack] = useState(false);
+  const [canScrollForward, setCanScrollForward] = useState(false);
+
+  const updateScrollState = () => {
+    const element = scrollRef.current;
+    if (!element) return;
+    setCanScrollBack(element.scrollLeft > 4);
+    setCanScrollForward(element.scrollLeft + element.clientWidth < element.scrollWidth - 4);
+  };
+
+  const scrollByPage = (direction) => {
+    scrollRef.current?.scrollBy({
+      left: direction * (scrollRef.current.clientWidth * 0.82),
+      behavior: 'smooth',
+    });
+  };
+
+  useEffect(() => {
+    updateScrollState();
+    window.addEventListener('resize', updateScrollState);
+    return () => window.removeEventListener('resize', updateScrollState);
+  }, [children]);
+
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0, md: 1 }, ...sx }}>
+      <IconButton
+        aria-label="Previous cards"
+        onClick={() => scrollByPage(-1)}
+        disabled={!canScrollBack}
+        sx={{ display: { xs: 'none', md: 'flex' }, flexShrink: 0, border: '1px solid', borderColor: 'divider' }}
+      >
+        <ArrowBackIosNewIcon fontSize="small" />
+      </IconButton>
+      <Stack
+        ref={scrollRef}
+        onScroll={updateScrollState}
+        direction="row"
+        spacing={{ xs: 2, sm: 3 }}
+        sx={{
+          width: '100%',
+          minWidth: 0,
+          overflowX: 'auto',
+          px: { xs: 0.5, sm: 1 },
+          py: 2.5,
+          position: 'relative',
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehaviorX: 'contain',
+          touchAction: 'pan-x',
+          '& > *': { scrollSnapAlign: 'start' },
+          '&::-webkit-scrollbar': { display: 'none' },
+          scrollbarWidth: 'none',
+          flexWrap: 'nowrap',
+        }}
+      >
+        {children}
+      </Stack>
+      <IconButton
+        aria-label="Next cards"
+        onClick={() => scrollByPage(1)}
+        disabled={!canScrollForward}
+        sx={{ display: { xs: 'none', md: 'flex' }, flexShrink: 0, border: '1px solid', borderColor: 'divider' }}
+      >
+        <ArrowForwardIosIcon fontSize="small" />
+      </IconButton>
+    </Box>
+  );
+};
 
 const CardSkeleton = () => (
-  <Box sx={{ minWidth: 340, flexShrink: 0 }}>
-    <Skeleton variant="rectangular" height={220} sx={{ borderRadius: 3 }} />
+  <Box sx={{ width: { xs: 280, sm: 320 }, minWidth: { xs: 280, sm: 320 }, flexShrink: 0 }}>
+    <Skeleton variant="rectangular" sx={{ height: { xs: 190, sm: 205 }, aspectRatio: '4 / 3', borderRadius: 3 }} />
     <Box sx={{ pt: 1.5 }}>
-      <Skeleton height={30} />
-      <Skeleton width="60%" sx={{ mt: 1 }} />
+      <Skeleton width="55%" height={22} />
+      <Skeleton height={58} sx={{ mt: 0.5 }} />
+      <Skeleton width="70%" height={28} sx={{ mt: 1 }} />
+      <Skeleton width="45%" height={32} sx={{ mt: 1 }} />
+      <Skeleton variant="rounded" height={44} sx={{ mt: 1.5 }} />
     </Box>
   </Box>
 );
@@ -246,6 +308,7 @@ const Home = () => {
                 tags={[`${trip.daysCount} Days`, `${trip.nightsCount} Nights`]}
                 price={`₹${trip.price?.toLocaleString()}`}
                 linkTo={`/trips/${trip._id}`}
+                sx={{ width: { xs: 280, sm: 320 }, minWidth: { xs: 280, sm: 320 }, flexShrink: 0 }}
               />
             ))
           )}
@@ -272,6 +335,7 @@ const Home = () => {
                 tags={[acc.roomType]}
                 price={`₹${acc.basePrice?.toLocaleString()}/night`}
                 linkTo={`/accommodations/${acc._id}`}
+                sx={{ width: { xs: 280, sm: 320 }, minWidth: { xs: 280, sm: 320 }, flexShrink: 0 }}
               />
             ))
           )}

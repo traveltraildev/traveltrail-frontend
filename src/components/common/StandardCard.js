@@ -1,11 +1,11 @@
 import React from 'react';
 import { Card, CardMedia, CardContent, Typography, Chip, Stack, Box, Button, IconButton } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import { useTheme } from '@mui/material/styles';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth, useClerk } from '@clerk/clerk-react';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 
 const StandardCard = ({
   item,
@@ -19,8 +19,8 @@ const StandardCard = ({
   showWishlistButton = true,
   children, // For custom content, like in "Why Choose Us"
   variant = 'default', // 'default' or 'custom'
+  sx = {},
 }) => {
-  const theme = useTheme();
   const { isSignedIn } = useAuth();
   const { openSignIn } = useClerk();
   const { addItem, removeItem, isWishlisted } = useWishlist();
@@ -61,16 +61,36 @@ const StandardCard = ({
   }
 
   return (
-    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', borderRadius: theme.shape.borderRadius, transition: 'transform 0.3s, box-shadow 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: theme.shadows[10] }, boxShadow: theme.shadows[3], position: 'relative' }}>
+    <Card sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+      width: '100%',
+      borderRadius: 3,
+      overflow: 'hidden',
+      border: '1px solid',
+      borderColor: 'divider',
+      boxShadow: '0 6px 20px rgba(33, 37, 41, 0.07)',
+      position: 'relative',
+      transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: '0 12px 28px rgba(33, 37, 41, 0.13)',
+      },
+      ...sx,
+    }}>
       {showWishlistButton && (
         <IconButton
-          aria-label="add to wishlist"
+          aria-label={isWishlisted(item._id) ? 'Remove from wishlist' : 'Add to wishlist'}
           onClick={handleWishlistClick}
           sx={{
             position: 'absolute',
-            top: 8,
-            right: 8,
-            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            top: 12,
+            right: 12,
+            width: 40,
+            height: 40,
+            backgroundColor: 'rgba(255, 255, 255, 0.92)',
+            boxShadow: 1,
             '&:hover': {
               backgroundColor: 'rgba(255, 255, 255, 1)',
             },
@@ -82,23 +102,48 @@ const StandardCard = ({
       )}
       <CardMedia
         component="img"
-        height="220"
+        sx={{
+          height: { xs: 190, sm: 205 },
+          aspectRatio: '4 / 3',
+          objectFit: 'cover',
+          backgroundColor: 'grey.100',
+        }}
         image={imageUrl || "/images/placeholder.jpg"}
         alt={title}
-        sx={{ objectFit: 'cover' }}
       />
-      <CardContent sx={{ flexGrow: 1, p: 3 }}>
-        <Typography variant="h6" component="h3" fontWeight="600" gutterBottom>{title}</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{subtitle}</Typography>
-        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-          {tags.map((tag, index) => (
-            <Chip key={index} label={tag} size="small" variant="outlined" />
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, p: { xs: 2, sm: 2.5 } }}>
+        <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mb: 0.75, color: 'text.secondary' }}>
+          <LocationOnOutlinedIcon sx={{ fontSize: 18 }} />
+          <Typography variant="body2" noWrap>{subtitle}</Typography>
+        </Stack>
+        <Typography
+          variant="h6"
+          component="h3"
+          fontWeight="700"
+          sx={{
+            lineHeight: 1.25,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            minHeight: '2.5em',
+          }}
+        >
+          {title}
+        </Typography>
+        <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" sx={{ mt: 1.5, minHeight: 28 }}>
+          {tags.filter(Boolean).map((tag, index) => (
+            <Chip key={index} label={tag} size="small" sx={{ borderRadius: 1.5, bgcolor: 'grey.100' }} />
           ))}
         </Stack>
-        <Typography variant="h5" fontWeight="700" color="primary">{price}</Typography>
+        <Box sx={{ mt: 'auto', pt: 2 }}>
+          <Typography variant="h6" fontWeight="800" color="primary.main">{price}</Typography>
+        </Box>
       </CardContent>
-      <Box sx={{ p: 2, pt: 0 }}>
-        <Button component={RouterLink} to={linkTo} variant="contained" fullWidth>View Details</Button>
+      <Box sx={{ px: { xs: 2, sm: 2.5 }, pb: { xs: 2, sm: 2.5 } }}>
+        <Button component={RouterLink} to={linkTo} variant="contained" fullWidth sx={{ minHeight: 44 }}>
+          View details
+        </Button>
       </Box>
     </Card>
   );
