@@ -42,8 +42,6 @@ const SectionCard = ({ title, description, icon, children }) => {
 };
 
 const CMSAdminPanel = () => {
-  const theme = useTheme();
-
   return (
     <>
       <Navbar />
