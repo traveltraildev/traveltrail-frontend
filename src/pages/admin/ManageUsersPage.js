@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, TableSortLabel, TablePagination, TextField, Button, Chip } from '@mui/material';
 import { BASE_URL } from '../../endpoints';
 import { useAuth } from '@clerk/clerk-react';
@@ -16,7 +16,7 @@ const ManageUsersPage = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filter, setFilter] = useState('');
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const token = await getToken();
       if (!token) {
@@ -42,11 +42,11 @@ const ManageUsersPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken]);
 
   useEffect(() => {
     fetchUsers();
-  }, [getToken]);
+  }, [fetchUsers]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';

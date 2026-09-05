@@ -17,7 +17,6 @@ import {
   useTheme,
 } from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import ItineraryDayForm from "./ItineraryDayForm";
 import { getAllTrips } from "../../../endpoints";
 import { useAuth } from '@clerk/clerk-react';
@@ -60,7 +59,6 @@ const AddTripPage = () => {
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ type: '', message: '' });
   const [lastCreatedTripId, setLastCreatedTripId] = useState(null);
-  const navigate = useNavigate();
   const theme = useTheme();
 
   const handleChange = (name, value) => {

@@ -18,19 +18,14 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Card,
-  CardMedia,
-  CardContent,
-  Skeleton,
   InputAdornment,
   MenuItem,
   Slide
 } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { getAllAccommodations } from "../endpoints";
 import { useTheme } from "@mui/material/styles";
-import { Tune, ExpandMore, Search, KingBed, People, FavoriteBorder } from "@mui/icons-material";
-import { Rating } from "@mui/material";
+import { Tune, ExpandMore, Search, KingBed, People } from "@mui/icons-material";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
