@@ -10,7 +10,7 @@ import {
   Tab,
   useTheme,
 } from '@mui/material';
-import { Search, Flight, Hotel, Groups, Explore } from '@mui/icons-material';
+import { Search, Hotel, Groups, Explore } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 

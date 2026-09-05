@@ -151,7 +151,7 @@ const AccommodationsList = () => {
     };
 
     fetchData();
-  }, [navigate]);
+  }, [getToken, navigate]);
 
   if (error) {
     return (

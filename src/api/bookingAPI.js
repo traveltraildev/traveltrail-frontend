@@ -1,6 +1,5 @@
 // src/api/bookingAPI.js
 import { BASE_URL } from '../endpoints';
-import { getUserAuthHeader } from '../utils';
 
 export const getUserBookingHistory = async (token) => {
   try {

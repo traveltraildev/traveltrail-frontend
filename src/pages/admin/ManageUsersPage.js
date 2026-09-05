@@ -48,7 +48,7 @@ const ManageUsersPage = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const handleRequestSort = (event, property) => {
+  const handleRequestSort = (property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
@@ -155,7 +155,7 @@ const ManageUsersPage = () => {
                       <TableSortLabel
                         active={orderBy === 'name'}
                         direction={orderBy === 'name' ? order : 'asc'}
-                        onClick={(e) => handleRequestSort(e, 'name')}
+                        onClick={() => handleRequestSort('name')}
                       >
                         Name
                       </TableSortLabel>
@@ -164,7 +164,7 @@ const ManageUsersPage = () => {
                       <TableSortLabel
                         active={orderBy === 'email'}
                         direction={orderBy === 'email' ? order : 'asc'}
-                        onClick={(e) => handleRequestSort(e, 'email')}
+                        onClick={() => handleRequestSort('email')}
                       >
                         Email
                       </TableSortLabel>
@@ -174,7 +174,7 @@ const ManageUsersPage = () => {
                       <TableSortLabel
                         active={orderBy === 'createdAt'}
                         direction={orderBy === 'createdAt' ? order : 'asc'}
-                        onClick={(e) => handleRequestSort(e, 'createdAt')}
+                        onClick={() => handleRequestSort('createdAt')}
                       >
                         Joining Date
                       </TableSortLabel>
@@ -183,7 +183,7 @@ const ManageUsersPage = () => {
                       <TableSortLabel
                         active={orderBy === 'lastActive'}
                         direction={orderBy === 'lastActive' ? order : 'asc'}
-                        onClick={(e) => handleRequestSort(e, 'lastActive')}
+                        onClick={() => handleRequestSort('lastActive')}
                       >
                         Last Active
                       </TableSortLabel>

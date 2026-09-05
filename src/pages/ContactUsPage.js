@@ -10,7 +10,6 @@ import {
   Grid,
   Button,
   Icon,
-  Link,
 } from "@mui/material";
 import { contactUsPage } from "../endpoints";
 import Navbar from "../components/common/Navbar";

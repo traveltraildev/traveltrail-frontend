@@ -217,13 +217,13 @@ const AddTripPage = () => {
                 <Typography variant="h5" fontWeight="600" sx={{ mb: 2 }}>Categorization & Media</Typography>
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
-                    <Autocomplete multiple options={themeOptions} value={formData.themes} onChange={(event, newValue) => handleChange("themes", newValue)} renderInput={(params) => (<TextField {...params} label="Themes" placeholder="Select themes" />)} />
+                    <Autocomplete multiple options={themeOptions} value={formData.themes} onChange={(...args) => handleChange("themes", args[1])} renderInput={(params) => (<TextField {...params} label="Themes" placeholder="Select themes" />)} />
                   </Grid>
                   <Grid item xs={12}>
-                    <Autocomplete multiple options={inclusionOptions} value={formData.inclusions} onChange={(event, newValue) => handleChange("inclusions", newValue)} renderInput={(params) => (<TextField {...params} label="Inclusions" placeholder="Select inclusions" />)} />
+                    <Autocomplete multiple options={inclusionOptions} value={formData.inclusions} onChange={(...args) => handleChange("inclusions", args[1])} renderInput={(params) => (<TextField {...params} label="Inclusions" placeholder="Select inclusions" />)} />
                   </Grid>
                   <Grid item xs={12}>
-                    <Autocomplete multiple options={exclusionOptions} value={formData.exclusions} onChange={(event, newValue) => handleChange("exclusions", newValue)} renderInput={(params) => (<TextField {...params} label="Exclusions" placeholder="Select exclusions" />)} />
+                    <Autocomplete multiple options={exclusionOptions} value={formData.exclusions} onChange={(...args) => handleChange("exclusions", args[1])} renderInput={(params) => (<TextField {...params} label="Exclusions" placeholder="Select exclusions" />)} />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField label="Image URLs (comma-separated)" name="images" multiline rows={3} value={formData.images.join(", ")} onChange={(e) => handleChange("images", e.target.value.split(",").map((url) => url.trim()))} helperText="Enter full image URLs separated by commas" />

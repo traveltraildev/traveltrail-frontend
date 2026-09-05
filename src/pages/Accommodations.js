@@ -25,7 +25,7 @@ import {
 import { useLocation } from "react-router-dom";
 import { getAllAccommodations } from "../endpoints";
 import { useTheme } from "@mui/material/styles";
-import { Tune, ExpandMore, Search, KingBed, People } from "@mui/icons-material";
+import { Tune, ExpandMore, Search } from "@mui/icons-material";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
@@ -51,11 +51,13 @@ const FilterSidebar = ({
     setLocalFilters(initialFilters);
   }, [initialFilters]);
 
-  const handlePriceChange = (event, newValue) => {
+  const handlePriceChange = (...args) => {
+    const newValue = args[1];
     setLocalFilters((prev) => ({ ...prev, priceRange: newValue }));
   };
 
-  const handleMaxOccupancyChange = (event, newValue) => {
+  const handleMaxOccupancyChange = (...args) => {
+    const newValue = args[1];
     setLocalFilters((prev) => ({ ...prev, maxOccupancyRange: newValue }));
   };
 

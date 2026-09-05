@@ -3,10 +3,8 @@ import {
   Container,
   Typography,
   Box,
-  Paper,
   Grid,
   Card,
-  CardContent,
   Button,
   Stack,
   useTheme

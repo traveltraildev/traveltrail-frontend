@@ -17,7 +17,7 @@ const Logout = () => {
   // legacy adminToken cleared on server-side; no client-side admin token to clear
       navigate('/');
     })();
-  }, []);
+  }, [navigate, signOut]);
 
   return null;
 };

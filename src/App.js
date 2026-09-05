@@ -1,10 +1,10 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { SignedIn, Protect, useUser } from '@clerk/clerk-react';
+import { SignedIn, useUser } from '@clerk/clerk-react';
 
 import { ParallaxProvider } from 'react-scroll-parallax';
 

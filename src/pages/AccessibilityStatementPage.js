@@ -1,15 +1,12 @@
 
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Box, Card, CardContent, CircularProgress } from "@mui/material";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import { Container, Typography, Box, Card, CircularProgress } from "@mui/material";
 import { BASE_URL } from "../endpoints"; // Assuming BASE_URL is in endpoints
 
 const AccessibilityStatementPage = () => {
   const pageKey = "accessibility-statement";
   const [pageContent, setPageContent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const isMobile = useMediaQuery("(max-width:600px)"); // Although not used in rendering in AboutUsPage, keeping for consistency
-
   useEffect(() => {
     const fetchPageContent = async () => {
       try {

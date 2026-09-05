@@ -7,7 +7,6 @@ import {
   AccordionSummary,
   AccordionDetails,
   Stack,
-  Paper,
   ListItemIcon,
   ListItemText,
   List,

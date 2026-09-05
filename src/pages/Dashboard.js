@@ -5,11 +5,7 @@ import {
   Typography,
   Grid,
   Paper,
-  Link,
   Button,
-  Card,
-  CardContent,
-  Stack,
   Icon
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
@@ -19,7 +15,6 @@ import {
     CardTravel,
     Apartment,
     AddCircle,
-    Settings,
     Assessment,
     Description // Import Description icon
 } from '@mui/icons-material';

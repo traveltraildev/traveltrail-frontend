@@ -12,7 +12,7 @@ const Feature = ({ title, data, type }) => {
 
   useEffect(() => {
     console.log(`${title} Data:`, data); // Log the data being passed
-  }, [data]);
+  }, [title, data]);
 
   const handleNext = () => {
     if (scrollRef.current) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack, Accordion, AccordionSummary, AccordionDetails, Skeleton, Box } from '@mui/material';
+import { Stack, Accordion, AccordionSummary, AccordionDetails, Skeleton } from '@mui/material';
 
 const FilterSidebarSkeleton = () => {
   return (

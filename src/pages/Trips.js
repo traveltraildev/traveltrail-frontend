@@ -50,7 +50,8 @@ const FilterSidebar = ({
     setLocalFilters(initialFilters);
   }, [initialFilters]);
 
-  const handlePriceChange = (event, newValue) => {
+  const handlePriceChange = (...args) => {
+    const newValue = args[1];
     setLocalFilters((prev) => ({ ...prev, priceRange: newValue }));
   };
 

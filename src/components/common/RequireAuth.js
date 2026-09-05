@@ -3,7 +3,7 @@ import { useUser } from '@clerk/clerk-react';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 
-const RequireAuth = ({ children, isAdmin = false }) => {
+const RequireAuth = ({ isAdmin = false }) => {
   const { user, isSignedIn, isLoaded } = useUser();
   const loading = !isLoaded; 
   const location = useLocation();

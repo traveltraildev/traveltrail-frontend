@@ -9,9 +9,7 @@ import {
   Skeleton,
   Button,
   Stack,
-  useTheme,
   Link,
-  Paper
 } from "@mui/material";
 import ImageGallery from "../components/TripDetails/ImageGallery";
 import TripInfo from "../components/TripDetails/TripInfo";

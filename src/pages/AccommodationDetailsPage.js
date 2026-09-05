@@ -8,14 +8,11 @@ import {
   Skeleton,
   Button,
   Stack,
-  Paper,
   Chip,
-  List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Divider,
-  useTheme
+  Divider
 } from "@mui/material";
 import ImageGallery from "../components/TripDetails/ImageGallery";
 import BookNow from "../components/TripDetails/BookNow";

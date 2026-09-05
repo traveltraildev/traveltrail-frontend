@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Box, Card, CardContent, CircularProgress, useTheme } from "@mui/material";
+import { Container, Typography, Box, Card, CircularProgress, useTheme } from "@mui/material";
 import { aboutUsPage } from "../endpoints";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
